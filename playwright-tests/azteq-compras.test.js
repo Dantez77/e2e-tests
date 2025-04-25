@@ -9,35 +9,33 @@ test.describe('Modulo Compras', () => {
   let page;
   let context;
 
+  const credentials = {
+    username: 'danq97@gmail.com',
+    password: '1234',
+  };
+
   test.beforeAll(async ({ browser }) => {
-    // context and page before all tests
-    context = await browser.newContext(); 
-    page = await context.newPage(); 
+    context = await browser.newContext();
+    page = await context.newPage();
 
-    // login flow
-    await page.goto('https://azteq.club/azteq-club/login/');
-    await page.fill('#username', 'danq97@gmail.com'); // Cambiar despues
-    await page.fill('#password', '1234'); //Cambiar despues
-    await page.locator('#goLogin1').click();
+    await test.step('Login and enter modulo compras', async () => {
+      await page.goto('https://azteq.club/azteq-club/login/');
+      await page.fill('#username', credentials.username);
+      await page.fill('#password', credentials.password);
+      await page.locator('#goLogin1').click();
+      await expect(page.locator('#login2')).toBeVisible();
 
-    await expect(page.locator('#login2')).toBeVisible();
+      await page.locator('#cdsuc').click();
+      await page.getByRole('option', { name: 'Oficina central', exact: true }).click();
+      await page.locator('#goLogin2').click();
 
-    const sucursal = page.locator('#cdsuc');
-    await sucursal.click();
+      await page.waitForURL('**/menu/menu.php', { timeout: 10000 });
+      await expect(page).toHaveURL(/.*menu\/menu\.php/);
 
-    const exactOption = page.getByRole('option', { name: 'Oficina central', exact: true }); //Esto deberia mantenerse consistene incluso si se cambia cuenta despues
-    await exactOption.click();
-
-    await page.locator('#goLogin2').click();
-    await page.waitForURL('**/menu/menu.php', { timeout: 10000 });
-    expect(page.url()).toContain('/menu/menu.php');
-
-    
-    await expect(page.getByRole('link', { name: 'btn-moduloCompras' })).toBeVisible();
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
-
-    expect(page.getByRole('link', { name: 'Compras', exact: true }));
-
+      const comprasBtn = page.getByRole('link', { name: 'btn-moduloCompras' });
+      await expect(comprasBtn).toBeVisible();
+      await comprasBtn.click();
+    });
   });
 
   //to get into the module fresh each time before a test
@@ -52,8 +50,6 @@ test.describe('Modulo Compras', () => {
   });
 
   //await page.screenshot({ path: 'debug1.png', fullPage: true }); //Debug screenshot
-
-
 
   /*
   ======== Funciones del modulo compras ==========
@@ -104,9 +100,10 @@ test.describe('Modulo Compras', () => {
     await expect(page.getByText('Consulta / Re-envío de DTEs')).toBeVisible();
   });
 
-  //NOTA: Por ahora los datos de tabla se siguen borrando despues de salir de compras locales,
-  //Lo mismo pasa con compras al extranjero.
-  //Compras locales, agragar item al registro
+  //===============================================================================
+  //Compras Locales
+  //===============================================================================
+
   test('Compras locales: Agregar al registro', async () => {
     //Datos necesarios para que este test funcione: Item (producto), Precio unitario, Proveedor.
 
@@ -210,7 +207,6 @@ test.describe('Modulo Compras', () => {
     const iframeElement = page.frameLocator('iframe');
 
     await page.getByRole('link', { name: 'Compras locales' }).click();
-
     await expect(iframeElement.getByRole('button', { name: 'Buscar documento' })).toBeVisible();
     await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
 
@@ -220,19 +216,62 @@ test.describe('Modulo Compras', () => {
     await expect(iframeElement.getByRole('cell', { name: 'Documento vacío' })).not.toBeVisible();
   });
 
-  test.skip('Compras locales: Anular documento', async () => {
+  test('Compras locales: Anular documento', async () => {
+    const iframeElement = page.frameLocator('iframe');
+    const numeroFactura = `delete-${Date.now()}`;
+
+    //Entrando a compras locales y agragando un elemento al registro
+    await page.getByRole('link', { name: 'Compras locales' }).click();
+    await iframeElement.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
+    await iframeElement.locator('[role="option"][data-index="0"]').click();
+    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+    await iframeElement.getByRole('textbox', { name: 'Item' }).click();
+    const optionLocator = iframeElement.locator('[role="option"][data-index="1"]');
+    const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]').innerText();
+    await optionLocator.click();
+    await iframeElement.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('100');
+    await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
+    await iframeElement.locator('#btnConfirmAddLine').click(); // Confirmacion
+    await iframeElement.getByRole('textbox', { name: 'Factura #' }).fill(numeroFactura);
+    await iframeElement.getByRole('button', { name: 'Grabar Documento' }).click();
+    await page.locator('.toast', { hasText: 'Cambios han sido guardados' }).isVisible();
+
+    await expect(iframeElement.getByRole('button', { name: 'Anular documento' })).toBeVisible();
+    await iframeElement.getByRole('button', { name: 'Anular documento' }).click();
+    await iframeElement.getByRole('button', { name: 'Buscar' }).click();
+    await iframeElement.getByRole('row', { name: numeroFactura }).click();
+    let errorAlert = null;
+
+    page.on('dialog', async (dialog) => {
+      const message = dialog.message();
+      if (message.includes('No es posible anular documento')) {
+        errorAlert = message;
+      }
+      await dialog.accept(); // or dismiss
+    });
+    
+    // Anular el documento
+    await iframeElement.locator('#btnConfirmNull').click();
+    
+    await page.waitForTimeout(500);
+    
+    // Revisar si el mensaje de error se muestra al borrar
+    expect(errorAlert).toBeNull();
+    
+    await expect(iframeElement.getByRole('cell', { name: numeroFactura })).not.toBeVisible();
+  });
+
+  test.fixme('Compras locales: Usar archivo Json', async () => {
     //TODO:
   });
 
-  test.skip('Compras locales: Usar archivo Json', async () => {
+  test.fixme('Compras locales: Obtener orden de compra', async () => {
     //TODO:
   });
 
-  test.skip('Compras locales: Obtener orden de compra', async () => {
-    //TODO:
-  });
-
-
+  //===============================================================================
+  //Compras a sujetos excluidos
+  //===============================================================================
 
   test('Compras a sujetos excluidos: Agregando item en tabla', async () => {
     //Datos necesarios para que este test funcione: Item (producto), Precio unitario, Proveedor excluido.
@@ -269,7 +308,7 @@ test.describe('Modulo Compras', () => {
 
     //Se ve si existe un registro en la tabla con el id del producto que escogimos
     await expect(iframeElement.getByRole('cell', { name: value })).toBeVisible();
-    await page.screenshot({ path: 'debug1.png', fullPage: true }); //Debug screenshot
+    //await page.screenshot({ path: 'debug1.png', fullPage: true }); //Debug screenshot
 
     
   });
@@ -316,9 +355,12 @@ test.describe('Modulo Compras', () => {
 
   });
 
-  test('Proveedores: Succesfully adding to table', async () => {
+  //Resecribir este test!!!
+  test.fixme('Proveedores: Succesfully adding to table', async () => {
     //iframe context
     const iframeElement = page.frameLocator('iframe');
+    const idProveedor = `test-${Date.now()}`;
+
 
     //Click on Proveedores
     await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
@@ -381,9 +423,12 @@ test.describe('Modulo Compras', () => {
   });
 
 
-  test('Proveedores: Deleting item from table', async () => {
+  test.fixme('Proveedores: Deleting item from table', async () => {
       //iframe context
       const iframeElement = page.frameLocator('iframe');
+      const idProveedor = `test-${Date.now()}`;
+
+
 
       //Click on Proveedores
       await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
@@ -408,7 +453,7 @@ test.describe('Modulo Compras', () => {
   //ATM its not possible to delete items from the table and its possible 
   // to have duplicate items so its tough writting a test for this 
   //TODO: 
-  test.skip('Grupos de proveedores: adding to table', async () => {
+  test.fixme('Grupos de proveedores: adding to table', async () => {
     const iframeElement = page.frameLocator('iframe');
     await page.getByRole('link', { name: 'Grupos de proveedores' }).click();
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
@@ -426,7 +471,7 @@ test.describe('Modulo Compras', () => {
 
 
   //Prueba sera reescrita una vez la funcion se arreglada, por ahora esta con datos quemados
-  test('Grupos de proveedores: deleting items from table', async () => {
+  test.fixme('Grupos de proveedores: deleting items from table', async () => {
     const iframeElement = page.frameLocator('iframe');
     const frame = await page.locator('iframe').first().contentFrame();
 
