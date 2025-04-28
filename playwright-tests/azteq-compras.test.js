@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 /*
-  Recordar cambiar correo y usuario antes de que se me acabe el plan de prueba. 
+  Recordar cambiar correo y usuario antes de que se me acabe el plan de prueba o____o. 
 */
 
 
@@ -202,6 +202,7 @@ test.describe('Modulo Compras', () => {
 
   });
 
+  //Rework needed
   test('Compras locales: Buscar documento', async () => {
 
     const iframeElement = page.frameLocator('iframe');
@@ -216,6 +217,9 @@ test.describe('Modulo Compras', () => {
     await expect(iframeElement.getByRole('cell', { name: 'Documento vacío' })).not.toBeVisible();
   });
 
+  //Nel funciona correctamente, 
+  //se reescribe el test mas tarde, 
+  //(hacer referencia a como  se hizo en el test de compras al exterior) 
   test('Compras locales: Anular documento', async () => {
     const iframeElement = page.frameLocator('iframe');
     const numeroFactura = `delete-${Date.now()}`;
@@ -240,6 +244,7 @@ test.describe('Modulo Compras', () => {
     await iframeElement.getByRole('button', { name: 'Anular documento' }).click();
     await iframeElement.getByRole('button', { name: 'Buscar' }).click();
     await iframeElement.getByRole('row', { name: numeroFactura }).click();
+
     let errorAlert = null;
 
     page.on('dialog', async (dialog) => {
@@ -273,63 +278,244 @@ test.describe('Modulo Compras', () => {
   //Compras a sujetos excluidos
   //===============================================================================
 
-  test('Compras a sujetos excluidos: Agregando item en tabla', async () => {
-    //Datos necesarios para que este test funcione: Item (producto), Precio unitario, Proveedor excluido.
-
+  test('Compras a sujetos excluidos: Agregando Registro', async () => {
     const iframeElement = page.frameLocator('iframe');
-
-    //Entrando a compras locales
+  
     await page.getByRole('link', { name: 'Compras a sujetos excluidos' }).click();
+  
+    let documentValue = '';
+  
+    await test.step('Agregando Item a tabla', async () => {
+      // Proveedor exitente!
+      await iframeElement.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+  
+      // Agregar item a la tabla
+      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Item' }).click();
+  
+      // Seleccionar item
+      const optionLocator = iframeElement.locator('[role="option"][data-index="2"]');
+      const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]').innerText();
+      await optionLocator.click();
+  
+      // Detalles
+      await iframeElement.getByRole('spinbutton', { name: 'Costo unit' }).fill('100');
+      await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
+  
+      // Confirm 
+      await iframeElement.locator('#btnConfirmAddLine').click();
+      await expect(iframeElement.getByRole('cell', { name: value })).toBeVisible();
+  
+      // Get the dynamic document number value from the disabled input
+      documentValue = await iframeElement.locator('input#coddoc').inputValue();
+      console.log('Documento generado:', documentValue);
+    });
+  
+    await test.step('Grabar documento', async () => {
+      await iframeElement.getByRole('textbox', { name: 'Comprador', exact: true }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+      await iframeElement.getByRole('button', { name: 'Grabar documento' }).click();
+      // await expect(iframeElement.locator('.toast')).toContainText('Documento a sido grabado');
+    });
+  
+    await test.step('Verificar registro agregado por medio de busqueda', async () => {
+      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+      await expect(iframeElement.getByRole('cell', { name: 'Documento vacío' })).toBeVisible();
+      await iframeElement.getByRole('button', { name: 'Buscar' }).click();
+  
+      // Use the extracted dynamic value to assert visibility
+      await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
+      await iframeElement.getByRole('button', { name: 'Cancelar' }).click();
 
-    //Seleccionando un proveedor que ya existe (el primero en la lista)
-    await iframeElement.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
+    });
 
-    //Agregar item al registro
+    await test.step('Anular documento', async () => {
+      await iframeElement.getByRole('button', { name: 'Anular documento' }).click();
+      await iframeElement.getByRole('button', { name: 'Buscar' }).click();
+      await iframeElement.getByRole('row', { name: documentValue }).click();
+
+      let errorAlert = null;
+
+      page.on('dialog', async (dialog) => {
+        const message = dialog.message();
+        if (message.includes('No es posible anular documento')) {
+          errorAlert = message; 
+        }
+        await dialog.accept(); // or dismiss
+      });
+      
+      // Anular el documento
+      await iframeElement.locator('#btnConfirmNull').click();
+      
+      await page.waitForTimeout(500);
+      
+      // Revisar si el mensaje de error se muestra al borrar
+      expect(errorAlert).toBeNull();
+      
+      // Verificar que el documento ya no existe
+      await expect(iframeElement.getByRole('cell', { name: documentValue })).not.toBeVisible();
+    });
+  });
+  
+  //===============================================================================
+  //Polizas de importacion
+  //===============================================================================
+
+  test('Polizas de importacion: Agregar registro', async () => {
+    const iframeElement = page.frameLocator('iframe');
+    const numeroPl = `PL-${Date.now()}`;
+
+    await page.getByRole('link', { name: 'Pólizas de importación' }).click();
+    await expect(iframeElement.getByRole('button', { name: 'Agregar' })).toBeVisible();
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Item' }).click();
 
-    // Producto a agregar
-    const optionLocator = iframeElement.locator('[role="option"][data-index="2"]');
+    //Llenando el formulario
+    await iframeElement.getByRole('textbox', { name: 'Póliza No.:' }).fill(numeroPl);
 
-    // Se extrae el id del producto que se encuentra en el segundo div dentro de la opcion para comparar mas tarde
-    const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]').innerText();
-    // console.log('Value:', value); //Para debugear y ver que era el correcto
+    await iframeElement.getByRole('textbox', { name: 'Fecha de ingreso' }).fill('2025-04-21');
+    await iframeElement.getByRole('textbox', { name: 'Agencia que tramita' }).click();
+    await iframeElement.locator('[role="option"][data-index="0"]').click(); 
 
-    // Click en la opcion de la cual se extrajo el id
-    await optionLocator.click();
+    await iframeElement.getByRole('textbox', { name: 'Inicio de trámites' }).fill('2025-04-01');
+    await iframeElement.getByRole('textbox', { name: 'Final de trámites' }).fill('2025-04-30');
+    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
 
-    //Mas detalles requeridos
-    await iframeElement.getByRole('spinbutton', { name: 'Costo unit' }).fill('100');
-    await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
+    //Confirmar que el registro fue creado
+    await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(numeroPl);
+    await expect(iframeElement.getByRole('cell', { name: numeroPl })).toBeVisible();
+  });
 
-    //confirmacion
-    await iframeElement.locator('#btnConfirmAddLine').click();
+  test('Polizas de importacion: Eliminar', async () => {
+    //TODO: Implementar la lógica para eliminar un registro en pólizas de importación
+    const iframeElement = page.frameLocator('iframe');
+    const numeroPl = `PL-${Date.now()}`;
 
-    //Se ve si existe un registro en la tabla con el id del producto que escogimos
-    await expect(iframeElement.getByRole('cell', { name: value })).toBeVisible();
-    //await page.screenshot({ path: 'debug1.png', fullPage: true }); //Debug screenshot
+    await page.getByRole('link', { name: 'Pólizas de importación' }).click();
+    await expect(iframeElement.getByRole('button', { name: 'Agregar' })).toBeVisible();
+    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+    await iframeElement.getByRole('textbox', { name: 'Póliza No.:' }).fill(numeroPl);
+    await iframeElement.getByRole('textbox', { name: 'Fecha de ingreso' }).fill('2025-04-21');
+    await iframeElement.getByRole('textbox', { name: 'Agencia que tramita' }).click();
+    await iframeElement.locator('[role="option"][data-index="0"]').click(); 
+    await iframeElement.getByRole('textbox', { name: 'Inicio de trámites' }).fill('2025-04-01');
+    await iframeElement.getByRole('textbox', { name: 'Final de trámites' }).fill('2025-04-30');
+    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
 
+    await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(numeroPl);
+    await expect(iframeElement.getByRole('cell', { name: numeroPl })).toBeVisible();
+
+
+    let errorAlert = null;
+
+    page.on('dialog', async (dialog) => {
+      const message = dialog.message();
+      if (message.includes('No es posible eliminar. Hay datos relativos')) {
+        errorAlert = message;
+      }
+      await dialog.dismiss(); // dismiss the dialog
+    });
+
+    await iframeElement.getByRole('row', { name: numeroPl }).getByRole('button').nth(1).click();
+
+    expect(errorAlert).toBeNull(); //Si se muestra el mensaje de error, la prueba falla    
+  });
+
+
+  //===============================================================================
+  //Compras al exterior
+  //===============================================================================
+
+  test('Compras al exterior: Agregar al registro', async () => {
+    const iframeElement = page.frameLocator('iframe');
+  
+    await page.getByRole('link', { name: 'Compras al exterior' }).click();
+  
+    let documentValue = '';
+    let numeroFactura = `F-${Date.now()}`;
+    let numeroBl = `BL-${Date.now()}`;
+
+  
+    await test.step('Agregando Item a tabla', async () => {
+      // Proveedor exitente
+      await iframeElement.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+  
+      // Agregar item a la tabla
+      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Producto' }).click();
+      const optionLocator = iframeElement.locator('[role="option"][data-index="1"]');
+      const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]').innerText();
+      await optionLocator.click();
+  
+      // Detalles requeridos
+      await iframeElement.getByRole('spinbutton', { name: 'Costo unit' }).fill('100');
+      await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
+  
+      // Confirm
+      await iframeElement.locator('#btnConfirmAddLine').click();
+      await expect(iframeElement.getByRole('cell', { name: value })).toBeVisible();
+  
+      documentValue = await iframeElement.locator('input#coddoc').inputValue(); //Guarde en caso que se usara en tabla luego
+      //console.log('Documento generado:', documentValue);
+    });
+  
+    await test.step('Grabar documento', async () => {
+      await iframeElement.getByRole('textbox', { name: 'Número de BL' }).fill(numeroBl);
+      await iframeElement.getByRole('textbox', { name: 'Factura proveedor:' }).fill(numeroFactura);
+      await iframeElement.getByRole('textbox', { name: 'Poliza de importación' }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click(); 
+      await iframeElement.getByRole('button', { name: 'Grabar documento' }).click();
+    });
+  
+    await test.step('Verificar registro agregado por medio de busqueda', async () => {
+      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+      await expect(iframeElement.getByRole('cell', { name: 'Documento vacío' })).toBeVisible();
+      await iframeElement.getByRole('button', { name: 'Buscar' }).click();
+      await expect(iframeElement.getByRole('cell', { name: numeroFactura })).toBeVisible();
+
+      await iframeElement.getByRole('button', { name: 'Cancelar' }).click(); //Salir de la ventana de busqueda
+    });
+
+    await test.step('Anular documento', async () => {
+      await iframeElement.getByRole('button', { name: 'Anular documento' }).click();
+      await iframeElement.getByRole('button', { name: 'Buscar' }).click();
+      await iframeElement.getByRole('row', { name: numeroFactura }).click();
+
+      let errorAlert = null;
+
+      page.on('dialog', async (dialog) => {
+        const message = dialog.message();
+        if (message.includes('No es posible anular documento')) {
+          errorAlert = message;
+        }
+        await dialog.accept(); // or dismiss
+      });
+      
+      // Anular el documento
+      await iframeElement.locator('#btnConfirmNull').click();
+
+      expect(errorAlert).toBeNull();
+
+      await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+
+      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+      await iframeElement.getByRole('button', { name: 'Buscar' }).click();
+      await page.waitForTimeout(500);
+            
+      //Verificar que el documento ahora posee un valor de 0.00
+      await expect(iframeElement.
+        getByRole('row', { name: numeroFactura }).
+        getByRole('cell', { name: '0.00' })).
+        toBeVisible();
     
-  });
-
-  test.skip('Polizas de importacion: test 1', async () => {
-    //TODO:
-  });
-
-  test.skip('Compras al exterior: Agregar al registro', async () => {
-    //TODO:
-  });
-
-  test.skip('Compras al exterior: Borrar elementos del registro', async () => {
-    //TODO:
+    });
   });
 
   test.skip('Retaceo de costos: test 1', async () => {
     //TODO:
   });
-
-  //When attempting to add an item to the table it should not be possible and a warning message should show up
+  //Al intentar agregar un item a la tabla no deberia ser posible y un mensaje de advertencia deberia aparecer
   test('Proveedores: Adding item to table without all required values', async () => {
     const iframeElement = page.frameLocator('iframe');
 
@@ -567,7 +753,7 @@ test.describe('Modulo Compras', () => {
   //Agrega un item a la tabla de almacenes
   //Por la forma que se genera el id, puede que el test falle si no hay cuidado de borrar tablas
   //
-  test('Almacenes: Add item to table', async () => {
+  test.skip('Almacenes: Add item to table', async () => {
     const iframeElement = page.frameLocator('iframe');
     const uniqueId = `${Date.now()}`.slice(-2);
 
@@ -587,7 +773,7 @@ test.describe('Modulo Compras', () => {
   });
 
   //Delete item from table 'Almacenes'
-  test('Almacenes: Delete item from table', async () => {
+  test.skip('Almacenes: Delete item from table', async () => {
     const iframeElement = page.frameLocator('iframe');
     const uniqueId = `${Date.now()}`.slice(-2);
 
@@ -613,6 +799,39 @@ test.describe('Modulo Compras', () => {
     await page.waitForTimeout(500);
     await expect(iframeElement.getByRole('cell', { name: uniqueId })).not.toBeVisible();
   });
+
+  // Ocurre el caso que solo se puden tener un numero limitado de almacenes y al tener los tests
+  // separados, y no borrar los los del test de crear almacenes, se llega al limite rapidamente 
+  // hasta que ya no se puede crear mas almacenes en el test de borrar almacenes y el test falla 
+  // por lo que se corran los tests juntos por medio de steps
+  test('Almacenes: Crear y Eliminar almacenes', async () => {
+    const iframeElement = page.frameLocator('iframe');
+    const uniqueId = `${Date.now()}`.slice(-2);
+
+    //First create item to be deleted
+    await page.getByRole('link', { name: 'Almacenes' }).click();
+    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+    await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
+    await iframeElement.getByRole('textbox', { name: 'Nombre del almacen' }).fill('almacen' + uniqueId);
+    await iframeElement.getByRole('textbox', { name: 'Sucursal' }).click();
+    await iframeElement.getByLabel('0', { exact: true }).getByText('01').click();
+    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+    const cellLocator = iframeElement.getByRole('cell', { name: uniqueId, exact: true });
+    await expect(cellLocator).toBeVisible();
+
+    //await cellLocator.locator('button').nth(1).click();
+    await iframeElement.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();
+    await expect(iframeElement.getByRole('button', { name: 'Eliminar' })).toBeVisible();
+    await iframeElement.getByRole('button', { name: 'Eliminar' }).click();
+
+    await expect(iframeElement.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
+    await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+    
+    await page.waitForTimeout(500);
+    await expect(iframeElement.getByRole('cell', { name: uniqueId })).not.toBeVisible();
+
+  });
+
 
 
   //Por ahora no es posible ya que la pagina no funciona correctamente
