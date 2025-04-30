@@ -139,6 +139,7 @@ test.describe('Modulo Compras', () => {
       await iframeElement.getByRole('spinbutton', { name: 'Precio 2 SIN IVA' }).fill('22');
 
       await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+      await page.locator('iframe').contentFrame().getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
 
       await expect(iframeElement.getByRole('cell', { name: uniqueId })).toBeVisible();
     });
@@ -584,78 +585,44 @@ test.describe('Modulo Compras', () => {
 
   });
 
-  //Resecribir este test!!!
   test.fixme('Proveedores: Agregando a tabla', async () => {
     //iframe context
     const iframeElement = page.frameLocator('iframe');
-    const idProveedor = `test-${Date.now()}`;
+    const idProveedor = `PV-`+`${Date.now()}`.slice(-7);
+    const nombreProveedor = `Proveedor `+`${Date.now()}`.slice(-4);
 
 
-    //Click on Proveedores
     await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
-    await expect(page.getByRole('link', { name: 'Proveedores Close' })).toBeVisible();
-
-    //For the sake of rerunning this test we check if the item we created is currently inside the table
-    //If it is, we delete it, if its not we continue
-
-    const row = iframeElement.getByRole('row', { name: '001 99999999999 Apellido,' });
-
-    const rowAppeared = await row.waitFor({ timeout: 5000 }).then(() => true).catch(() => false);
-    //await page.screenshot({ path: 'debug1.png', fullPage: true }); //Debug screenshot
-
-    if (rowAppeared) {
-      const deleteButton = row.getByRole('button').nth(1);
-      await deleteButton.click();
-      await iframeElement.getByRole('button', { name: 'Eliminar' }).click();
-      await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
-
-      // Confirm its been deleted
-      await expect(row).toHaveCount(0);
-    }
-
-    //Click on Agregar
-    await expect(iframeElement.getByRole('button', { name: 'Agregar' })).toBeVisible();
+    
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
 
-    expect(iframeElement.getByRole('heading', { name: 'Registro de proveedores' })).toBeVisible();
 
-    //Filling out form
-    await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill('001'); //ID
-    await iframeElement.getByRole('textbox', { name: 'Apellidos' }).fill('Apellido'); //Surname
-    await iframeElement.getByRole('textbox', { name: 'Nombres' }).fill('Nombre'); //Name
-    await iframeElement.locator('#dirprov').fill('Direccion 1'); //Address
+    await iframeElement.getByRole('textbox', { name: 'Codigo Este valor es' }).fill('1234');
 
-    //If option is not on visible because you need to scroll further down, it will not be found
-    //So need to search country through filter first
-    await iframeElement.getByRole('textbox', { name: 'Pais', exact: true }).click();
-    await iframeElement.getByRole('textbox', { name: 'Type to filter' }).fill('el sal');
-    await iframeElement.getByRole('option', { name: 'sv El Salvador sv' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Departamento', exact: true }).click();
-    await iframeElement.getByRole('option', { name: 'La Libertad' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Municipio', exact: true }).click();
-    await iframeElement.getByRole('option', { name: 'La Libertad Norte' }).click();
+    await iframeElement.getByRole('textbox', { name: 'Tipo de persona' }).click();
+    await iframeElement.locator('[role="option"][data-index="0"]').click();
 
-    await iframeElement.getByRole('textbox', { name: 'Giro', exact: true }).click();
-    await iframeElement.getByRole('option', { name: 'Cultivo de arroz' }).click();
+    await iframeElement.getByRole('textbox', { name: 'Nombre' }).click();
+    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'Nombre' }).fill('proveedor 00x');
 
-    await iframeElement.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
-    await iframeElement.getByRole('textbox', { name: 'NIT' }).fill('99999999999');
-    await iframeElement.getByRole('textbox', { name: 'Teléfono:' }).fill('22222222');
-
-    //Page sometimes and sometimes does not require this value to be valid. Dunno why
-    await iframeElement.getByRole('spinbutton', { name: '% Ret ISR:' }).fill('5');
-
-    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
-
-    //Checks the table was created
-    await expect(row).toBeVisible();
+    await page.locator('iframe').contentFrame().locator('#dirprov').click();
+    await page.locator('iframe').contentFrame().locator('#dirprov').fill('calle 1, ciudad 1, pais 1');
+    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'Pais', exact: true }).click();
+    await page.locator('iframe').contentFrame().getByRole('option', { name: 'af Afganistán af' }).click();
+    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'NIT' }).click();
+    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'NIT' }).fill('1234151');
+    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'Teléfono:' }).click();
+    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'Teléfono:' }).fill('12351234');
+    await page.locator('iframe').contentFrame().getByRole('button', { name: 'Grabar' }).click();
+    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'Email: Este valor es' }).fill('mail@mail.com');
+    await page.locator('iframe').contentFrame().getByRole('button', { name: 'Grabar' }).click();
   });
 
 
   test.fixme('Proveedores: Deleting item from table', async () => {
     //iframe context
     const iframeElement = page.frameLocator('iframe');
-    const idProveedor = `test-${Date.now()}`;
+    const idProveedor = `PV-`+`${Date.now()}`.slice(-7);
 
 
 

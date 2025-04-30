@@ -252,6 +252,7 @@ test.describe('Modulo Ventas', () => {
 
       await iframeElement.getByRole('button', { name: 'Grabar' }).click();
 
+      await page.locator('iframe').contentFrame().getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
       await expect(iframeElement.getByRole('cell', { name: uniqueId })).toBeVisible();
     });
 
@@ -272,6 +273,8 @@ test.describe('Modulo Ventas', () => {
 
     //Eliminando producto
     await test.step('Eliminando item de la tabla', async () => {
+      await page.locator('iframe').contentFrame().getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
+      await expect(iframeElement.getByRole('cell', { name: uniqueId })).toBeVisible();
       await iframeElement.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();
       await iframeElement.getByRole('button', { name: 'Eliminar' }).click();
       await page.waitForTimeout(500);
