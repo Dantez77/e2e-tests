@@ -4,7 +4,6 @@ const { test, expect } = require('@playwright/test');
   Recordar cambiar correo y usuario antes de que se me acabe el plan de prueba o____o. 
 */
 
-
 test.describe('Modulo Compras', () => {
   let page;
   let context;
@@ -106,39 +105,43 @@ test.describe('Modulo Compras', () => {
 
   test('Compras locales: Agregar al registro', async () => {
     //Datos necesarios para que este test funcione: Item (producto), Precio unitario, Proveedor.
-
     const iframeElement = page.frameLocator('iframe');
+    const uniqueId = `P-` + `${Date.now()}`.slice(-7);
+    const producto = `Producto ` + `${Date.now()}`.slice(-4);
 
-    //Entrando a compras locales
-    await page.getByRole('link', { name: 'Compras locales' }).click();
 
-    //Seleccionando un proveedor que ya existe
-    await iframeElement.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
+    await page.getByRole('link', { name: 'Productos', exact: true }).click();
 
-    //Agregar item al registro
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Item' }).click();
+    await test.step('Agregando el item a la tabla', async () => {
 
-    // Opcion que se escoge, por ahora se tiene con la opcion numero 2 
-    const optionLocator = iframeElement.locator('[role="option"][data-index="1"]');
+      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
+      await iframeElement.getByRole('textbox', { name: 'Descripcion', exact: true }).fill(producto);
 
-    // Se extrae el id del producto que se encuentra en el segundo div dentro de la opcion para comparar mas tarde
-    const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]').innerText();
-    // console.log('Value:', value); //Para debugear y ver que era el correcto
+      await iframeElement.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
 
-    // Click en la opcion de la cual se extrajo el id
-    await optionLocator.click();
+      await iframeElement.getByText('NoSí').first().click(); // Insumo
+      await iframeElement.getByText('NoSí').nth(2).click();  // Solo maneja unidades completas
+      await iframeElement.getByText('NoSí').nth(1).click();  // Este producto de puede vender
 
-    //Mas detalles requeridos
-    await iframeElement.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('100');
-    await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
+      await iframeElement.getByText('Contables').click();
 
-    //confirmacion
-    await iframeElement.locator('#btnConfirmAddLine').click();
+      await iframeElement.getByRole('textbox', { name: 'Concepto de gastos de importación' }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
 
-    //Se ve si existe un registro en la tabla con el id del producto que escogimos
-    await expect(iframeElement.getByRole('cell', { name: value })).toBeVisible();
+      await iframeElement.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+
+
+      await iframeElement.getByText('Precios').click();
+      await iframeElement.getByRole('spinbutton', { name: 'Precio 1 SIN IVA' }).fill('20');
+      await iframeElement.getByRole('spinbutton', { name: 'Precio 2 SIN IVA' }).fill('22');
+
+      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+
+      await expect(iframeElement.getByRole('cell', { name: uniqueId })).toBeVisible();
+    });
   });
 
   //Borrar elementos del registro
@@ -217,12 +220,10 @@ test.describe('Modulo Compras', () => {
     await expect(iframeElement.getByRole('cell', { name: 'Documento vacío' })).not.toBeVisible();
   });
 
-  //Nel funciona correctamente, 
-  //se reescribe el test mas tarde, 
-  //(hacer referencia a como  se hizo en el test de compras al exterior) 
+  //Verificar si se puede anular un doc correctamente
   test('Compras locales: Anular documento', async () => {
     const iframeElement = page.frameLocator('iframe');
-    const numeroFactura = `delete-${Date.now()}`;
+    const numeroFactura = `anular-${Date.now()}`;
 
     //Entrando a compras locales y agragando un elemento al registro
     await page.getByRole('link', { name: 'Compras locales' }).click();
@@ -230,15 +231,16 @@ test.describe('Modulo Compras', () => {
     await iframeElement.locator('[role="option"][data-index="0"]').click();
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
     await iframeElement.getByRole('textbox', { name: 'Item' }).click();
-    const optionLocator = iframeElement.locator('[role="option"][data-index="1"]');
+    const optionLocator = iframeElement.locator('[role="option"][data-index="3"]');
     const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]').innerText();
     await optionLocator.click();
-    await iframeElement.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('100');
+    await iframeElement.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('20');
     await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
     await iframeElement.locator('#btnConfirmAddLine').click(); // Confirmacion
+
     await iframeElement.getByRole('textbox', { name: 'Factura #' }).fill(numeroFactura);
     await iframeElement.getByRole('button', { name: 'Grabar Documento' }).click();
-    await page.locator('.toast', { hasText: 'Cambios han sido guardados' }).isVisible();
+    //await page.locator('.toast', { hasText: 'Documento ha sido grabado' }).toBeVisible();
 
     await expect(iframeElement.getByRole('button', { name: 'Anular documento' })).toBeVisible();
     await iframeElement.getByRole('button', { name: 'Anular documento' }).click();
@@ -258,12 +260,19 @@ test.describe('Modulo Compras', () => {
     // Anular el documento
     await iframeElement.locator('#btnConfirmNull').click();
 
-    await page.waitForTimeout(500);
-
-    // Revisar si el mensaje de error se muestra al borrar
     expect(errorAlert).toBeNull();
 
-    await expect(iframeElement.getByRole('cell', { name: numeroFactura })).not.toBeVisible();
+    await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+
+    await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+    await iframeElement.getByRole('button', { name: 'Buscar' }).click();
+    await page.waitForTimeout(500);
+
+    //Verificar que el documento ahora posee un valor de 0.00
+    await expect(iframeElement.
+      getByRole('row', { name: numeroFactura }).
+      getByRole('cell', { name: '0.00' })).
+      toBeVisible();
   });
 
   test.fixme('Compras locales: Usar archivo Json', async () => {
@@ -529,7 +538,7 @@ test.describe('Modulo Compras', () => {
 
     await iframeElement.getByRole('textbox', { name: 'Poliza:' }).click();
     await iframeElement.locator('[role="option"][data-index="0"]').click();
- 
+
     // Revisar que se lleno todo
     await expect(iframeElement.locator('#grid_gastos').
       getByRole('cell', { name: 'Documento vacío' })).not.toBeVisible();
@@ -872,95 +881,6 @@ test.describe('Modulo Compras', () => {
   test.skip('Sucursales: test 1', async () => {
     //TODO: Crear y borrar sucursales 
     // Por ahora no se pueden borrar asi que se trabajara despues
-  });
-
-
-  /*
-  ======== Configuracion e informes del modulo compras ==========
-  ********Hacer otra suite aparte para esto mas tarde
-  */
-
-
-  //Informes y consultas
-  test.skip('Informes y consultas: Libro de Compras', async () => {
-    //TODO: 
-  });
-
-  test.skip('Informes y consultas: Compras por producto', async () => {
-    //TODO:
-  });
-
-  test.skip('Informes y consultas: Compras por proveedor', async () => {
-    //TODO:
-  });
-
-  test.skip('Informes y consultas: Compras por fecha', async () => {
-    //TODO: 
-  });
-
-  test.skip('Informes y consultas: Retaceo de poliza de importancion', async () => {
-    //TODO:
-  });
-
-  test.skip('Informes y consultas: Compras por sucursal', async () => {
-    //TODO:
-  });
-
-  test.skip('Informes y consultas: Retenciones IVA', async () => {
-    //TODO:
-  });
-
-  test.skip('Informes y consultas: Exportacion Archivos .csv', async () => {
-    //TODO:
-  });
-
-
-  //Configuracion
-
-  test.skip('Configuracion: Periodo de trabajo', async () => {
-    //TODO: 
-  });
-
-  test.skip('Configuracion: Conceptos de gastos', async () => {
-    //TODO: 
-  });
-
-  test.skip('Configuracion: Datos de la empresa', async () => {
-    //TODO: 
-  });
-
-  test.skip('Configuracion: Compras con numero provisional', async () => {
-    //TODO: 
-  });
-
-  test.skip('Configuracion: Numeracion de documentos', async () => {
-    //TODO: 
-  });
-
-  test.skip('Configuracion: Logo de la emrpresa', async () => {
-    //TODO: 
-  });
-
-  test.skip('Configuracion: Transferencias con numero provisional', async () => {
-    //TODO: 
-  });
-
-  test.skip('Configuracion: Compradores', async () => {
-    //TODO: 
-  });
-
-  test.skip('Configuracion: Generar CSE de nomina honorarios', async () => {
-    //TODO: 
-  });
-
-
-  //Facturacion electronica
-  test.skip('Facturacion electronica: Revision / envio de DTEs', async () => {
-    //TODO: 
-  });
-
-  test.skip('Facturacion electronica: Consulta / Re-envio de DTEs', async () => {
-    //TODO: 
   });
 
 });
