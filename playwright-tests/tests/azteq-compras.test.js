@@ -700,7 +700,7 @@ test.describe('Modulo Compras', () => {
     await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
     await iframeElement.getByRole('textbox', { name: 'Descripcion', exact: true }).fill('descripcion producto');
     await iframeElement.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
-    await iframeElement.getByText('Metro', { exact: true }).click();
+    await iframeElement.locator('[role="option"][data-index="0"]').click();
     await iframeElement.getByText('Contables').click();
     await iframeElement.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
     await iframeElement.getByText('Costo artículos producidos/').click();
@@ -729,7 +729,7 @@ test.describe('Modulo Compras', () => {
     await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
     await iframeElement.getByRole('textbox', { name: 'Descripcion', exact: true }).fill('descripcion producto');
     await iframeElement.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
-    await iframeElement.getByText('Metro', { exact: true }).click();
+    await iframeElement.locator('[role="option"][data-index="0"]').click();
     await iframeElement.getByText('Contables').click();
     await iframeElement.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
     await iframeElement.getByText('Costo artículos producidos/').click();

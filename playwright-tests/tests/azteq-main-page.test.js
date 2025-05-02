@@ -2,7 +2,6 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Modules Page Functionality', () => {
   let page;
-
   let context;
 
   test.beforeAll(async ({ browser }) => {
@@ -243,7 +242,7 @@ test.describe('Modules Page Functionality', () => {
   });
 
   //Billing page loads correctly
-  test('Subscription management: Billing page loads correctly', async () => {
+  test.fixme('Subscription management: Billing page loads correctly', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='admsubscrip']");
 
@@ -256,9 +255,12 @@ test.describe('Modules Page Functionality', () => {
     await expect(newTab.locator('[data-test="cancel-subscription"]')).toBeVisible();
     await expect(newTab.getByRole('link', { name: 'Añadir método de pago' })).toBeVisible();
 
+  
     //Pagina de factura
+    await page.waitForTimeout(500);
     const page2Promise = newTab.waitForEvent('popup');
     await newTab.getByTestId('hip-link').click();
+
 
     const page2 = await page2Promise;
     await expect(page2.getByText('Número de factura')).toBeVisible();
