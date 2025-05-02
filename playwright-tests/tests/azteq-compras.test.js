@@ -139,7 +139,7 @@ test.describe('Modulo Compras', () => {
       await iframeElement.getByRole('spinbutton', { name: 'Precio 2 SIN IVA' }).fill('22');
 
       await iframeElement.getByRole('button', { name: 'Grabar' }).click();
-      await page.locator('iframe').contentFrame().getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
+      await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
 
       await expect(iframeElement.getByRole('cell', { name: uniqueId })).toBeVisible();
     });
@@ -158,7 +158,8 @@ test.describe('Modulo Compras', () => {
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
     await iframeElement.getByRole('textbox', { name: 'Item' }).click();
     const optionLocator = iframeElement.locator('[role="option"][data-index="1"]');
-    const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]').innerText();
+    const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]')
+      .innerText();
     await optionLocator.click();
     await iframeElement.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('100');
     await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
@@ -175,7 +176,9 @@ test.describe('Modulo Compras', () => {
       await dialog.accept(); // or dialog.dismiss() for Cancel
     });
     //Boton para eliminar registro
-    await iframeElement.getByRole('row', { name: value }).getByRole('button', { name: 'Delete' }).click();
+    await iframeElement.getByRole('row', { name: value })
+      .getByRole('button', { name: 'Delete' })
+      .click();
 
     //Verificamos que el item ya no existe
     await expect(iframeElement.getByRole('cell', { name: value })).not.toBeVisible();
@@ -192,7 +195,8 @@ test.describe('Modulo Compras', () => {
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
     await iframeElement.getByRole('textbox', { name: 'Item' }).click();
     const optionLocator = iframeElement.locator('[role="option"][data-index="1"]');
-    const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]').innerText();
+    const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]')
+      .innerText();
     await optionLocator.click();
     await iframeElement.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('100');
     await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
@@ -233,7 +237,8 @@ test.describe('Modulo Compras', () => {
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
     await iframeElement.getByRole('textbox', { name: 'Item' }).click();
     const optionLocator = iframeElement.locator('[role="option"][data-index="3"]');
-    const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]').innerText();
+    const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]')
+      .innerText();
     await optionLocator.click();
     await iframeElement.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('20');
     await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
@@ -306,7 +311,8 @@ test.describe('Modulo Compras', () => {
 
       // Seleccionar item
       const optionLocator = iframeElement.locator('[role="option"][data-index="2"]');
-      const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]').innerText();
+      const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]')
+        .innerText();
       await optionLocator.click();
 
       // Detalles
@@ -455,7 +461,9 @@ test.describe('Modulo Compras', () => {
       await iframeElement.getByRole('button', { name: 'Agregar' }).click();
       await iframeElement.getByRole('textbox', { name: 'Producto' }).click();
       const optionLocator = iframeElement.locator('[role="option"][data-index="1"]');
-      const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]').innerText();
+      const value = await optionLocator
+        .locator('div[style="font-size:10px;line-height:12px;"]')
+        .innerText();
       await optionLocator.click();
 
       // Detalles requeridos
@@ -556,7 +564,6 @@ test.describe('Modulo Compras', () => {
     await page.iframeElement.getByRole('spinbutton', { name: 'Valor:' }).fill('13');
     await page.iframeElement.getByRole('button', { name: 'Actualizar' }).click();
 
-
   });
 
   //Al intentar agregar un item a la tabla no deberia ser posible y un mensaje de advertencia deberia aparecer
@@ -574,14 +581,30 @@ test.describe('Modulo Compras', () => {
     await iframeElement.getByRole('button', { name: 'Grabar' }).click();
 
     //Check for required field messages
-    await expect(iframeElement.locator('#parsley-id-7').getByText('Este valor es requerido.')).toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-17').getByText('Este valor es requerido.')).toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-19').getByText('Este valor es requerido.')).toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-27').getByText('Este valor es requerido.')).toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-37').getByText('Este valor es requerido.')).toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-41').getByText('Este valor es requerido.')).toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-45').getByText('Este valor es requerido.')).toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-51').getByText('Este valor es requerido.')).toBeVisible();
+    await expect(iframeElement.locator('#parsley-id-7')
+      .getByText('Este valor es requerido.'))
+      .toBeVisible();
+    await expect(iframeElement.locator('#parsley-id-17')
+      .getByText('Este valor es requerido.'))
+      .toBeVisible();
+    await expect(iframeElement.locator('#parsley-id-19')
+      .getByText('Este valor es requerido.'))
+      .toBeVisible();
+    await expect(iframeElement.locator('#parsley-id-27')
+      .getByText('Este valor es requerido.'))
+      .toBeVisible();
+    await expect(iframeElement.locator('#parsley-id-37')
+      .getByText('Este valor es requerido.'))
+      .toBeVisible();
+    await expect(iframeElement.locator('#parsley-id-41')
+      .getByText('Este valor es requerido.'))
+      .toBeVisible();
+    await expect(iframeElement.locator('#parsley-id-45')
+      .getByText('Este valor es requerido.'))
+      .toBeVisible();
+    await expect(iframeElement.locator('#parsley-id-51')
+      .getByText('Este valor es requerido.'))
+      .toBeVisible();
 
   });
 
@@ -693,7 +716,8 @@ test.describe('Modulo Compras', () => {
     await page.getByRole('link', { name: 'Grupos de proveedores' }).click();
 
     //Cambiar luego
-    await expect(page.locator('iframe').contentFrame().getByRole('cell', { name: '001' })).toBeVisible();
+    await expect(page.locator('iframe').contentFrame().getByRole('cell', { name: '001' }))
+      .toBeVisible();
 
 
     await iframeElement.getByRole('row', { name: 'prueba1' }).getByRole('button').nth(1).click();
@@ -717,7 +741,8 @@ test.describe('Modulo Compras', () => {
     //Detalles
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
     await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-    await iframeElement.getByRole('textbox', { name: 'Descripcion', exact: true }).fill('descripcion producto');
+    await iframeElement.getByRole('textbox', { name: 'Descripcion', exact: true })
+      .fill('descripcion producto');
     await iframeElement.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
     await iframeElement.locator('[role="option"][data-index="0"]').click();
     await iframeElement.getByText('Contables').click();
@@ -747,7 +772,8 @@ test.describe('Modulo Compras', () => {
     // Llenar detalles
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
     await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-    await iframeElement.getByRole('textbox', { name: 'Descripcion', exact: true }).fill('descripcion producto');
+    await iframeElement.getByRole('textbox', { name: 'Descripcion', exact: true })
+      .fill('descripcion producto');
     await iframeElement.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
     await iframeElement.locator('[role="option"][data-index="0"]').click();
     await iframeElement.getByText('Contables').click();
@@ -802,7 +828,8 @@ test.describe('Modulo Compras', () => {
     //Editar
     await test.step('Editar almacen', async () => {
       await iframeElement.getByRole('row', { name: uniqueId }).getByRole('button').nth(0).click();
-      await iframeElement.getByRole('textbox', { name: 'Nombre del almacen' }).fill('almacen ' + uniqueId);
+      await iframeElement.getByRole('textbox', { name: 'Nombre del almacen' })
+        .fill('almacen ' + uniqueId);
       await iframeElement.getByRole('button', { name: 'Grabar' }).click();
       await expect(iframeElement.getByRole('row', { name: uniqueId })
         .getByRole('cell', { name: 'almacen ' + uniqueId }))
@@ -863,7 +890,8 @@ test.describe('Modulo Compras', () => {
     await page.getByRole('link', { name: 'Almacenes' }).click();
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
     await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-    await iframeElement.getByRole('textbox', { name: 'Nombre del almacen' }).fill('almacen' + uniqueId);
+    await iframeElement.getByRole('textbox', { name: 'Nombre del almacen' })
+      .fill('almacen' + uniqueId);
     await iframeElement.getByRole('textbox', { name: 'Sucursal' }).click();
     await iframeElement.getByLabel('0', { exact: true }).getByText('01').click();
     await iframeElement.getByRole('button', { name: 'Grabar' }).click();
