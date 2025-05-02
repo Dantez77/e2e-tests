@@ -107,26 +107,37 @@ test.describe('Modulo Ventas', () => {
           `);
   });
 
-  test('Credito fiscal', async () => {
+  test('Credito fiscal: Agregar, Editar y Anular', async () => {
+    // TODO: Añadir las funcionalidades posibles dentro de Credito Fiscal, esto incluye:
+    // - Crear un documento de facturacion (indice de exito: Verificacion de documento creado) - COMPLETO
+    // - Editar un documento de facturacion (indice de exito: Verificacion de documento editado) - COMPLETO
+    // - Anular un documento de facturacion (indice de exito: Verificacion de que el documento fue anulado) - COMPLETO
+    // - Obtener cotizacion -PENDIENTE <============
+
     const iframeElement = page.frameLocator('iframe');
     let documentValue = '';
     await page.getByRole('link', { name: 'Crédito fiscal' }).click();
 
-    await test.step('Grabando documento', async () => {
+    await test.step('Grabando un nuevo documento', async () => {
       await iframeElement.getByRole('button', { name: 'Agregar' }).click();
 
       await iframeElement.getByRole('textbox', { name: 'Cliente:' }).click();
       await iframeElement.locator('[role="option"][data-index="0"]').click();
+
       await iframeElement.getByRole('textbox', { name: 'Almacen:' }).click();
       await iframeElement.locator('[role="option"][data-index="2"]').click();
+
       await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
       await iframeElement.locator('[role="option"][data-index="0"]').click();
+
       await iframeElement.getByRole('textbox', { name: 'Términos de pago' }).click();
       await iframeElement.locator('[role="option"][data-index="0"]').click();
+
       documentValue = await iframeElement.locator('input#coddoc').inputValue();
       //console.log('Documento generado:', documentValue);
 
       await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+
       await iframeElement.getByRole('textbox', { name: 'Código' }).click();
       await iframeElement.locator('[role="option"][data-index="2"]').click();
       await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('10');
@@ -182,8 +193,54 @@ test.describe('Modulo Ventas', () => {
 
   });
 
-  test.skip('Factura', async () => {
-    //TODO: 
+  test.only('Factura', async () => {
+    // TODO: Añadir las funcionalidades posibles dentro de Facturacion, esto incluye:
+    //  - Crear un documento de facturacion (indice de exito: Verificacion de documento creado) - PENDIENTE
+    // - Editar un documento de facturacion (indice de exito: Verificacion de documento editado) - PENDIENTE
+    // - Anular un documento de facturacion (indice de exito: Verificacion de que el documento fue anulado) - PENDIENTE
+    // - Obtener cotizacion -PENDIENTE
+
+    const iframeElement = page.frameLocator('iframe');
+    let documentValue = ''; //Facturas posee un id auto generado, usamos esta variable para extraerlo y verificacion
+    await page.getByRole('link', { name: 'Factura', exact: true }).click();
+
+    await test.step('Grabando un nuevo documento', async () => {
+      //TODO: 
+      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+
+      await iframeElement.getByRole('textbox', { name: 'Cliente:' }).click();
+      await iframeElement.locator('[role="option"][data-index="1"]').click();
+
+      await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
+      await iframeElement.locator('[role="option"][data-index="1"]').click();
+
+      await iframeElement.getByRole('textbox', { name: 'Términos de pago' }).click();
+      await iframeElement.locator('[role="option"][data-index="1"]').click();
+
+      documentValue = await iframeElement.locator('input#coddoc').inputValue();
+
+      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+
+      await iframeElement.getByRole('textbox', { name: 'Código' }).click();
+      await iframeElement.locator('[role="option"][data-index="4"]').click();
+      await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('12');
+
+      await iframeElement.locator('#btnConfirmAddLine').click();
+
+      await iframeElement.getByRole('button', { name: 'Grabar documento' }).click();
+
+
+
+    });
+
+    await test.step('Editando el documento creado', async () => {
+      //TODO: 
+    });
+
+    await test.step('Anulando el documento', async () => {
+      //TODO: 
+    });
+
   });
 
   test.skip('Factura de exportacion', async () => {
