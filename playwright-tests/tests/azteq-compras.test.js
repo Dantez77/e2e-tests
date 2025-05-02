@@ -780,22 +780,46 @@ test.describe('Modulo Compras', () => {
 
   //Agrega un item a la tabla de almacenes
   //Por la forma que se genera el id, puede que el test falle si no hay cuidado de borrar tablas
-  test.skip('Almacenes: Add item to table', async () => {
+  test('Almacenes: Agregar, Editar y Eliminar', async () => {
     const iframeElement = page.frameLocator('iframe');
     const uniqueId = `${Date.now()}`.slice(-2);
-
-    //Almacenes
     await page.getByRole('link', { name: 'Almacenes' }).click();
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-    await iframeElement.getByRole('textbox', { name: 'Nombre del almacen' }).fill('almacen1');
-    await iframeElement.getByRole('textbox', { name: 'Sucursal' }).click();
-    await iframeElement.getByLabel('0', { exact: true }).getByText('01').click();
-    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
 
-    const cellLocator = iframeElement.getByRole('cell', { name: uniqueId, exact: true });
+    //Crear
+    await test.step('Agregar almacen', async () => {
+      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
+      await iframeElement.getByRole('textbox', { name: 'Nombre del almacen' }).fill('almacen XX');
+      await iframeElement.getByRole('textbox', { name: 'Sucursal' }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
 
-    await expect(cellLocator).toBeVisible();
+      //Verificar que fue creado
+      await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
+      await expect(iframeElement.getByRole('cell', { name: uniqueId })).toBeVisible();
+    });
+
+    //Editar
+    await test.step('Editar almacen', async () => {
+      await iframeElement.getByRole('row', { name: uniqueId }).getByRole('button').nth(0).click();
+      await iframeElement.getByRole('textbox', { name: 'Nombre del almacen' }).fill('almacen ' + uniqueId);
+      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+      await expect(iframeElement.getByRole('row', { name: uniqueId })
+        .getByRole('cell', { name: 'almacen ' + uniqueId }))
+        .toBeVisible();
+    });
+
+    //Eliminar
+    await test.step('Eliminar almacen', async () => {
+      await iframeElement.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();
+      await iframeElement.getByRole('button', { name: 'Eliminar' }).click();
+
+      await expect(iframeElement.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
+      await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+
+      await page.waitForTimeout(500);
+      await expect(iframeElement.getByRole('cell', { name: uniqueId })).not.toBeVisible();
+    });
 
   });
 

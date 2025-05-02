@@ -127,7 +127,7 @@ test.describe('Login Functionality', () => {
 
   // Test de fuerza bruta. Este test debería NUNCA tener éxito si las protecciones están en su lugar.
   // Solo correr en test.only
-  test('Brute force should not allow login', async ({ page }) => {
+  test.skip('Brute force should not allow login', async ({ page }) => {
     // Current password is 1234
     let pass = 1200;
     let loginSuccess = false;
