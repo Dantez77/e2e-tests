@@ -33,12 +33,12 @@ test.describe('Modules Page Functionality', () => {
     await context.close(); 
   });
 
-  test('Page loads correctly', async () => {
+  test('La pagina carga correctamente', async () => {
     await page.waitForURL('**/menu/menu.php', { timeout: 10000 });
     await expect(page.url()).toContain('/menu/menu.php');
   });
 
-  test('Toggle and load theme', async () => {
+  test('Toggle de tema oscuro y claro', async () => {
 
     const theme = await page.evaluate(() => {
       return localStorage.getItem('azteqTheme');
@@ -63,9 +63,8 @@ test.describe('Modules Page Functionality', () => {
 
   });
 
-  test('Configuration btn event', async () => {
+  test('Configuraciones se muestran correctamente', async () => {
     await page.click("[id='btnConfig']");
-    //await page.screenshot({ path: 'test1.png', fullPage: true }); //Debug screenshot
 
     //menu
     await expect(page.locator("[id='updaterepos']")).toBeVisible(); //Actualizar repos
@@ -76,7 +75,7 @@ test.describe('Modules Page Functionality', () => {
     await expect(page.locator("[id='updaterepos']")).not.toBeVisible();
   });
 
-  test('Account btn event', async () => {
+  test('Boton de cuenta muestra el menu correctamente', async () => {
     await page.click("[id='btnAccount']");
 
     await expect(page.locator("[id='changepassword']")).toBeVisible(); //Actualizar password
@@ -108,7 +107,7 @@ test.describe('Modules Page Functionality', () => {
   });
 
   //Logout desde opciones de usuario
-  test('Logout from user options', async () => {
+  test('Logout desde opciones de usuario', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='logout']");
 
@@ -153,7 +152,7 @@ test.describe('Modules Page Functionality', () => {
   });
 
 
-  test('Change password: Required input test', async () => {
+  test('Cambio de contraseña: Se requieren todos los inputs', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='changepassword']");
 
@@ -174,7 +173,7 @@ test.describe('Modules Page Functionality', () => {
   });
 
   //Password change (For now it allows a password change to the same or previously used passwords)
-  test('Change password: Correct password change', async () => {
+  test('Cambio de contraseña: Se efectua el cambio efectivamente', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='changepassword']");
 
@@ -189,7 +188,7 @@ test.describe('Modules Page Functionality', () => {
   });
 
   //Attempt to change password without having the correct password first
-  test('Change password: Attempt with wrong password', async () => {
+  test('Cambio de contraseña: Verifica que el password sea el adecuado', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='changepassword']");
 
@@ -203,8 +202,7 @@ test.describe('Modules Page Functionality', () => {
     });
   });
 
-  //Checking if password field can be left empty and password can be changed to ''
-  test.skip('Change password: Check if password cant be changed to "" ', async () => {
+  test('Cambio de contraseña: Verifica si el password puede ser cambiado a "" ', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='changepassword']");
 
@@ -220,29 +218,26 @@ test.describe('Modules Page Functionality', () => {
 
   // For future reference this test will fail if account doesnt have a branch named 'Oficina central Norte'
   // Opciones por defecto para el usuario
-  test('User default options: Changing branch', async () => {
+  test('Configurar Cuenta: Cambiar sucursal', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='configureaccount']");
 
     //Changing branch
     await page.click('[placeholder="Sucursal"]'); 
     await page.click('text="Oficina central norte"');
-    //await page.screenshot({ path: 'test.png', fullPage: true }); //Debug screenshot
 
     //Changing back to avoid issues
     await page.click('[placeholder="Sucursal"]'); 
     await page.click('text="Oficina central"');
-    //await page.screenshot({ path: 'test2.png', fullPage: true }); //Debug screenshot
 
     //Checking it saves new configuration
     await page.click("[id='dosetdefaults']");
 
     await expect(page.locator('.mbsc-toast')).toHaveText('Opciones por defecto han sido guardadas');
-    //await page.screenshot({ path: 'test1.png', fullPage: true }); //Debug screenshot
   });
 
   //Billing page loads correctly
-  test.fixme('Subscription management: Billing page loads correctly', async () => {
+  test.fixme('Manejo de subscripcion carga correctamente', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='admsubscrip']");
 
@@ -255,12 +250,10 @@ test.describe('Modules Page Functionality', () => {
     await expect(newTab.locator('[data-test="cancel-subscription"]')).toBeVisible();
     await expect(newTab.getByRole('link', { name: 'Añadir método de pago' })).toBeVisible();
 
-  
     //Pagina de factura
     await page.waitForTimeout(500);
     const page2Promise = newTab.waitForEvent('popup');
     await newTab.getByTestId('hip-link').click();
-
 
     const page2 = await page2Promise;
     await expect(page2.getByText('Número de factura')).toBeVisible();
@@ -270,7 +263,7 @@ test.describe('Modules Page Functionality', () => {
   });
 
   //Opciones de Usuario: Cambiar Sucursal
-  test('Changing Company and Branch', async () => {
+  test('Cambio de empresa', async () => {
     // Open account menu and change company
     await page.click("[id='btnAccount']");
     await page.click("[id='changecompany']");
@@ -300,5 +293,3 @@ test.describe('Modules Page Functionality', () => {
     expect(fullLabel).toContain(selectedCdsuc);
   });
 });
-
-
