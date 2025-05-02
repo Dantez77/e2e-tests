@@ -585,65 +585,84 @@ test.describe('Modulo Compras', () => {
 
   });
 
-  test.fixme('Proveedores: Agregando a tabla', async () => {
+  test('Proveedores: Agregando a tabla', async () => {
     //iframe context
     const iframeElement = page.frameLocator('iframe');
-    const idProveedor = `PV-`+`${Date.now()}`.slice(-7);
-    const nombreProveedor = `Proveedor `+`${Date.now()}`.slice(-4);
-
+    const idProveedor = `PV-` + `${Date.now()}`.slice(-7);
+    const nombreProveedor = `Proveedor ` + `${Date.now()}`.slice(-4);
 
     await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
-    
+
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
 
-
-    await iframeElement.getByRole('textbox', { name: 'Codigo Este valor es' }).fill('1234');
+    await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(idProveedor);
 
     await iframeElement.getByRole('textbox', { name: 'Tipo de persona' }).click();
     await iframeElement.locator('[role="option"][data-index="0"]').click();
 
     await iframeElement.getByRole('textbox', { name: 'Nombre' }).click();
-    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'Nombre' }).fill('proveedor 00x');
+    await iframeElement.getByRole('textbox', { name: 'Nombre' }).fill(nombreProveedor);
 
-    await page.locator('iframe').contentFrame().locator('#dirprov').click();
-    await page.locator('iframe').contentFrame().locator('#dirprov').fill('calle 1, ciudad 1, pais 1');
-    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'Pais', exact: true }).click();
-    await page.locator('iframe').contentFrame().getByRole('option', { name: 'af Afganistán af' }).click();
-    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'NIT' }).click();
-    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'NIT' }).fill('1234151');
-    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'Teléfono:' }).click();
-    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'Teléfono:' }).fill('12351234');
-    await page.locator('iframe').contentFrame().getByRole('button', { name: 'Grabar' }).click();
-    await page.locator('iframe').contentFrame().getByRole('textbox', { name: 'Email: Este valor es' }).fill('mail@mail.com');
-    await page.locator('iframe').contentFrame().getByRole('button', { name: 'Grabar' }).click();
+    await iframeElement.locator('#dirprov').fill('calle 1, ciudad 1, pais 1');
+    await iframeElement.getByRole('textbox', { name: 'Pais', exact: true }).click();
+    await iframeElement.locator('[role="option"][data-index="0"]').click();
+    await iframeElement.getByRole('textbox', { name: 'Teléfono:' }).fill('7XXX7XXX');
+    await iframeElement.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
+    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+
+    //Verificar si fue guardado
+    await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(idProveedor);
+    await expect(iframeElement.getByRole('cell', { name: idProveedor, exact: true })).toBeVisible();
+
   });
 
-
-  test.fixme('Proveedores: Deleting item from table', async () => {
-    //iframe context
+  //Test complete de proveedores
+  test('Proveedores: Crear, Editar y Eliminar', async () => {
     const iframeElement = page.frameLocator('iframe');
-    const idProveedor = `PV-`+`${Date.now()}`.slice(-7);
+    const idProveedor = `PV-` + `${Date.now()}`.slice(-7);
+    const nombreProveedor = `Proveedor ` + `${Date.now()}`.slice(-4);
+    const nit = `${Date.now()}`.slice(-10);
 
-
-
-    //Click on Proveedores
     await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
-    await expect(page.getByRole('link', { name: 'Proveedores Close' })).toBeVisible();
 
-    //Deletes item added in 'proveedores: adding to table test'
-    const row = iframeElement.getByRole('row', { name: '001 99999999999 Apellido,' });
+    //Crear
+    await test.step('Crear proveedor', async () => {
+      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(idProveedor);
+      await iframeElement.getByRole('textbox', { name: 'Tipo de persona' }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+      await iframeElement.getByRole('textbox', { name: 'Nombre' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Nombre' }).fill(nombreProveedor);
+      await iframeElement.locator('#dirprov').fill('calle 1, ciudad 1, pais 1');
+      await iframeElement.getByRole('textbox', { name: 'Pais', exact: true }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+      await iframeElement.getByRole('textbox', { name: 'Teléfono:' }).fill('7XXX7XXX');
+      await iframeElement.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
+      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
 
-    const rowAppeared = await row.waitFor({ timeout: 5000 }).then(() => true).catch(() => false);
-    //await page.screenshot({ path: 'debug1.png', fullPage: true }); //Debug screenshot
+      await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(idProveedor);
+      await expect(iframeElement.getByRole('cell', { name: idProveedor, exact: true })).toBeVisible();
+    });
 
-    if (rowAppeared) {
-      const deleteButton = row.getByRole('button').nth(1);
-      await deleteButton.click();
+    //Editar
+    await test.step('Editar proveedor', async () => {
+      await iframeElement.getByRole('row', { name: idProveedor }).getByRole('button').first().click();
+      await iframeElement.getByRole('textbox', { name: 'NIT' }).fill(nit);
+      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+      await expect(iframeElement.getByRole('cell', { name: nit, exact: true })).toBeVisible();
+    });
+
+    //Eliminar
+    await test.step('Eliminar proveedor', async () => {
+      await iframeElement.getByRole('row', { name: idProveedor }).getByRole('button').nth(1).click();
       await iframeElement.getByRole('button', { name: 'Eliminar' }).click();
+      await expect(iframeElement.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
       await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+      await page.waitForTimeout(500);
 
-    }
-    await expect(row).toHaveCount(0);
+      //Verificando que ya no existe
+      await expect(iframeElement.getByRole('cell', { name: idProveedor, exact: true })).toHaveCount(0);
+    });
   });
 
   //ATM its not possible to delete items from the table and its possible 
@@ -695,7 +714,7 @@ test.describe('Modulo Compras', () => {
 
     await page.getByRole('link', { name: 'Productos' }).click();
 
-    //Fill form to add a new product
+    //Detalles
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
     await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
     await iframeElement.getByRole('textbox', { name: 'Descripcion', exact: true }).fill('descripcion producto');
@@ -707,10 +726,11 @@ test.describe('Modulo Compras', () => {
     await iframeElement.getByText('Precios').click();
     await iframeElement.getByRole('spinbutton', { name: 'Precio 1 SIN IVA' }).fill('100');
 
-    //Save and add to list
+    //Grabar
     await iframeElement.getByRole('button', { name: 'Grabar' }).click();
 
-    await page.locator('iframe').contentFrame().getByLabel('Mostrar 102550100 registros').selectOption('100');
+    //Verificar que fue creado
+    await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
     await expect(iframeElement.getByRole('cell', { name: uniqueId, exact: true })).toBeVisible();
 
     //await page.screenshot({ path: 'debug1.png', fullPage: true }); //Debug screenshot
@@ -724,7 +744,7 @@ test.describe('Modulo Compras', () => {
 
     await page.getByRole('link', { name: 'Productos' }).click();
 
-    // Fill form
+    // Llenar detalles
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
     await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
     await iframeElement.getByRole('textbox', { name: 'Descripcion', exact: true }).fill('descripcion producto');
@@ -735,10 +755,8 @@ test.describe('Modulo Compras', () => {
     await iframeElement.getByText('Costo artículos producidos/').click();
     await iframeElement.getByRole('button', { name: 'Grabar' }).click();
 
-    // Wait for save to complete
-    await page.locator('iframe').contentFrame().getByLabel('Mostrar 102550100 registros').selectOption('100');
-
-    // Wait for product to appear
+    // Buscar producto
+    await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
     const cellLocator = iframeElement.getByRole('cell', { name: uniqueId, exact: true });
     await expect(cellLocator).toBeVisible({ timeout: 5000 }); // Wait until it's there
 
@@ -762,7 +780,6 @@ test.describe('Modulo Compras', () => {
 
   //Agrega un item a la tabla de almacenes
   //Por la forma que se genera el id, puede que el test falle si no hay cuidado de borrar tablas
-  //
   test.skip('Almacenes: Add item to table', async () => {
     const iframeElement = page.frameLocator('iframe');
     const uniqueId = `${Date.now()}`.slice(-2);
