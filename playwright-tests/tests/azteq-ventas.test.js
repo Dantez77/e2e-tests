@@ -1,9 +1,5 @@
 const { test, expect } = require('@playwright/test');
 
-/*
-  Recordar cambiar correo y usuario antes de que se me acabe el plan de prueba o____o. 
-*/
-
 test.describe('Modulo Ventas', () => {
   let page;
   let context;
@@ -123,7 +119,7 @@ test.describe('Modulo Ventas', () => {
       await iframeElement.getByRole('button', { name: 'Agregar' }).click();
 
       await iframeElement.getByRole('textbox', { name: 'Cliente:' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
+      await iframeElement.locator('[role="option"][data-index="1"]').click();
 
       await iframeElement.getByRole('textbox', { name: 'Almacen:' }).click();
       await iframeElement.locator('[role="option"][data-index="2"]').click();
@@ -231,7 +227,6 @@ test.describe('Modulo Ventas', () => {
       await iframeElement.locator('#btnConfirmAddLine').click();
 
       await iframeElement.getByRole('button', { name: 'Grabar documento' }).click();
-      //  
     });
 
     await test.step('Editando el documento creado', async () => {
@@ -399,8 +394,23 @@ test.describe('Modulo Ventas', () => {
     });
   });
 
-  test.skip('Nota de credito', async () => {
-    //TODO: 
+  test('Nota de credito', async () => {
+    // TODO:Añadir las funcionalidades posibles dentro de Factura de exportacion, esto incluye:
+    // - Crear un documento (indice de exito: Verificacion de documento creado) - PENDIENTE
+    // - Editar un documento (indice de exito: Verificacion de documento editado) - PENDIENTE
+    // - Anular un documento (indice de exito: Verificacion de que el documento fue anulado) - PENDIENTE
+    // REQUIERE PARA FUNCIONAR: Creacion previa de credito fiscal.
+
+    const iframeElement = page.frameLocator('iframe');
+    let documentValue = '';
+
+    documentValue = await crearCreditoFiscal(page, iframeElement);
+    await test.step('Creando Nota de Credito', async () => {
+      console.log(documentValue);
+
+    });
+
+
   });
 
   test.skip('Nota de debito', async () => {
@@ -624,3 +634,33 @@ test.describe('Modulo Ventas', () => {
 
 
 });
+
+
+async function crearCreditoFiscal(page, iframeElement) {
+  await page.getByRole('link', { name: 'Crédito fiscal' }).click();
+  await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+
+  await iframeElement.getByRole('textbox', { name: 'Cliente:' }).click();
+  await iframeElement.locator('[role="option"][data-index="1"]').click();
+
+  await iframeElement.getByRole('textbox', { name: 'Almacen:' }).click();
+  await iframeElement.locator('[role="option"][data-index="2"]').click();
+
+  await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
+  await iframeElement.locator('[role="option"][data-index="0"]').click();
+
+  await iframeElement.getByRole('textbox', { name: 'Términos de pago' }).click();
+  await iframeElement.locator('[role="option"][data-index="0"]').click();
+
+  const documentValue = await iframeElement.locator('input#coddoc').inputValue();
+
+  await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+  await iframeElement.getByRole('textbox', { name: 'Código' }).click();
+  await iframeElement.locator('[role="option"][data-index="2"]').click();
+  await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('1');
+
+  await iframeElement.locator('#btnConfirmAddLine').click();
+  await iframeElement.getByRole('button', { name: 'Grabar documento' }).click();
+
+  return documentValue;
+}
