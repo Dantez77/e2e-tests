@@ -109,7 +109,7 @@ test.describe('Modulo Ventas', () => {
 
   test('Credito fiscal: Agregar, Editar y Anular', async () => {
     // TODO: Añadir las funcionalidades posibles dentro de Credito Fiscal, esto incluye:
-    // - Crear un documento de facturacion (indice de exito: Verificacion de documento creado) - COMPLETO
+    // - Crear un documento de facturacion (indice de exito: Verificacion de documento creado) - INCOMPLETO (VERIFICAR CON ALERTA)
     // - Editar un documento de facturacion (indice de exito: Verificacion de documento editado) - COMPLETO
     // - Anular un documento de facturacion (indice de exito: Verificacion de que el documento fue anulado) - COMPLETO
     // - Obtener cotizacion -PENDIENTE <============
@@ -119,6 +119,7 @@ test.describe('Modulo Ventas', () => {
     await page.getByRole('link', { name: 'Crédito fiscal' }).click();
 
     await test.step('Grabando un nuevo documento', async () => {
+      //TODO: Por ahora falta verificar el toast despues de crear documento 
       await iframeElement.getByRole('button', { name: 'Agregar' }).click();
 
       await iframeElement.getByRole('textbox', { name: 'Cliente:' }).click();
@@ -149,6 +150,11 @@ test.describe('Modulo Ventas', () => {
 
     await test.step('Buscar y editar documento', async () => {
       await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+
+      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
+
       await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
       iframeElement.getByRole('cell', { name: documentValue }).click();
       await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
@@ -173,10 +179,10 @@ test.describe('Modulo Ventas', () => {
       await iframeElement
         .getByRole('row', { name: documentValue })
         .getByRole('cell', { name: 'Bob' }).click();
-      
+
       await iframeElement.locator('#btnConfirmNull').click();
 
-      
+
       await page.waitForTimeout(500);
 
       await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
@@ -187,25 +193,22 @@ test.describe('Modulo Ventas', () => {
       await expect(iframeElement
         .getByRole('row', { name: documentValue })
         .getByRole('cell', { name: 'Bob' })).toHaveCount(0);
-
     });
-
-
   });
 
-  test.only('Factura', async () => {
+  test('Factura', async () => {
     // TODO: Añadir las funcionalidades posibles dentro de Facturacion, esto incluye:
-    //  - Crear un documento de facturacion (indice de exito: Verificacion de documento creado) - PENDIENTE
-    // - Editar un documento de facturacion (indice de exito: Verificacion de documento editado) - PENDIENTE
-    // - Anular un documento de facturacion (indice de exito: Verificacion de que el documento fue anulado) - PENDIENTE
-    // - Obtener cotizacion -PENDIENTE
+    // - Crear un documento de facturacion (indice de exito: Verificacion de documento creado) - INCOMPLETO VERIFICAR ALERTA
+    // - Editar un documento de facturacion (indice de exito: Verificacion de documento editado) - COMPLETO
+    // - Anular un documento de facturacion (indice de exito: Verificacion de que el documento fue anulado) - COMPLETO
+    // - Obtener cotizacion -PENDIENTE <============
 
     const iframeElement = page.frameLocator('iframe');
     let documentValue = ''; //Facturas posee un id auto generado, usamos esta variable para extraerlo y verificacion
     await page.getByRole('link', { name: 'Factura', exact: true }).click();
 
     await test.step('Grabando un nuevo documento', async () => {
-      //TODO: 
+      //TODO: Por ahora falta verificar el toast despues de crear documento 
       await iframeElement.getByRole('button', { name: 'Agregar' }).click();
 
       await iframeElement.getByRole('textbox', { name: 'Cliente:' }).click();
@@ -228,17 +231,65 @@ test.describe('Modulo Ventas', () => {
       await iframeElement.locator('#btnConfirmAddLine').click();
 
       await iframeElement.getByRole('button', { name: 'Grabar documento' }).click();
-
-
-
+      //  
     });
 
     await test.step('Editando el documento creado', async () => {
-      //TODO: 
+      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+
+      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click(); //Buscar por numero de doc
+
+      await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
+      iframeElement.getByRole('cell', { name: documentValue }).click();
+      await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
+      //El elemento aqui se llama John Doe, pero sera diferente en caso cambien las credenciales actualmente utilizadas
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+
+      await iframeElement.getByRole('button', { name: 'Grabar cambios' }).click();
+
+      //Se busca otra vez
+      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+
+      //Verificar que el documento fue editado
+      await expect(iframeElement
+        .getByRole('row', { name: documentValue })
+        .getByRole('cell', { name: 'John Doe' })).toBeVisible();
     });
 
     await test.step('Anulando el documento', async () => {
-      //TODO: 
+      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+      await iframeElement.getByRole('button', { name: 'Anular Documento' }).click();
+
+      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+
+      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click(); 
+
+      await iframeElement
+        .getByRole('row', { name: documentValue })
+        .getByRole('cell', { name: 'John Doe' }).click();
+
+      await iframeElement.locator('#btnConfirmNull').click();
+
+
+      await page.waitForTimeout(500);
+
+      await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+      await page.waitForTimeout(500)
+
+      //Confirmar que fue anulado
+      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+
+      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+
+      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click(); 
+
+      await expect(iframeElement
+        .getByRole('row', { name: documentValue })
+        .getByRole('cell', { name: 'John Doe' })).toHaveCount(0);
     });
 
   });
@@ -423,8 +474,52 @@ test.describe('Modulo Ventas', () => {
     //TODO: 
   });
 
-
   ////////////////////////////////////////////////////////
   //           Configuraciones adicionales              //
   ////////////////////////////////////////////////////////
+
+  //Esta test fue creado solo para automatizar la creacion de nuevos clientes, dejar en skip o borrar en el futuro
+  test.skip('Clientes Exterior: Nuevo cliente', async () => {
+    const iframeElement = page.frameLocator('iframe');
+    const uniqueId = `CEXT-` + `${Date.now()}`.slice(-5);
+    const cliente = `Cliente Exterior ` + `${Date.now()}`.slice(-3);
+
+    await page.getByRole('link', { name: 'Clientes', exact: true }).click();
+
+    // Creando cliente
+    await test.step('Agregando Producto a la tabla', async () => {
+      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+
+      //Llenando formulario
+      await iframeElement.getByRole('textbox', { name: 'Codigo cliente:' }).fill(uniqueId);
+      await iframeElement.getByRole('textbox', { name: 'Razon social:' }).fill('RZ');
+      await iframeElement.getByRole('textbox', { name: 'Nombre comercial:' }).fill(cliente);
+      await iframeElement.locator('#direc').fill('direccion ');
+      await iframeElement.getByRole('textbox', { name: 'Giro' }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+
+      await iframeElement.getByRole('textbox', { name: 'Vendedor asignado' }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+
+      await iframeElement.getByRole('textbox', { name: 'Ubicación' }).click();
+      await iframeElement.locator('[role="option"][data-index="2"]').click();
+
+      await iframeElement.getByRole('textbox', { name: 'Cod país (MH El Salvador)' }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+
+      await iframeElement.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
+      await iframeElement.getByRole('textbox', { name: 'Telefono 1' }).fill('6377776666');
+
+      await iframeElement.getByRole('textbox', { name: 'Tipo de cliente:' }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+
+      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+
+      //Verificando que el elemento fue agregado a la tabla y es visible
+      await expect(iframeElement.getByRole('cell', { name: uniqueId })).toBeVisible();
+
+    });
+  });
+
+
 });
