@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { crearCreditoFiscal } = require('/home/qa/repo/e2e-tests/playwright-tests/tests/helpers/crearCreditoFiscal');
 
 test.describe('Modulo Ventas', () => {
   let page;
@@ -395,21 +396,46 @@ test.describe('Modulo Ventas', () => {
   });
 
   test('Nota de credito', async () => {
-    // TODO:Añadir las funcionalidades posibles dentro de Factura de exportacion, esto incluye:
-    // - Crear un documento (indice de exito: Verificacion de documento creado) - PENDIENTE
+    // TODO: Añadir las funcionalidades posibles dentro de Factura de exportacion, esto incluye:
+    // - Crear un documento (indice de exito: Verificacion de documento creado) - COMPLETO
     // - Editar un documento (indice de exito: Verificacion de documento editado) - PENDIENTE
     // - Anular un documento (indice de exito: Verificacion de que el documento fue anulado) - PENDIENTE
-    // REQUIERE PARA FUNCIONAR: Creacion previa de credito fiscal.
+    // REQUIERE PARA FUNCIONAR: Creacion previa de credito fiscal. - COMPLETADO POR MEDIO DE FUNCION AYUDA
 
     const iframeElement = page.frameLocator('iframe');
+    let numeroCFF = '';
     let documentValue = '';
 
-    documentValue = await crearCreditoFiscal(page, iframeElement);
+    numeroCFF = await crearCreditoFiscal(page, iframeElement);
+
+    await page.getByRole('link', { name: 'Ventas' }).click();
+    await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
+
     await test.step('Creando Nota de Credito', async () => {
-      console.log(documentValue);
+      await page.getByRole('link', { name: 'Nota de crédito', exact: true }).click();
+      await page.waitForTimeout(500);
+      documentValue = await iframeElement.locator('input#coddoc').inputValue();
 
+      await iframeElement.getByRole('textbox', { name: 'Cliente:' }).click(); //Cliente
+      await iframeElement.locator('[role="option"][data-index="2"]').click();
+
+      await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click(); //Vendedor
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+
+      await iframeElement.getByRole('textbox', { name: 'Crédito fiscal' }).click(); // Credito Fiscal
+      await iframeElement.getByRole('option', { name: numeroCFF }).click();
+
+      await iframeElement.getByRole('button', { name: 'Grabar Documento' }).click();
+
+      //Confirmando que el documento fue creado
+      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+
+      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
+
+      expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
     });
-
 
   });
 
@@ -634,33 +660,3 @@ test.describe('Modulo Ventas', () => {
 
 
 });
-
-
-async function crearCreditoFiscal(page, iframeElement) {
-  await page.getByRole('link', { name: 'Crédito fiscal' }).click();
-  await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-
-  await iframeElement.getByRole('textbox', { name: 'Cliente:' }).click();
-  await iframeElement.locator('[role="option"][data-index="1"]').click();
-
-  await iframeElement.getByRole('textbox', { name: 'Almacen:' }).click();
-  await iframeElement.locator('[role="option"][data-index="2"]').click();
-
-  await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
-  await iframeElement.locator('[role="option"][data-index="0"]').click();
-
-  await iframeElement.getByRole('textbox', { name: 'Términos de pago' }).click();
-  await iframeElement.locator('[role="option"][data-index="0"]').click();
-
-  const documentValue = await iframeElement.locator('input#coddoc').inputValue();
-
-  await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-  await iframeElement.getByRole('textbox', { name: 'Código' }).click();
-  await iframeElement.locator('[role="option"][data-index="2"]').click();
-  await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('1');
-
-  await iframeElement.locator('#btnConfirmAddLine').click();
-  await iframeElement.getByRole('button', { name: 'Grabar documento' }).click();
-
-  return documentValue;
-}
