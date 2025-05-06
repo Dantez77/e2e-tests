@@ -125,7 +125,7 @@ test.describe('Login Functionality', () => {
     expect(isDisabled).toBe(true);
   });
 
-  // Test de fuerza bruta. Este test debería NUNCA tener éxito si las protecciones están en su lugar.
+  // Test de fuerza bruta. Este test NUNCA deberia tener éxito si las protecciones están en su lugar.
   // Solo correr en test.only
   test.skip('Brute force should not allow login', async ({ page }) => {
     // Current password is 1234
@@ -216,7 +216,7 @@ test.describe('Login Functionality', () => {
 
   });
 
-  //Verifying that the PHPSESSID cookie is set and persists across requests ensures that users are authenticated. 
+  //Verificando que PHPSESSID esta puesta y persiste atreves de requests nos asegura que los usuarios fueron autenticados
   test('Validate auth cookies after login', async ({ page }) => {
     await page.fill('#username', 'danq97@gmail.com');
     await page.fill('#password', '1234');

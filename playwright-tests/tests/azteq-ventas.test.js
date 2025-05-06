@@ -1,6 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { crearCreditoFiscal } = require('../tests/helpers/crearCreditoFiscal');
 const { crearNotaCredito } = require('../tests/helpers/crearNotaCredito');
+const { crearFactura } = require('../tests/helpers/crearFactura');
 
 
 test.describe('Modulo Ventas', () => {
@@ -207,46 +208,19 @@ test.describe('Modulo Ventas', () => {
     await page.getByRole('link', { name: 'Factura', exact: true }).click();
 
     await test.step('Grabando un nuevo documento', async () => {
-      //TODO: Por ahora falta verificar el toast despues de crear documento 
-      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-
-      await iframeElement.getByRole('textbox', { name: 'Cliente:' }).click();
-      await iframeElement.locator('[role="option"][data-index="1"]').click();
-
-      await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
-      await iframeElement.locator('[role="option"][data-index="1"]').click();
-
-      await iframeElement.getByRole('textbox', { name: 'Términos de pago' }).click();
-      await iframeElement.locator('[role="option"][data-index="1"]').click();
-
-      documentValue = await iframeElement.locator('input#coddoc').inputValue();
-
-      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-
-      await iframeElement.getByRole('textbox', { name: 'Código' }).click();
-      await iframeElement.locator('[role="option"][data-index="4"]').click();
-      await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('12');
-
-      await iframeElement.locator('#btnConfirmAddLine').click();
-
-      await iframeElement.getByRole('button', { name: 'Grabar documento' }).click();
-    });
-
-    await test.step('Editando el documento creado', async () => {
+      documentValue = await crearFactura(page, iframeElement);
       await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
       await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
       await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+      await expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
+    });
 
-      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click(); //Buscar por numero de doc
-
-      await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
+    await test.step('Editando el documento creado', async () => {
       iframeElement.getByRole('cell', { name: documentValue }).click();
       await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
       //El elemento aqui se llama John Doe, pero sera diferente en caso cambien las credenciales actualmente utilizadas
       await iframeElement.locator('[role="option"][data-index="0"]').click();
-
       await iframeElement.getByRole('button', { name: 'Grabar cambios' }).click();
-
       //Se busca otra vez
       await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
 
