@@ -235,7 +235,7 @@ test.describe('Login Functionality', () => {
   
     const expiryDate = sessionCookie.expires;
     const currentTime = Date.now() / 1000;  
-    expect(expiryDate).toBeGreaterThan(currentTime);  // For the expiry date 
+    expect(expiryDate).toBeGreaterThan(currentTime);  // Fecha de expiracion 
   });
   
 });

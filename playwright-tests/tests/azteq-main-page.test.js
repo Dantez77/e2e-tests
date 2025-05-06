@@ -25,7 +25,7 @@ test.describe('Modules Page Functionality', () => {
 
     await page.locator('#goLogin2').click();
     await page.waitForURL('**/menu/menu.php', { timeout: 10000 });
-    await expect(page.url()).toContain('/menu/menu.php');
+    expect(page.url()).toContain('/menu/menu.php');
   });
 
   test.afterAll(async () => {
@@ -39,7 +39,6 @@ test.describe('Modules Page Functionality', () => {
   });
 
   test('Toggle de tema oscuro y claro', async () => {
-
     const theme = await page.evaluate(() => {
       return localStorage.getItem('azteqTheme');
     });
@@ -51,7 +50,6 @@ test.describe('Modules Page Functionality', () => {
       return localStorage.getItem('azteqTheme');
     });
     expect(themeAfterToggle).toBe('light');
-    //await page.screenshot({ path: 'test2.png', fullPage: true }); //Debug screenshot
 
     await page.click('span.slider.round.slider-light-bg'); 
 
@@ -59,7 +57,6 @@ test.describe('Modules Page Functionality', () => {
       return localStorage.getItem('azteqTheme');
     });
     expect(themeAfterSecondToggle).toBe('dark');
-    //await page.screenshot({ path: 'test1.png', fullPage: true }); //Debug screenshot
 
   });
 
@@ -89,8 +86,8 @@ test.describe('Modules Page Functionality', () => {
     await expect(page.locator("[id='changepassword']")).not.toBeVisible();
   });
 
-  //TODO: Fix it so it actually tests POST validation and just the success toast
-  test.skip('Actualizar repositorios estandar: Checks POST validation', async () => {
+  // Que no se corra me dijeron, pero aqui esta por si acaso
+  test.fixme('Actualizar repositorios estandar: Checks POST validation', async () => {
     await page.click("[id='btnConfig']");
     //await page.screenshot({ path: 'test1.png', fullPage: true }); //Debug screenshot
     await page.click("[id='updaterepos']");
@@ -106,26 +103,25 @@ test.describe('Modules Page Functionality', () => {
     expect(postData).toEqual({ toalert: true });
   });
 
-  //Logout desde opciones de usuario
   test('Logout desde opciones de usuario', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='logout']");
 
-    //Check if the logout pop up shows up after clicking logout
+    // Check if the logout pop up shows up after clicking logout
     await expect(page.getByText('Logout')).toBeVisible();
     await expect(page.getByText('Desea terminar sesión?')).toBeVisible();
     
     await expect(page.getByRole('button', { name: 'No - Cancelar' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
 
-    //Log out
+    // Log out
     await page.getByRole('button', { name: 'Si - proceder' }).click();
 
-    //Back to log in menu
+    // Back to log in menu
     await page.waitForURL('**/login/index.php', { timeout: 10000 });
-    await expect(page.url()).toContain('/login/index.php');
+    expect(page.url()).toContain('/login/index.php');
     
-    //Check if the session really closed
+    // Check if the session really closed
     await page.click('#goLogin1');
     await expect(page.locator('.mbsc-toast')).toHaveText('ID o password incorrecto(s)');
   });
@@ -173,6 +169,7 @@ test.describe('Modules Page Functionality', () => {
   });
 
   //Password change (For now it allows a password change to the same or previously used passwords)
+  //FIXME: Deberia fallar por que esto no se deberia poder hacer
   test('Cambio de contraseña: Se efectua el cambio efectivamente', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='changepassword']");
@@ -202,6 +199,7 @@ test.describe('Modules Page Functionality', () => {
     });
   });
 
+  //FIXME: 
   test('Cambio de contraseña: Verifica si el password puede ser cambiado a "" ', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='changepassword']");
@@ -269,7 +267,7 @@ test.describe('Modules Page Functionality', () => {
     await page.click("[id='changecompany']");
   
     await page.waitForURL('**/menu/cambiar_empresa.php', { timeout: 10000 });
-    await expect(page.url()).toContain('/menu/cambiar_empresa.php');
+    expect(page.url()).toContain('/menu/cambiar_empresa.php');
   
     // Select enterprise
     await page.click('[id="dbschm_dummy"]'); 
@@ -284,7 +282,7 @@ test.describe('Modules Page Functionality', () => {
     await page.click('[id="cambiarEmpresa"]'); 
   
     await page.waitForURL('**/menu/menu.php', { timeout: 10000 });
-    await expect(page.url()).toContain('/menu/menu.php');
+    expect(page.url()).toContain('/menu/menu.php');
   
     // Get branch name from main menu
     const fullLabel = await page.locator('.b4-sucurs-name.pl-2').innerText();
