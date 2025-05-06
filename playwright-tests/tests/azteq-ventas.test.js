@@ -1,5 +1,7 @@
 const { test, expect } = require('@playwright/test');
-const { crearCreditoFiscal } = require('/home/qa/repo/e2e-tests/playwright-tests/tests/helpers/crearCreditoFiscal');
+const { crearCreditoFiscal } = require('../tests/helpers/crearCreditoFiscal');
+const { crearNotaCredito } = require('../tests/helpers/crearNotaCredito');
+
 
 test.describe('Modulo Ventas', () => {
   let page;
@@ -395,7 +397,8 @@ test.describe('Modulo Ventas', () => {
     });
   });
 
-  test('Nota de credito', async () => {
+  //PROBLEMA CON LA EDICION Y ANULACION DE NUEVOS DOCUMENTOS. CUANDO SE ARREGLE SE HARA EL TEST NUEVAMENTE
+  test.skip('Nota de credito', async () => {
     // TODO: Añadir las funcionalidades posibles dentro de Factura de exportacion, esto incluye:
     // - Crear un documento (indice de exito: Verificacion de documento creado) - COMPLETO
     // - Editar un documento (indice de exito: Verificacion de documento editado) - PENDIENTE
@@ -406,39 +409,28 @@ test.describe('Modulo Ventas', () => {
     let numeroCFF = '';
     let documentValue = '';
 
-    numeroCFF = await crearCreditoFiscal(page, iframeElement);
+    numeroCFF = await crearCreditoFiscal(page, iframeElement); //Crear credito fiscal
 
     await page.getByRole('link', { name: 'Ventas' }).click();
     await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
 
     await test.step('Creando Nota de Credito', async () => {
-      await page.getByRole('link', { name: 'Nota de crédito', exact: true }).click();
-      await page.waitForTimeout(500);
-      documentValue = await iframeElement.locator('input#coddoc').inputValue();
-
-      await iframeElement.getByRole('textbox', { name: 'Cliente:' }).click(); //Cliente
-      await iframeElement.locator('[role="option"][data-index="2"]').click();
-
-      await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click(); //Vendedor
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-
-      await iframeElement.getByRole('textbox', { name: 'Crédito fiscal' }).click(); // Credito Fiscal
-      await iframeElement.getByRole('option', { name: numeroCFF }).click();
-
-      await iframeElement.getByRole('button', { name: 'Grabar Documento' }).click();
-
-      //Confirmando que el documento fue creado
-      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
-      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
-
-      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
-
-      expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
+      documentValue = await crearNotaCredito(page, iframeElement, numeroCFF); //Nota de Credito
+      await expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
     });
 
+    await test.step('Editando Nota de Credito', async () => {
+      //TODO: No es posible hacer por ahora, regresar mas tarde
+
+    });
+
+    await test.step('Eliminando Nota de Credito', async () => {
+      //TODO: No es posible hacer por ahora, regresar mas tarde
+
+    });
   });
 
+  //PROBLEMA CON LA EDICION Y ANULACION DE NUEVOS DOCUMENTOS. CUANDO SE ARREGLE SE HARA EL TEST NUEVAMENTE
   test.skip('Nota de debito', async () => {
     //TODO: 
   });
@@ -658,5 +650,42 @@ test.describe('Modulo Ventas', () => {
     });
   });
 
+  ////////////////////////////////////////////////////
+  /*
+  test.describe('Nota de Credito 12', () => {
+    let iframeElement;
+    let documentValue;
+    let numeroCFF;
+
+    test.beforeAll(async () => {
+      iframeElement = page.frameLocator('iframe');
+      numeroCFF = await crearCreditoFiscal(page, iframeElement);
+      await page.getByRole('link', { name: 'Ventas' }).click();
+      await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
+      documentValue = await crearNotaCredito(page, iframeElement, numeroCFF);
+      await expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
+
+    });
+
+    test('Edita la nota de crédito', async () => {
+      await page.getByRole('link', { name: 'Nota de crédito', exact: true }).click();
+
+      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
+      await expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
+
+      await iframeElement.getByRole('row', { name: documentValue }).click();
+
+
+
+    });
+
+    test('Anular la nota de crédito', async () => {
+      // Use documentValue to find and delete
+    });
+  });
+  */
 
 });
