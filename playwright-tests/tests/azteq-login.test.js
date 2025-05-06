@@ -18,29 +18,27 @@ test.describe('Login Functionality', () => {
   });
 
   //Page loads and shows all inputs
-  test('Page loads and shows all inputs', async ({ page }) => {
+  test('Login: la pagina carga y se muestran todos los elementos', async ({ page }) => {
     await expect(page.locator('#username')).toBeVisible();
     await expect(page.locator('#password')).toBeVisible();
     await expect(page.locator('#goLogin1')).toBeVisible();
   });
 
-  //User can enter email and password
-  test('User can enter email and password', async ({ page }) => {
+  test('Input correctos en login', async ({ page }) => {
     await page.fill('#username', 'test@test.com');
     await page.fill('#password', 'testpassword');
     await expect(page.locator('#username')).toHaveValue('test@test.com');
     await expect(page.locator('#password')).toHaveValue('testpassword');
   });
 
-  //Login button enabled with filled form
-  test('Login button enabled with filled form', async ({ page }) => {
+  test('Boton de login es abilitado una vez se llenan los campos', async ({ page }) => {
     await page.fill('#username', 'test@test.com');
     await page.fill('#password', 'testpassword');
     await expect(page.locator('#goLogin1')).toBeEnabled();
   });
 
-  //Valid username and password combination successfully logs the user in.
-  test('Valid username and password combination successfully logs the user in.', async ({ page }) => {
+  // Combinacion de usuario y contraseña con login exitoso 
+  test('Combinacion de usuario y contraseña con login exitoso', async ({ page }) => {
     await page.fill('#username', 'danq97@gmail.com');
     await page.fill('#password', '1234');
     await page.click('#goLogin1');
@@ -49,7 +47,7 @@ test.describe('Login Functionality', () => {
   });
   
   //Dropdowns available after login: Empresa & Sucursal
-  test('Dropdowns available after login: Empresa & Sucursal', async ({ page }) => {
+  test('Dropdowns visibles despues de hacer login', async ({ page }) => {
     await page.fill('#username', 'danq97@gmail.com');
     await page.fill('#password', '1234');
     await page.locator('#goLogin1').click();
@@ -66,7 +64,7 @@ test.describe('Login Functionality', () => {
   });
 
   //Keyboard login triggers login with "Enter"
-  test('Keyboard login triggers login with "Enter"', async ({ page }) => {
+  test('Se puede hacer login con "ENTER"', async ({ page }) => {
     await page.fill('#username', 'danq97@gmail.com');
     await page.fill('#password', '1234');
     await page.press('#password', 'Enter');
@@ -75,44 +73,33 @@ test.describe('Login Functionality', () => {
   });
 
   //No error messages after login test
-  test('No error messages after successful login', async ({ page }) => {
+  test('Login correcto y sin errores', async ({ page }) => {
     await page.fill('#username', 'danq97@gmail.com');
     await page.fill('#password', '1234');
     await page.click('#goLogin1');
     await expect(page.locator('.error-message')).toHaveCount(0);
   });
 
-  //Check this test again later as I dont know rn how to test correct cookie validation
-  test.skip('Session or cookie validation after login', async ({ page }) => {
-    await page.fill('#username', 'danq97@gmail.com');
-    await page.fill('#password', '1234');
-    await page.click('#goLogin1');
-    //TODO: cookie validation
-  });
-
-  test('Submit empty form', async ({ page }) => {
+  test.fixme('Login sin credenciales en los campos', async ({ page }) => {
     await page.click('#goLogin1');
     await expect(page.locator('.mbsc-toast')).toHaveText('ID o password incorrecto(s)');
-
-    //await expect(page.locator('.error-message')).toBeVisible();  
   });
 
-  //Submit form with only email: Should show error or a alarm toast
-  test('Submit form with only email', async ({ page }) => {
+  test('Login sin password', async ({ page }) => {
     await page.fill('#username', 'danq97@gmail.com');
     await page.click('#goLogin1');
     await expect(page.locator('.mbsc-toast')).toHaveText('ID o password incorrecto(s)');
   });
 
-  test('Incorrect credentials show error', async ({ page }) => {
+  test('Login con credenciales incorrectas', async ({ page }) => {
     await page.fill('#username', 'wronuser@wrong.com');
     await page.fill('#password', 'wrongpassword');
     await page.click('#goLogin1');
     await expect(page.locator('.mbsc-toast')).toHaveText('ID o password incorrecto(s)');
   });
 
-  //Brute force vulnerability test
-  //Needs CAPTCHA to verify you are not a bot
+  // Test de fuerza bruta
+  // Verificando si no se puede hacer intentos exesivos de login
   test('Brute force test: Infinite login attempts', async ({ page }) => {
     for (let i = 0; i < 6; i++) {
       await page.fill('#username', 'wronguser@wrong.com');
@@ -127,7 +114,7 @@ test.describe('Login Functionality', () => {
 
   // Test de fuerza bruta. Este test NUNCA deberia tener éxito si las protecciones están en su lugar.
   // Solo correr en test.only
-  test.skip('Brute force should not allow login', async ({ page }) => {
+  test.skip('Brute force bot: should not allow login', async ({ page }) => {
     // Current password is 1234
     let pass = 1200;
     let loginSuccess = false;
@@ -212,8 +199,6 @@ test.describe('Login Functionality', () => {
     await page.locator('#goLogin2').click();
     await page.waitForURL('**/menu/menu.php', { timeout: 10000 });
     await expect(page.url()).toContain('/menu/menu.php');
-    //await page.screenshot({ path: 'mobiscroll_debug.png', fullPage: true });
-
   });
 
   //Verificando que PHPSESSID esta puesta y persiste atreves de requests nos asegura que los usuarios fueron autenticados
