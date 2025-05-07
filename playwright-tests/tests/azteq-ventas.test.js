@@ -2,6 +2,9 @@ const { test, expect } = require('@playwright/test');
 const { crearCreditoFiscal } = require('../tests/helpers/crearCreditoFiscal');
 const { crearNota } = require('../tests/helpers/crearNota');
 const { crearFactura } = require('../tests/helpers/crearFactura');
+const { crearCotizacion } = require('../tests/helpers/crearCotizacion');
+const { busquedaDoc } = require('../tests/helpers/busquedaDoc');
+
 
 
 test.describe('Modulo Ventas', () => {
@@ -449,37 +452,49 @@ test.describe('Modulo Ventas', () => {
     });
   
     test('Agregando Cotizacion', async () => {
+      iframeElement = page.frameLocator('iframe');
+      //Creando cotizacion
+      documentValue = await crearCotizacion(page, iframeElement);
+      //Verificando creacion de cotizacion
+      await busquedaDoc(page, iframeElement, documentValue);
+      expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
+    });
+
+    //Falla sin agregar cotizacion
+    test('Editando Cotizacion', async () => {
       await page.getByRole('link', { name: 'Cotización' }).click();
       iframeElement = page.frameLocator('iframe');
 
-      await iframeElement.getByRole('textbox', { name: 'Cliente' }).click();
-      await iframeElement.locator('[role="option"][data-index="2"]').click();
-  
+      //Verificando creacion de cotizacion
+      await busquedaDoc(page, iframeElement, documentValue);
+      await iframeElement.getByRole('cell', { name: documentValue }).click();
+
+      //Editando Vendedor
       await iframeElement.getByRole('textbox', { name: 'Vendedor' }).click();
-      await iframeElement.locator('[role="option"][data-index="1"]').click();
-  
-      await iframeElement.getByRole('textbox', { name: 'Termino de Pago' }).click();
-      await iframeElement.getByRole('option', { name: 'Contado' }).click();
-  
-      await iframeElement.getByRole('textbox', { name: 'Válido hasta' }).fill('2099-11-11');
-      documentValue = await iframeElement.locator('input#coddoc').inputValue();
-  
-      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-  
-      await iframeElement.getByRole('textbox', { name: 'Código' }).click();
-      await iframeElement.locator('[role="option"][data-index="2"]').click();
-  
-      await iframeElement.locator('#btnConfirmAddLine').click();
-      await iframeElement.getByRole('button', { name: 'Grabar Documento' }).click();
+      await iframeElement.locator('[role="option"][data-index="0"]').click();
+
+      await iframeElement.getByRole('button', { name: 'Grabar cambios'}).click();
       await iframeElement.getByRole('button', { name: 'Cancel' }).click();
-  
-      await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
-      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
-  
-      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
-      await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
+
+      //Verificando cambios...
+      await busquedaDoc(page, iframeElement, documentValue);
+      expect(iframeElement
+        .getByRole('row', { name: documentValue })
+        .getByRole('cell', { name: 'John Doe'})) //Sujeto a cambio (fixme)
+        .toBeVisible();
+
+
     });
+
+    test.skip('Anulando Cotizacion', async () => {
+      iframeElement = page.frameLocator('iframe');
+      //Creando cotizacion
+      documentValue = await crearCotizacion(page, iframeElement);
+      //Verificando creacion de cotizacion
+      await busquedaDoc(page, iframeElement, documentValue);
+      expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
+    });
+
   });
   
 
@@ -640,7 +655,7 @@ test.describe('Modulo Ventas', () => {
   });
 
   test.skip('Sucursales', async () => {
-    //TODO: 
+    //TODO:
   });
 
   test.skip('Grupos de clientes', async () => {
