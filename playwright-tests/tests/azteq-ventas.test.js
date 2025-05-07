@@ -440,48 +440,48 @@ test.describe('Modulo Ventas', () => {
 
   });
 
-  test.only('Cotizacion', async () => {
-    // TODO: Añadir las funcionalidades posibles dentro de Cotizacion, esto incluye:
-    // - Crear un documento (indice de exito: Verificacion de documento creado) - PENDIENTE
-    // - Editar un documento (indice de exito: Verificacion de documento editado) - PENDIENTE
-    // - Anular un documento (indice de exito: Verificacion de que el documento fue anulado) - PENDIENTE
-    const iframeElement = page.frameLocator('iframe');
+  test.describe('Cotizacion', () => {
+    let iframeElement;
     let documentValue = '';
+  
+    test.beforeAll(async () => {
+      //TODO
+    });
+  
+    test('Agregando Cotizacion', async () => {
+      await page.getByRole('link', { name: 'Cotización' }).click();
+      iframeElement = page.frameLocator('iframe');
 
-    await page.getByRole('link', { name: 'Cotización' }).click();
-
-    await test.step('Editando Nota de Debito', async () => {
       await iframeElement.getByRole('textbox', { name: 'Cliente' }).click();
       await iframeElement.locator('[role="option"][data-index="2"]').click();
-
+  
       await iframeElement.getByRole('textbox', { name: 'Vendedor' }).click();
       await iframeElement.locator('[role="option"][data-index="1"]').click();
-
+  
       await iframeElement.getByRole('textbox', { name: 'Termino de Pago' }).click();
       await iframeElement.getByRole('option', { name: 'Contado' }).click();
-
+  
       await iframeElement.getByRole('textbox', { name: 'Válido hasta' }).fill('2099-11-11');
       documentValue = await iframeElement.locator('input#coddoc').inputValue();
-
+  
       await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-
-      //Agregando producto
+  
       await iframeElement.getByRole('textbox', { name: 'Código' }).click();
       await iframeElement.locator('[role="option"][data-index="2"]').click();
-
+  
       await iframeElement.locator('#btnConfirmAddLine').click();
       await iframeElement.getByRole('button', { name: 'Grabar Documento' }).click();
       await iframeElement.getByRole('button', { name: 'Cancel' }).click();
-
+  
       await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
       await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
       await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
-
+  
       await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
       await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
     });
-
   });
+  
 
   test.skip('Comprobante de donacion', async () => {
     //TODO: 
@@ -733,3 +733,51 @@ test.describe('Modulo Ventas', () => {
   */
 
 });
+
+/* 
+test.describe('Cotizacion', async () => {
+    // TODO: Añadir las funcionalidades posibles dentro de Cotizacion, esto incluye:
+    // - Crear un documento (indice de exito: Verificacion de documento creado) - PENDIENTE
+    // - Editar un documento (indice de exito: Verificacion de documento editado) - PENDIENTE
+    // - Anular un documento (indice de exito: Verificacion de que el documento fue anulado) - PENDIENTE
+    const iframeElement = page.frameLocator('iframe');
+    let documentValue = '';
+
+    test.beforeAll(async () => {
+      await page.getByRole('link', { name: 'Cotización' }).click();
+    });
+
+
+    test('Editando Nota de Debito', async () => {
+      await iframeElement.getByRole('textbox', { name: 'Cliente' }).click();
+      await iframeElement.locator('[role="option"][data-index="2"]').click();
+
+      await iframeElement.getByRole('textbox', { name: 'Vendedor' }).click();
+      await iframeElement.locator('[role="option"][data-index="1"]').click();
+
+      await iframeElement.getByRole('textbox', { name: 'Termino de Pago' }).click();
+      await iframeElement.getByRole('option', { name: 'Contado' }).click();
+
+      await iframeElement.getByRole('textbox', { name: 'Válido hasta' }).fill('2099-11-11');
+      documentValue = await iframeElement.locator('input#coddoc').inputValue();
+
+      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+
+      //Agregando producto
+      await iframeElement.getByRole('textbox', { name: 'Código' }).click();
+      await iframeElement.locator('[role="option"][data-index="2"]').click();
+
+      await iframeElement.locator('#btnConfirmAddLine').click();
+      await iframeElement.getByRole('button', { name: 'Grabar Documento' }).click();
+      await iframeElement.getByRole('button', { name: 'Cancel' }).click();
+
+      await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
+      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
+      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+
+      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
+      await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
+    });
+
+  });
+*/
