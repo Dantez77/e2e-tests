@@ -445,7 +445,7 @@ test.describe('Modulo Compras', () => {
 
 
   //===============================================================================
-  //Compras al exterior
+  // Compras al exterior
   //===============================================================================
 
   test('Compras al exterior: Agregar al registro', async () => {

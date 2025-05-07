@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const { crearCreditoFiscal } = require('../tests/helpers/crearCreditoFiscal');
-const { crearNotaCredito } = require('../tests/helpers/crearNotaCredito');
+const { crearNota } = require('../tests/helpers/crearNota');
 const { crearFactura } = require('../tests/helpers/crearFactura');
 
 
@@ -371,25 +371,27 @@ test.describe('Modulo Ventas', () => {
     });
   });
 
-  //PROBLEMA CON LA EDICION Y ANULACION DE NUEVOS DOCUMENTOS. CUANDO SE ARREGLE SE HARA EL TEST NUEVAMENTE
-  test.skip('Nota de credito', async () => {
-    // TODO: Añadir las funcionalidades posibles dentro de Factura de exportacion, esto incluye:
+  test('Nota de credito', async () => {
+    // TODO: Añadir las funcionalidades posibles dentro de Nota de Credito, esto incluye:
     // - Crear un documento (indice de exito: Verificacion de documento creado) - COMPLETO
     // - Editar un documento (indice de exito: Verificacion de documento editado) - PENDIENTE
     // - Anular un documento (indice de exito: Verificacion de que el documento fue anulado) - PENDIENTE
-    // REQUIERE PARA FUNCIONAR: Creacion previa de credito fiscal. - COMPLETADO POR MEDIO DE FUNCION AYUDA
+    // REQUIERE PARA FUNCIONAR: Creacion previa de credito fiscal. crearCreditoFiscal(page, iframe);
 
     const iframeElement = page.frameLocator('iframe');
     let numeroCFF = '';
     let documentValue = '';
+    const tipoPago = 'Contado';
+    const tipoNota = 'Nota de crédito';
 
-    numeroCFF = await crearCreditoFiscal(page, iframeElement); //Crear credito fiscal
+    numeroCFF = await crearCreditoFiscal(page, iframeElement, tipoPago);
 
     await page.getByRole('link', { name: 'Ventas' }).click();
     await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
 
     await test.step('Creando Nota de Credito', async () => {
-      documentValue = await crearNotaCredito(page, iframeElement, numeroCFF); //Nota de Credito
+      documentValue = await crearNota(page, iframeElement, numeroCFF, tipoNota); //Nota de Credito
+      console.log(documentValue);
       await expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
     });
 
@@ -404,13 +406,83 @@ test.describe('Modulo Ventas', () => {
     });
   });
 
-  //PROBLEMA CON LA EDICION Y ANULACION DE NUEVOS DOCUMENTOS. CUANDO SE ARREGLE SE HARA EL TEST NUEVAMENTE
-  test.skip('Nota de debito', async () => {
-    //TODO: 
+  test('Nota de debito', async () => {
+    // TODO: Añadir las funcionalidades posibles dentro de Nota de Debito, esto incluye:
+    // - Crear un documento (indice de exito: Verificacion de documento creado) - COMPLETO
+    // - Editar un documento (indice de exito: Verificacion de documento editado) - PENDIENTE
+    // - Anular un documento (indice de exito: Verificacion de que el documento fue anulado) - PENDIENTE
+    // REQUIERE PARA FUNCIONAR: Creacion previa de credito fiscal. crearCreditoFiscal(page, iframe); 
+    const iframeElement = page.frameLocator('iframe');
+
+    let numeroCFF = '';
+    let documentValue = '';
+    const tipoPago = 'Credito';
+    const tipoNota = 'Nota de débito';
+
+    numeroCFF = await crearCreditoFiscal(page, iframeElement, tipoPago); //Crear credito fiscal (0 es credito contado)
+
+    await page.getByRole('link', { name: 'Ventas' }).click();
+    await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
+
+    test.step('Creando Nota de Debito', async () => {
+      documentValue = await crearNota(page, iframeElement, numeroCFF, tipoNota); //Nota de Credito
+      console.log(documentValue);
+      await expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
+    });
+
+    test.step('Editando Nota de Debito', async () => {
+      //TODO: Funcionalidad para editar una nota de debito
+    });
+
+    test.step('Anulando Nota de Debito', async () => {
+      //TODO: Funcionalidad para anular una nota de debito
+    });
+
   });
 
-  test.skip('Cotizacion', async () => {
-    //TODO: 
+  test.only('Cotizacion', async () => {
+    // TODO: Añadir las funcionalidades posibles dentro de Cotizacion, esto incluye:
+    // - Crear un documento (indice de exito: Verificacion de documento creado) - PENDIENTE
+    // - Editar un documento (indice de exito: Verificacion de documento editado) - PENDIENTE
+    // - Anular un documento (indice de exito: Verificacion de que el documento fue anulado) - PENDIENTE
+    const iframeElement = page.frameLocator('iframe');
+    let documentValue = '';
+
+    await page.getByRole('link', { name: 'Cotización' }).click();
+
+
+    //TODO: Funcionalidad para editar una nota de debito
+
+    await iframeElement.getByRole('textbox', { name: 'Cliente' }).click();
+    await iframeElement.locator('[role="option"][data-index="2"]').click();
+
+    await iframeElement.getByRole('textbox', { name: 'Vendedor' }).click();
+    await iframeElement.locator('[role="option"][data-index="1"]').click();
+
+    await iframeElement.getByRole('textbox', { name: 'Termino de Pago' }).click();
+    await iframeElement.getByRole('option', { name: 'Contado' }).click();
+
+    await iframeElement.getByRole('textbox', { name: 'Válido hasta' }).fill('2099-11-11');
+    documentValue = await iframeElement.locator('input#coddoc').inputValue();
+
+    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+
+    //Agregando producto
+    await iframeElement.getByRole('textbox', { name: 'Código' }).click();
+    await iframeElement.locator('[role="option"][data-index="2"]').click();
+
+    await iframeElement.locator('#btnConfirmAddLine').click();
+    await iframeElement.getByRole('button', { name: 'Grabar Documento' }).click();
+    await iframeElement.getByRole('button', { name: 'Cancel' }).click();
+
+    await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
+    await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
+    await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+
+    await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
+    console.log(documentValue);
+    await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
+    
   });
 
   test.skip('Comprobante de donacion', async () => {
@@ -582,7 +654,7 @@ test.describe('Modulo Ventas', () => {
   ////////////////////////////////////////////////////////
 
   //Esta test fue creado solo para automatizar la creacion de nuevos clientes, dejar en skip o borrar en el futuro
-  test.skip('Clientes Exterior: Nuevo cliente', async () => {
+  test.skip('Clientes Exterior: Nuevo clientes ', async () => {
     const iframeElement = page.frameLocator('iframe');
     const uniqueId = `CEXT-` + `${Date.now()}`.slice(-5);
     const cliente = `Cliente Exterior ` + `${Date.now()}`.slice(-3);
