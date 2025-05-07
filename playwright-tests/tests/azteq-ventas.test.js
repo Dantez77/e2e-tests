@@ -651,48 +651,7 @@ test.describe('Modulo Ventas', () => {
   //           Configuraciones adicionales              //
   ////////////////////////////////////////////////////////
 
-  //Esta test fue creado solo para automatizar la creacion de nuevos clientes, dejar en skip o borrar en el futuro
-  test.skip('Clientes Exterior: Nuevo clientes ', async () => {
-    const iframeElement = page.frameLocator('iframe');
-    const uniqueId = `CEXT-` + `${Date.now()}`.slice(-5);
-    const cliente = `Cliente Exterior ` + `${Date.now()}`.slice(-3);
 
-    await page.getByRole('link', { name: 'Clientes', exact: true }).click();
-
-    // Creando cliente
-    await test.step('Agregando Producto a la tabla', async () => {
-      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-
-      //Llenando formulario
-      await iframeElement.getByRole('textbox', { name: 'Codigo cliente:' }).fill(uniqueId);
-      await iframeElement.getByRole('textbox', { name: 'Razon social:' }).fill('RZ');
-      await iframeElement.getByRole('textbox', { name: 'Nombre comercial:' }).fill(cliente);
-      await iframeElement.locator('#direc').fill('direccion ');
-      await iframeElement.getByRole('textbox', { name: 'Giro' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-
-      await iframeElement.getByRole('textbox', { name: 'Vendedor asignado' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-
-      await iframeElement.getByRole('textbox', { name: 'Ubicación' }).click();
-      await iframeElement.locator('[role="option"][data-index="2"]').click();
-
-      await iframeElement.getByRole('textbox', { name: 'Cod país (MH El Salvador)' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-
-      await iframeElement.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
-      await iframeElement.getByRole('textbox', { name: 'Telefono 1' }).fill('6377776666');
-
-      await iframeElement.getByRole('textbox', { name: 'Tipo de cliente:' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-
-      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
-
-      //Verificando que el elemento fue agregado a la tabla y es visible
-      await expect(iframeElement.getByRole('cell', { name: uniqueId })).toBeVisible();
-
-    });
-  });
 
   ////////////////////////////////////////////////////
   /*
@@ -735,7 +694,7 @@ test.describe('Modulo Ventas', () => {
 });
 
 /* 
-test.describe('Cotizacion', async () => {
+test.describe('Cotizacion', () => {
     // TODO: Añadir las funcionalidades posibles dentro de Cotizacion, esto incluye:
     // - Crear un documento (indice de exito: Verificacion de documento creado) - PENDIENTE
     // - Editar un documento (indice de exito: Verificacion de documento editado) - PENDIENTE
