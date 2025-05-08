@@ -21,8 +21,6 @@ async function crearCreditoFiscal(page, iframeElement, tipoPago) {
     await iframeElement.getByRole('textbox', { name: 'Términos de pago' }).click();
     await iframeElement.getByRole('option', { name: tipoPago }).click();
 
-
-
     const documentValue = await iframeElement.locator('input#coddoc').inputValue();
 
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();

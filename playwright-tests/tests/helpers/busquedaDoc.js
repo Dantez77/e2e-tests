@@ -10,10 +10,8 @@
 
 //Busca y valida que un documento existe
 async function busquedaDoc(page, iframeElement, documentValue) {
-    await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
     await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
     await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
-
     await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
 }
 
