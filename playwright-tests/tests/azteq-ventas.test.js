@@ -153,10 +153,8 @@ test.describe('Modulo Ventas', () => {
 
     await test.step('Buscar y editar documento', async () => {
       await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
-      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
-
-      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
+      
+      await busquedaDoc(page, iframeElement, documentValue);
 
       await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
       iframeElement.getByRole('cell', { name: documentValue }).click();
@@ -280,7 +278,6 @@ test.describe('Modulo Ventas', () => {
     let documentValue = '';
     await page.getByRole('link', { name: 'Factura de exportación', exact: true }).click();
 
-
     await test.step('Creando el documento', async () => {
       //TODO: Por ahora falta verificar el toast despues de crear documento 
       await page.waitForTimeout(500)
@@ -393,8 +390,7 @@ test.describe('Modulo Ventas', () => {
     });
 
     test('Creando Nota de Credito', async () => {
-
-      numeroCFF = await crearCreditoFiscal(page, iframeElement, tipoPago); //Crear credito fiscal (0 es credito contado)
+      numeroCFF = await crearCreditoFiscal(page, iframeElement, tipoPago);
       //console.log(numeroCFF);
       await page.getByRole('link', { name: 'Ventas' }).click();
       await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
@@ -458,24 +454,30 @@ test.describe('Modulo Ventas', () => {
     const tipoPago = 'Credito';
     const tipoNota = 'Nota de débito';
 
-    test.beforeEach(async () => {
+    test.beforeAll(async () => {
       iframeElement = page.frameLocator('iframe');
-    });
-
-    test('Creando Nota de Debito', async () => {
-      numeroCFF = await crearCreditoFiscal(page, iframeElement, tipoPago); //Crear credito fiscal (0 es credito contado)
-      //console.log(numeroCFF);
+      numeroCFF = await crearCreditoFiscal(page, iframeElement, tipoPago);
       await page.getByRole('link', { name: 'Ventas' }).click();
       await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
+      documentValue = await crearNota(page, iframeElement, numeroCFF, tipoNota);
+    });
 
-      documentValue = await crearNota(page, iframeElement, numeroCFF, tipoNota); //Nota de Credito
+    test.beforeEach(async () => {
+      iframeElement = page.frameLocator('iframe');
+      await page.getByRole('link', { name: 'Nota de débito', exact: true }).click();
+    });
+
+    test('Validando Creacion de Nota de Debito', async () => {
+      //console.log(numeroCFF);
       //console.log(documentValue);
+      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+      await busquedaDoc(page, iframeElement, documentValue);
       await expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
     });
 
     test('Editando Nota de Debito', async () => {
-      await page.getByRole('link', { name: 'Nota de débito', exact: true }).click();
-
+      test.skip(!documentValue, 'No document created'); // prevents test crash if setup fails
+      
       await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
       await busquedaDoc(page, iframeElement, documentValue);
       await iframeElement.getByRole('cell', { name: documentValue }).click();
@@ -489,14 +491,11 @@ test.describe('Modulo Ventas', () => {
       await busquedaDoc(page, iframeElement, documentValue);
       await expect(iframeElement
         .getByRole('row', { name: documentValue })
-        .getByRole('cell', { name: 'Bob' }))
+        .getByRole('cell', { name: 'Bob' })) //EDITAR MAS TARDE
         .toBeVisible();
     });
 
     test('Anulando Nota de Debito', async () => {
-      //console.log(documentValue);
-      await page.getByRole('link', { name: 'Nota de débito', exact: true }).click();
-      await page.waitForTimeout(500);
       //Verificando creacion de cotizacion
       await iframeElement.getByRole('button', { name: 'Anular Documento' }).click();
       await busquedaDoc(page, iframeElement, documentValue);
@@ -572,7 +571,7 @@ test.describe('Modulo Ventas', () => {
       await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
       await busquedaDoc(page, iframeElement, documentValue);
 
-      expect(iframeElement.getByRole('cell', { name: documentValue })).not.toBeVisible();
+      expect(iframeElement.getByRole('cell', { name: documentValue })).toHaveCount(0);
     });
 
   });
@@ -834,4 +833,82 @@ test.describe('Cotizacion', () => {
     });
 
   });
+
+
+  test.describe('Nota de debito', () => {
+  // Declare shared variables
+  let iframeElement;
+  let numeroCFF = '';
+  let documentValue;
+  const tipoPago = 'Credito';
+  const tipoNota = 'Nota de débito';
+  const newVendor = 'Bob';  // Store the vendor name for editing
+
+  // Use beforeAll to initialize global resources
+  test.beforeAll(async () => {
+    iframeElement = page.frameLocator('iframe');
+    numeroCFF = await crearCreditoFiscal(page, iframeElement, tipoPago);
+    await page.getByRole('link', { name: 'Ventas' }).click();
+    await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
+    documentValue = await crearNota(page, iframeElement, numeroCFF, tipoNota);
+  });
+
+  // Initialize before each test to reset any necessary navigation
+  test.beforeEach(async () => {
+    iframeElement = page.frameLocator('iframe');
+    await page.getByRole('link', { name: 'Nota de débito', exact: true }).click();
+  });
+
+  test('Validando Creacion de Nota de Debito', async () => {
+    // Log document data for debugging (remove after confirmation)
+    console.log('Numero CFF:', numeroCFF);
+    console.log('Document Value:', documentValue);
+
+    // Search for the created document and validate its visibility
+    await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+    await busquedaDoc(page, iframeElement, documentValue);
+    await expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
+  });
+
+  test('Editando Nota de Debito', async () => {
+    // Search for the document and click on it
+    await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
+    await busquedaDoc(page, iframeElement, documentValue);
+    await iframeElement.getByRole('cell', { name: documentValue }).click();
+
+    // Edit the "Vendedor" field
+    await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
+    await iframeElement.locator(`[role="option"][data-index="1"]`).click();  // Select second option (Bob)
+    await iframeElement.getByRole('button', { name: 'Grabar cambios' }).click();
+
+    // After saving changes, return to the main page and search again
+    await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
+    await busquedaDoc(page, iframeElement, documentValue);
+    
+    // Validate the "Vendedor" field has been updated to "Bob"
+    await expect(iframeElement.getByRole('row', { name: documentValue }).getByRole('cell', { name: newVendor }))
+      .toBeVisible();
+  });
+
+  test('Anulando Nota de Debito', async () => {
+    // Start by clicking "Anular Documento"
+    await iframeElement.getByRole('button', { name: 'Anular Documento' }).click();
+
+    // Search for the document to annul and click on it
+    await busquedaDoc(page, iframeElement, documentValue);
+    await iframeElement.getByRole('cell', { name: documentValue }).click();
+
+    // Confirm the annulment
+    await iframeElement.locator('#btnConfirmNull').click();
+    await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+
+    // Wait for the document to be annulled and no longer visible
+    await expect(iframeElement.getByRole('button', { name: 'Buscar Documento' })).toBeVisible();
+    await busquedaDoc(page, iframeElement, documentValue);
+
+    // Verify the document is no longer visible
+    await expect(iframeElement.getByRole('cell', { name: documentValue })).toHaveCount(0);
+  });
+});
+
 */

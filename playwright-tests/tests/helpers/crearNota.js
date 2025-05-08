@@ -23,17 +23,18 @@ async function crearNota(page, iframeElement, numeroCFF, tipoNota) {
   await iframeElement.locator('[role="option"][data-index="0"]').click();
 
   await iframeElement.getByRole('textbox', { name: 'Crédito fiscal' }).click();
+  await iframeElement.getByRole('textbox', { name: 'Type to filter' }).fill(numeroCFF);
   await iframeElement.getByRole('option', { name: numeroCFF }).click();
 
   await iframeElement.getByRole('button', { name: 'Grabar Documento' }).click();
-
+/*
   // Confirmación
   await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
   await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
   await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
 
   await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
-
+*/
   return documentValue;
 }
 

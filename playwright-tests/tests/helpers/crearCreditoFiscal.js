@@ -4,7 +4,7 @@
  * Crea una Factura en el sistema.
  * @param {import('@playwright/test').Page} page - Página de Playwright.
  * @param {import('@playwright/test').FrameLocator} iframeElement - Frame principal donde se interactúa.
- * @param {import('@playwright/test').FrameLocator} tipoPago - Frame principal donde se interactúa.
+ * @param {import('@playwright/test').FrameLocator} tipoPago - Credito o Contado
  * @returns {Promise<string>} - Devuelve el número de documento generado.
  */
 
