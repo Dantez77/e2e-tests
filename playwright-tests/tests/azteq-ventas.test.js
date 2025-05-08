@@ -374,51 +374,85 @@ test.describe('Modulo Ventas', () => {
     });
   });
 
-  test('Nota de credito', async () => {
+  test.describe('Nota de credito', () => {
     // TODO: Añadir las funcionalidades posibles dentro de Nota de Credito, esto incluye:
     // - Crear un documento (indice de exito: Verificacion de documento creado) - COMPLETO
-    // - Editar un documento (indice de exito: Verificacion de documento editado) - PENDIENTE
-    // - Anular un documento (indice de exito: Verificacion de que el documento fue anulado) - PENDIENTE
+    // - Editar un documento (indice de exito: Verificacion de documento editado) - COMLPETO (FALLA)
+    // - Anular un documento (indice de exito: Verificacion de que el documento fue anulado) - COMPLETO (FALLA)
     // REQUIERE PARA FUNCIONAR: Creacion previa de credito fiscal. crearCreditoFiscal(page, iframe);
 
-    const iframeElement = page.frameLocator('iframe');
+    let iframeElement;
+
     let numeroCFF = '';
-    let documentValue = '';
+    let documentValue;
     const tipoPago = 'Contado';
     const tipoNota = 'Nota de crédito';
 
-    numeroCFF = await crearCreditoFiscal(page, iframeElement, tipoPago);
+    test('Creando Nota de Credito', async () => {
+      iframeElement = page.frameLocator('iframe');
 
-    await page.getByRole('link', { name: 'Ventas' }).click();
-    await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
+      numeroCFF = await crearCreditoFiscal(page, iframeElement, tipoPago); //Crear credito fiscal (0 es credito contado)
+      //console.log(numeroCFF);
+      await page.getByRole('link', { name: 'Ventas' }).click();
+      await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
 
-    await test.step('Creando Nota de Credito', async () => {
       documentValue = await crearNota(page, iframeElement, numeroCFF, tipoNota); //Nota de Credito
-      console.log(documentValue);
+      //console.log(documentValue);
       await expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
     });
 
-    await test.step('Editando Nota de Credito', async () => {
-      //TODO: No es posible hacer por ahora, regresar mas tarde
+    test('Editando Nota de Credito', async () => {
+      await page.getByRole('link', { name: 'Nota de crédito', exact: true }).click();
 
+      await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
+      await busquedaDoc(page, iframeElement, documentValue);
+      await iframeElement.getByRole('cell', { name: documentValue }).click();
+
+      await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
+      await iframeElement.locator('[role="option"][data-index="1"]').click();
+      await iframeElement.getByRole('button', { name: 'Grabar cambios' }).click();
+
+      //Luego de grabar cambios regreso a la pagina principal de notas de debito y vuelvo a buscar
+      await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
+      await busquedaDoc(page, iframeElement, documentValue);
+      await expect(iframeElement
+        .getByRole('row', { name: documentValue })
+        .getByRole('cell', { name: 'Bob' }))
+        .toBeVisible();
     });
 
-    await test.step('Eliminando Nota de Credito', async () => {
-      //TODO: No es posible hacer por ahora, regresar mas tarde
+    test('Anulando Nota de Credito', async () => {
+      iframeElement = page.frameLocator('iframe');
+      //console.log(documentValue);
 
+      await page.getByRole('link', { name: 'Nota de crédito', exact: true }).click();
+      await page.waitForTimeout(500);
+      //Verificando creacion de cotizacion
+      await iframeElement.getByRole('button', { name: 'Anular Documento' }).click();
+      await busquedaDoc(page, iframeElement, documentValue);
+      await iframeElement.getByRole('cell', { name: documentValue }).click();
+
+      await iframeElement.locator('#btnConfirmNull').click();
+      await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+
+      //esta fallando aqui por que no sale despues de confirmar la anulacion del documento
+      await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
+      await busquedaDoc(page, iframeElement, documentValue);
+
+      expect(iframeElement.getByRole('cell', { name: documentValue })).not.toBeVisible();
     });
   });
 
   test.describe('Nota de debito', () => {
     // TODO: Añadir las funcionalidades posibles dentro de Nota de Debito, esto incluye:
     // - Crear un documento (indice de exito: Verificacion de documento creado) - COMPLETO
-    // - Editar un documento (indice de exito: Verificacion de documento editado) - PENDIENTE
-    // - Anular un documento (indice de exito: Verificacion de que el documento fue anulado) - PENDIENTE
+    // - Editar un documento (indice de exito: Verificacion de documento editado) - COMLPETO (FALLA)
+    // - Anular un documento (indice de exito: Verificacion de que el documento fue anulado) - COMPLETO (FALLA)
     // REQUIERE PARA FUNCIONAR: Creacion previa de credito fiscal. crearCreditoFiscal(page, iframe); 
     let iframeElement;
 
     let numeroCFF = '';
-    let documentValue = '';
+    let documentValue;
     const tipoPago = 'Credito';
     const tipoNota = 'Nota de débito';
 
@@ -445,7 +479,6 @@ test.describe('Modulo Ventas', () => {
 
       await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
       await iframeElement.locator('[role="option"][data-index="1"]').click();
-
       await iframeElement.getByRole('button', { name: 'Grabar cambios' }).click();
 
       //Luego de grabar cambios regreso a la pagina principal de notas de debito y vuelvo a buscar
@@ -457,8 +490,25 @@ test.describe('Modulo Ventas', () => {
         .toBeVisible();
     });
 
-    test.skip('Anulando Nota de Debito', async () => {
-      //TODO: Funcionalidad para anular una nota de debito
+    test('Anulando Nota de Debito', async () => {
+      iframeElement = page.frameLocator('iframe');
+      //console.log(documentValue);
+
+      await page.getByRole('link', { name: 'Nota de débito', exact: true }).click();
+      await page.waitForTimeout(500);
+      //Verificando creacion de cotizacion
+      await iframeElement.getByRole('button', { name: 'Anular Documento' }).click();
+      await busquedaDoc(page, iframeElement, documentValue);
+      await iframeElement.getByRole('cell', { name: documentValue }).click();
+
+      await iframeElement.locator('#btnConfirmNull').click();
+      await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+
+      //esta fallando aqui por que no sale despues de confirmar la anulacion del documento
+      await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
+      await busquedaDoc(page, iframeElement, documentValue);
+
+      expect(iframeElement.getByRole('cell', { name: documentValue })).not.toBeVisible();
     });
 
   });
@@ -471,11 +521,11 @@ test.describe('Modulo Ventas', () => {
 
     let iframeElement;
     let documentValue = '';
-  
+
     test.beforeAll(async () => {
       //TODO
     });
-  
+
     test('Agregando Cotizacion', async () => {
       iframeElement = page.frameLocator('iframe');
       //Creando cotizacion
@@ -499,7 +549,7 @@ test.describe('Modulo Ventas', () => {
       await iframeElement.getByRole('textbox', { name: 'Vendedor' }).click();
       await iframeElement.locator('[role="option"][data-index="0"]').click();
 
-      await iframeElement.getByRole('button', { name: 'Grabar cambios'}).click();
+      await iframeElement.getByRole('button', { name: 'Grabar cambios' }).click();
       await iframeElement.getByRole('button', { name: 'Cancel' }).click();
 
       //Verificando cambios...
@@ -507,7 +557,7 @@ test.describe('Modulo Ventas', () => {
       await busquedaDoc(page, iframeElement, documentValue);
       expect(iframeElement
         .getByRole('row', { name: documentValue })
-        .getByRole('cell', { name: 'John Doe'})) //Sujeto a cambio (fixme)
+        .getByRole('cell', { name: 'John Doe' })) //Sujeto a cambio (fixme)
         .toBeVisible();
     });
 
@@ -518,7 +568,7 @@ test.describe('Modulo Ventas', () => {
       await busquedaDoc(page, iframeElement, documentValue);
       await iframeElement.getByRole('cell', { name: documentValue }).click();
 
-      await iframeElement.locator('#btnConfirmNull' ).click();
+      await iframeElement.locator('#btnConfirmNull').click();
       await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
 
       //esta fallando aqui por que no sale despues de confirmar la anulacion del documento
@@ -529,7 +579,7 @@ test.describe('Modulo Ventas', () => {
     });
 
   });
-  
+
 
   test.skip('Comprobante de donacion', async () => {
     //TODO: 
