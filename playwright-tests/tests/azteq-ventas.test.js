@@ -437,7 +437,24 @@ test.describe('Modulo Ventas', () => {
     });
 
     test('Editando Nota de Debito', async () => {
-      //TODO: Funcionalidad para editar una nota de debito
+      await page.getByRole('link', { name: 'Nota de débito', exact: true }).click();
+
+      await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
+      await busquedaDoc(page, iframeElement, documentValue);
+      await iframeElement.getByRole('cell', { name: documentValue }).click();
+
+      await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
+      await iframeElement.locator('[role="option"][data-index="1"]').click();
+
+      await iframeElement.getByRole('button', { name: 'Grabar cambios' }).click();
+
+      //Luego de grabar cambios regreso a la pagina principal de notas de debito y vuelvo a buscar
+      await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
+      await busquedaDoc(page, iframeElement, documentValue);
+      await expect(iframeElement
+        .getByRole('row', { name: documentValue })
+        .getByRole('cell', { name: 'Bob' }))
+        .toBeVisible();
     });
 
     test.skip('Anulando Nota de Debito', async () => {
@@ -474,7 +491,6 @@ test.describe('Modulo Ventas', () => {
       await page.getByRole('link', { name: 'Cotización' }).click();
       iframeElement = page.frameLocator('iframe');
 
-      //Verificando creacion de cotizacion
       await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
       await busquedaDoc(page, iframeElement, documentValue);
       await iframeElement.getByRole('cell', { name: documentValue }).click();
