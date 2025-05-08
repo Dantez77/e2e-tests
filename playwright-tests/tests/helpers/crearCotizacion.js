@@ -9,8 +9,6 @@
 
 
 async function crearCotizacion(page, iframeElement) {
-    await page.getByRole('link', { name: 'Cotización' }).click();
-
     await iframeElement.getByRole('textbox', { name: 'Cliente' }).click();
     await iframeElement.locator('[role="option"][data-index="2"]').click();
 
