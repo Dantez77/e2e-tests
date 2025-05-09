@@ -14,25 +14,23 @@ test.describe('Credito Fiscal', () => {
     page = await context.newPage();
     iframeElement = page.frameLocator('iframe');
 
-    // Login and navigate to the "Modulo Ventas"
+    //LOGIN -> MODULO VENTAS
     await test.step('Login and navigate to Modulo Ventas', async () => {
       await login(page, credentials);
-
       const ventasBtn = page.getByRole('link', { name: 'btn-moduloVentas' });
       await expect(ventasBtn).toBeVisible();
       await ventasBtn.click();
     });
   });
 
+  //CREDITO FISCAL
   test.beforeEach(async () => {
-    // Ensure the test starts fresh in the "Modulo Ventas"
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
     await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
     await page.getByRole('link', { name: 'Crédito fiscal' }).click();
   });
 
   test.afterAll(async () => {
-    // Clean up resources
     await page.close();
     await context.close();
   });
@@ -63,7 +61,7 @@ test.describe('Credito Fiscal', () => {
       await iframeElement.locator('#btnConfirmAddLine').click();
       await iframeElement.getByRole('button', { name: 'Grabar documento' }).click();
 
-      // Verify the document was created
+      //VERIFICAR QUE SE CREO EL DOCUMENTO
       await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
       await busquedaDoc(page, iframeElement, documentValue);
       await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
@@ -75,7 +73,7 @@ test.describe('Credito Fiscal', () => {
       await iframeElement.locator('[role="option"][data-index="1"]').click();
       await iframeElement.getByRole('button', { name: 'Grabar cambios' }).click();
 
-      // Verify the document was edited
+      // VERIFICAR QUE SE EDITO
       await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
       await busquedaDoc(page, iframeElement, documentValue);
       await expect(
@@ -91,7 +89,7 @@ test.describe('Credito Fiscal', () => {
 
       await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
 
-      // Verify the document was annulled
+      // VERIFICAR QUE SE ANULO
       await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
       await busquedaDoc(page, iframeElement, documentValue);
       await expect(
