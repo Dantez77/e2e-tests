@@ -5,7 +5,6 @@
  * @param {import('@playwright/test').Page} page - Página de Playwright.
  * @param {import('@playwright/test').FrameLocator} iframeElement - Frame principal donde se interactúa.
  * @param {string} documentValue - Numero de documento a buscar
- * @returns {Promise<string>} - Devuelve el número de documento generado.
  */
 
 //Busca y valida que un documento existe

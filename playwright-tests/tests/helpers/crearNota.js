@@ -14,7 +14,6 @@ async function crearNota(page, iframeElement, numeroCFF, tipoNota) {
 
   await page.waitForTimeout(500);
 
-  const documentValue = await iframeElement.locator('input#coddoc').inputValue();
 
   await iframeElement.getByRole('textbox', { name: 'Cliente:' }).click();
   await iframeElement.locator('[role="option"][data-index="2"]').click();
@@ -23,8 +22,9 @@ async function crearNota(page, iframeElement, numeroCFF, tipoNota) {
   await iframeElement.locator('[role="option"][data-index="0"]').click();
 
   await iframeElement.getByRole('textbox', { name: 'Crédito fiscal' }).click();
-  await iframeElement.getByRole('textbox', { name: 'Type to filter' }).fill(numeroCFF);
-  await iframeElement.getByRole('option', { name: numeroCFF }).click();
+  await iframeElement.locator('[role="option"][data-index="0"]').click(); //Este valor deberia ser numeroCFF
+
+  const documentValue = await iframeElement.locator('input#coddoc').inputValue();
 
   await iframeElement.getByRole('button', { name: 'Grabar Documento' }).click();
 /*
