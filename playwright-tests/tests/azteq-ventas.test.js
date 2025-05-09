@@ -50,7 +50,7 @@ test.describe('Modulo Ventas', () => {
 
   test.afterAll(async () => {
     await page.close();
-    // context.close();
+    context.close();
   });
 
   test('Se muestran todos los elementos y opciones en patalla', async () => {
@@ -239,7 +239,7 @@ test.describe('Modulo Ventas', () => {
       await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
 
       await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
-
+      
       await iframeElement
         .getByRole('row', { name: documentValue })
         .getByRole('cell', { name: 'John Doe' }).click();
@@ -386,8 +386,6 @@ test.describe('Modulo Ventas', () => {
     test.beforeAll(async () => {
       let iframeElement = page.frameLocator('iframe');
       numeroCFF = await crearCreditoFiscal(page, iframeElement, tipoPago);
-      await page.getByRole('link', { name: 'Ventas' }).click();
-      await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
       documentValue = await crearNota(page, iframeElement, numeroCFF, tipoNota);
     });
 
@@ -420,9 +418,11 @@ test.describe('Modulo Ventas', () => {
       //Luego de grabar cambios regreso a la pagina principal de notas de debito y vuelvo a buscar
       await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
       await busquedaDoc(page, iframeElement, documentValue);
+
+      const nuevoProveedor = 'Bob';
       await expect(iframeElement
         .getByRole('row', { name: documentValue })
-        .getByRole('cell', { name: 'Bob' })) //EDITAR MAS TARDE
+        .getByRole('cell', { name: nuevoProveedor })) //EDITAR MAS TARDE
         .toBeVisible();
     });
 
@@ -497,9 +497,11 @@ test.describe('Modulo Ventas', () => {
       //Luego de grabar cambios regreso a la pagina principal de notas de debito y vuelvo a buscar
       await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
       await busquedaDoc(page, iframeElement, documentValue);
+
+      const nuevoProveedor = 'Bob'; //Sale mejor que se guarde el value y despues se compare / recordar cambiar mas tarde 
       await expect(iframeElement
         .getByRole('row', { name: documentValue })
-        .getByRole('cell', { name: 'Bob' })) //EDITAR MAS TARDE
+        .getByRole('cell', { name: nuevoProveedor })) 
         .toBeVisible();
     });
 

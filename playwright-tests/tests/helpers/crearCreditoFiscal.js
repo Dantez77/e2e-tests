@@ -35,6 +35,9 @@ async function crearCreditoFiscal(page, iframeElement, tipoPago) {
         route.abort(); // Blocks pdf pop up
     });
 
+    await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
+
+
     return documentValue;
 }
 
