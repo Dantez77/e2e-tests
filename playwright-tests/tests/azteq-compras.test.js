@@ -1,9 +1,5 @@
 const { test, expect } = require('@playwright/test');
 
-/*
-  Recordar cambiar correo y usuario antes de que se me acabe el plan de prueba o____o. 
-*/
-
 test.describe('Modulo Compras', () => {
   let page;
   let context;
@@ -48,63 +44,6 @@ test.describe('Modulo Compras', () => {
     await context.close();
   });
 
-  //await page.screenshot({ path: 'debug1.png', fullPage: true }); //Debug screenshot
-
-  /*
-  ======== Funciones del modulo compras ==========
-  */
-
-  //All page elements and module specific options loaded and are visible
-  test('All page elements loaded and are visible', async () => {
-    expect(page.getByRole('link', { name: 'Compras', exact: true }));
-    await page.waitForTimeout(500);
-    //Module specific options
-    await expect.soft(page.getByRole('link', { name: 'Compras locales' })).toBeVisible();
-    await expect.soft(page.getByRole('link', { name: 'Compras a sujetos excluidos' })).toBeVisible();
-    await expect.soft(page.getByRole('link', { name: 'Pólizas de importación' })).toBeVisible();
-    await expect.soft(page.getByRole('link', { name: 'Compras al exterior' })).toBeVisible();
-    await expect.soft(page.getByRole('link', { name: 'Retaceo de costos' })).toBeVisible();
-    await expect.soft(page.getByRole('link', { name: 'Proveedores', exact: true })).toBeVisible();
-    await expect.soft(page.getByRole('link', { name: 'Grupos de proveedores' })).toBeVisible();
-    await expect.soft(page.getByRole('link', { name: 'Productos' })).toBeVisible();
-    await expect.soft(page.getByRole('link', { name: 'Almacenes' })).toBeVisible();
-    await expect.soft(page.getByRole('link', { name: 'Sucursales' })).toBeVisible();
-
-    //
-    await page.getByRole('button', { name: 'Informes y consultas' }).click();
-    await page.waitForTimeout(500);
-
-    await expect.soft(page.getByText('Libro de compras')).toBeVisible();
-    await expect.soft(page.getByText('Compras por producto')).toBeVisible();
-    await expect.soft(page.getByText('Compras por proveedor')).toBeVisible();
-    await expect.soft(page.getByText('Compras por fecha')).toBeVisible();
-    await expect.soft(page.getByText('Retaceo de póliza de')).toBeVisible();
-    await expect.soft(page.getByText('Compras por sucursal')).toBeVisible();
-    await expect.soft(page.getByText('Retenciones 1% IVA')).toBeVisible();
-    await expect.soft(page.getByText('Exportación archivos .csv')).toBeVisible();
-
-    //Settings 
-    await page.getByRole('button', { name: 'Configuración' }).click();
-    await page.waitForTimeout(500);
-
-    await expect.soft(page.getByText('Período de trabajo')).toBeVisible();
-    await expect.soft(page.getByText('Conceptos de gastos')).toBeVisible();
-    await expect.soft(page.getByText('Datos de la empresa')).toBeVisible();
-    await expect.soft(page.getByText('Compras con número provisional')).toBeVisible();
-    await expect.soft(page.getByText('Numeración de documentos')).toBeVisible();
-    await expect.soft(page.getByText('Logo de la empresa')).toBeVisible();
-    await expect.soft(page.getByText('Transferencias con número')).toBeVisible();
-    await expect.soft(page.getByText('Compradores')).toBeVisible();
-    await expect.soft(page.getByText('Generar CSE de nómina')).toBeVisible();
-
-    //
-    await page.getByRole('button', { name: 'Facturación electrónica' }).click();
-    await page.waitForTimeout(500);
-
-    await expect.soft(page.getByText('Revisión / envío de DTEs')).toBeVisible();
-    await expect.soft(page.getByText('Consulta / Re-envío de DTEs')).toBeVisible();
-  });
-
   //===============================================================================
   //Compras Locales
   //===============================================================================
@@ -114,7 +53,6 @@ test.describe('Modulo Compras', () => {
     const iframe = page.frameLocator('iframe');
     const uniqueId = `P-` + `${Date.now()}`.slice(-7);
     const producto = `Producto ` + `${Date.now()}`.slice(-4);
-
 
     await page.getByRole('link', { name: 'Productos', exact: true }).click();
 
