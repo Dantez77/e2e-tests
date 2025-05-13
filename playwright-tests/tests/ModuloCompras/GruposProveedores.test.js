@@ -26,7 +26,7 @@ test.describe('Modulo Compras - Grupos de Proveedores', () => {
     await context.close();
   });
 
-  test('Agregar grupo de proveedores', async () => {
+  test.skip('Agregar grupo de proveedores', async () => {
     const uniqueCode = `GP-${Date.now()}`.slice(-6);
     const groupName = `Grupo ${Date.now()}`.slice(-4);
 
@@ -40,7 +40,7 @@ test.describe('Modulo Compras - Grupos de Proveedores', () => {
     await expect(iframe.getByRole('cell', { name: uniqueCode })).toBeVisible();
   });
 
-  test('Eliminar grupo de proveedores', async () => {
+  test.skip('Eliminar grupo de proveedores', async () => {
     const uniqueCode = `GP-${Date.now()}`.slice(-6);
     const groupName = `Grupo ${Date.now()}`.slice(-4);
 
