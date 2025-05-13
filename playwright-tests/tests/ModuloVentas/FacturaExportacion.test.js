@@ -130,7 +130,6 @@ test.describe('Factura de Exportación', () => {
 
       await iframeElement.getByRole('button', { name: 'Por número' }).click();
       await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
-
       await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
 
       await expect(iframeElement

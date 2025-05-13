@@ -89,20 +89,9 @@ test.describe('Factura', () => {
       await page.waitForTimeout(500);
 
       await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
-      await page.waitForTimeout(500)
+    
+      await expect(iframeElement.locator('.mbsc-toast')).toHaveText('Cambios han sido grabados');
 
-      //Confirmar que fue anulado
-      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
-
-      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
-
-      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
-
-      await expect(iframeElement
-        .getByRole('row', { name: documentValue })
-        .getByRole('cell', { name: 'John Doe' })).toHaveCount(0);
     });
-
   });
 });

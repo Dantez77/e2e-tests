@@ -31,9 +31,7 @@ async function crearCreditoFiscal(page, iframeElement, tipoPago) {
     await iframeElement.locator('#btnConfirmAddLine').click();
     await iframeElement.getByRole('button', { name: 'Grabar documento' }).click();
 
-    await page.route('**/*.pdf', route => {
-        route.abort(); // Blocks pdf pop up
-    });
+    //await page.route('**/*.pdf', route => {route.abort();});
 
     await page.getByRole('link', { name: 'Crédito fiscal Close' }).getByLabel('Close').click();
 

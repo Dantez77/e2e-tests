@@ -111,7 +111,7 @@ test.describe('Modulo Compras', () => {
 
   test('Compras locales: Agregar al registro', async () => {
     //Datos necesarios para que este test funcione: Item (producto), Precio unitario, Proveedor.
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const uniqueId = `P-` + `${Date.now()}`.slice(-7);
     const producto = `Producto ` + `${Date.now()}`.slice(-4);
 
@@ -120,34 +120,34 @@ test.describe('Modulo Compras', () => {
 
     await test.step('Agregando el item a la tabla', async () => {
 
-      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-      await iframeElement.getByRole('textbox', { name: 'Descripcion', exact: true }).fill(producto);
+      await iframe.getByRole('button', { name: 'Agregar' }).click();
+      await iframe.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
+      await iframe.getByRole('textbox', { name: 'Descripcion', exact: true }).fill(producto);
 
-      await iframeElement.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
 
-      await iframeElement.getByText('NoSí').first().click(); // Insumo
-      await iframeElement.getByText('NoSí').nth(2).click();  // Solo maneja unidades completas
-      await iframeElement.getByText('NoSí').nth(1).click();  // Este producto de puede vender
+      await iframe.getByText('NoSí').first().click(); // Insumo
+      await iframe.getByText('NoSí').nth(2).click();  // Solo maneja unidades completas
+      await iframe.getByText('NoSí').nth(1).click();  // Este producto de puede vender
 
-      await iframeElement.getByText('Contables').click();
+      await iframe.getByText('Contables').click();
 
-      await iframeElement.getByRole('textbox', { name: 'Concepto de gastos de importación' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByRole('textbox', { name: 'Concepto de gastos de importación' }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
 
-      await iframeElement.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
 
 
-      await iframeElement.getByText('Precios').click();
-      await iframeElement.getByRole('spinbutton', { name: 'Precio 1 SIN IVA' }).fill('20');
-      await iframeElement.getByRole('spinbutton', { name: 'Precio 2 SIN IVA' }).fill('22');
+      await iframe.getByText('Precios').click();
+      await iframe.getByRole('spinbutton', { name: 'Precio 1 SIN IVA' }).fill('20');
+      await iframe.getByRole('spinbutton', { name: 'Precio 2 SIN IVA' }).fill('22');
 
-      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
-      await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
+      await iframe.getByRole('button', { name: 'Grabar' }).click();
+      await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
 
-      await expect(iframeElement.getByRole('cell', { name: uniqueId })).toBeVisible();
+      await expect(iframe.getByRole('cell', { name: uniqueId })).toBeVisible();
     });
   });
 
@@ -155,24 +155,24 @@ test.describe('Modulo Compras', () => {
   test('Compras locales: Borrar elementos del registro', async () => {
     //Datos necesarios para que este test funcione: Item (producto), Precio unitario, Proveedor.
 
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
 
     //Entrando a compras locales y agragando un elemento al registro
     await page.getByRole('link', { name: 'Compras locales' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Item' }).click();
-    const optionLocator = iframeElement.locator('[role="option"][data-index="1"]');
+    await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Item' }).click();
+    const optionLocator = iframe.locator('[role="option"][data-index="1"]');
     const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]')
       .innerText();
     await optionLocator.click();
-    await iframeElement.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('100');
-    await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
-    await iframeElement.locator('#btnConfirmAddLine').click(); // Confirmacion
+    await iframe.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('100');
+    await iframe.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
+    await iframe.locator('#btnConfirmAddLine').click(); // Confirmacion
 
     //Ver el registro que vamos a borrar existe
-    await expect(iframeElement.getByRole('cell', { name: value })).toBeVisible();
+    await expect(iframe.getByRole('cell', { name: value })).toBeVisible();
 
     //La accion de borrar se ejecuta luego de la confirmacion de un dialogo
     //Playwright bloquea estos mensajes por default, asi que hay que poner esto para que salga
@@ -182,34 +182,34 @@ test.describe('Modulo Compras', () => {
       await dialog.accept(); // or dialog.dismiss() for Cancel
     });
     //Boton para eliminar registro
-    await iframeElement.getByRole('row', { name: value })
+    await iframe.getByRole('row', { name: value })
       .getByRole('button', { name: 'Delete' })
       .click();
 
     //Verificamos que el item ya no existe
-    await expect(iframeElement.getByRole('cell', { name: value })).not.toBeVisible();
+    await expect(iframe.getByRole('cell', { name: value })).not.toBeVisible();
   });
 
   test('Compras locales: Grabar documento', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const numeroFactura = `test-${Date.now()}`;
 
     //Entrando a compras locales y agragando un elemento al registro
     await page.getByRole('link', { name: 'Compras locales' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Item' }).click();
-    const optionLocator = iframeElement.locator('[role="option"][data-index="1"]');
+    await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Item' }).click();
+    const optionLocator = iframe.locator('[role="option"][data-index="1"]');
     const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]')
       .innerText();
     await optionLocator.click();
-    await iframeElement.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('100');
-    await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
-    await iframeElement.locator('#btnConfirmAddLine').click(); // Confirmacion
+    await iframe.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('100');
+    await iframe.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
+    await iframe.locator('#btnConfirmAddLine').click(); // Confirmacion
 
-    await iframeElement.getByRole('textbox', { name: 'Factura #' }).fill(numeroFactura);
-    await iframeElement.getByRole('button', { name: 'Grabar Documento' }).click();
+    await iframe.getByRole('textbox', { name: 'Factura #' }).fill(numeroFactura);
+    await iframe.getByRole('button', { name: 'Grabar Documento' }).click();
 
     //await expect(locator.innerText()).toContainText('Cambios han sido guardados');
     await page.locator('.toast', { hasText: 'Cambios han sido guardados' }).isVisible()
@@ -219,45 +219,45 @@ test.describe('Modulo Compras', () => {
   //Rework needed
   test('Compras locales: Buscar documento', async () => {
 
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
 
     await page.getByRole('link', { name: 'Compras locales' }).click();
-    await expect(iframeElement.getByRole('button', { name: 'Buscar documento' })).toBeVisible();
-    await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
+    await expect(iframe.getByRole('button', { name: 'Buscar documento' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Buscar documento' }).click();
 
     //Al entrar revisa si el registro esta vacio y una vez se da a bscar, la tabla se llena y el mensaje deberia desaparecer
-    await expect(iframeElement.getByRole('cell', { name: 'Documento vacío' })).toBeVisible();
-    await iframeElement.getByRole('button', { name: 'Buscar' }).click();
-    await expect(iframeElement.getByRole('cell', { name: 'Documento vacío' })).not.toBeVisible();
+    await expect(iframe.getByRole('cell', { name: 'Documento vacío' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Buscar' }).click();
+    await expect(iframe.getByRole('cell', { name: 'Documento vacío' })).not.toBeVisible();
   });
 
   //Verificar si se puede anular un doc correctamente
   test('Compras locales: Anular documento', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const numeroFactura = `anular-${Date.now()}`;
 
     //Entrando a compras locales y agragando un elemento al registro
     await page.getByRole('link', { name: 'Compras locales' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Item' }).click();
-    const optionLocator = iframeElement.locator('[role="option"][data-index="3"]');
+    await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Item' }).click();
+    const optionLocator = iframe.locator('[role="option"][data-index="3"]');
     const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]')
       .innerText();
     await optionLocator.click();
-    await iframeElement.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('20');
-    await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
-    await iframeElement.locator('#btnConfirmAddLine').click(); // Confirmacion
+    await iframe.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('20');
+    await iframe.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
+    await iframe.locator('#btnConfirmAddLine').click(); // Confirmacion
 
-    await iframeElement.getByRole('textbox', { name: 'Factura #' }).fill(numeroFactura);
-    await iframeElement.getByRole('button', { name: 'Grabar Documento' }).click();
+    await iframe.getByRole('textbox', { name: 'Factura #' }).fill(numeroFactura);
+    await iframe.getByRole('button', { name: 'Grabar Documento' }).click();
     //await page.locator('.toast', { hasText: 'Documento ha sido grabado' }).toBeVisible();
 
-    await expect(iframeElement.getByRole('button', { name: 'Anular documento' })).toBeVisible();
-    await iframeElement.getByRole('button', { name: 'Anular documento' }).click();
-    await iframeElement.getByRole('button', { name: 'Buscar' }).click();
-    await iframeElement.getByRole('row', { name: numeroFactura }).click();
+    await expect(iframe.getByRole('button', { name: 'Anular documento' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Anular documento' }).click();
+    await iframe.getByRole('button', { name: 'Buscar' }).click();
+    await iframe.getByRole('row', { name: numeroFactura }).click();
 
     let errorAlert = null;
 
@@ -270,18 +270,18 @@ test.describe('Modulo Compras', () => {
     });
 
     // Anular el documento
-    await iframeElement.locator('#btnConfirmNull').click();
+    await iframe.locator('#btnConfirmNull').click();
 
     expect(errorAlert).toBeNull();
 
-    await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+    await iframe.getByRole('button', { name: 'Si - proceder' }).click();
 
-    await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
-    await iframeElement.getByRole('button', { name: 'Buscar' }).click();
+    await iframe.getByRole('button', { name: 'Buscar documento' }).click();
+    await iframe.getByRole('button', { name: 'Buscar' }).click();
     await page.waitForTimeout(500);
 
     //Verificar que el documento ahora posee un valor de 0.00
-    await expect(iframeElement.
+    await expect(iframe.
       getByRole('row', { name: numeroFactura }).
       getByRole('cell', { name: '0.00' })).
       toBeVisible();
@@ -300,7 +300,7 @@ test.describe('Modulo Compras', () => {
   //===============================================================================
 
   test('Compras a sujetos excluidos: Agregando Registro', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
 
     await page.getByRole('link', { name: 'Compras a sujetos excluidos' }).click();
 
@@ -308,54 +308,54 @@ test.describe('Modulo Compras', () => {
 
     await test.step('Agregando Item a tabla', async () => {
       // Proveedor exitente!
-      await iframeElement.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
 
       // Agregar item a la tabla
-      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Item' }).click();
+      await iframe.getByRole('button', { name: 'Agregar' }).click();
+      await iframe.getByRole('textbox', { name: 'Item' }).click();
 
       // Seleccionar item
-      const optionLocator = iframeElement.locator('[role="option"][data-index="2"]');
+      const optionLocator = iframe.locator('[role="option"][data-index="2"]');
       const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]')
         .innerText();
       await optionLocator.click();
 
       // Detalles
-      await iframeElement.getByRole('spinbutton', { name: 'Costo unit' }).fill('100');
-      await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
+      await iframe.getByRole('spinbutton', { name: 'Costo unit' }).fill('100');
+      await iframe.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
 
       // Confirm 
-      await iframeElement.locator('#btnConfirmAddLine').click();
-      await expect(iframeElement.getByRole('cell', { name: value })).toBeVisible();
+      await iframe.locator('#btnConfirmAddLine').click();
+      await expect(iframe.getByRole('cell', { name: value })).toBeVisible();
 
       // Get the dynamic document number value from the disabled input
-      documentValue = await iframeElement.locator('input#coddoc').inputValue();
+      documentValue = await iframe.locator('input#coddoc').inputValue();
       console.log('Documento generado:', documentValue);
     });
 
     await test.step('Grabar documento', async () => {
-      await iframeElement.getByRole('textbox', { name: 'Comprador', exact: true }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-      await iframeElement.getByRole('button', { name: 'Grabar documento' }).click();
-      // await expect(iframeElement.locator('.toast')).toContainText('Documento a sido grabado');
+      await iframe.getByRole('textbox', { name: 'Comprador', exact: true }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByRole('button', { name: 'Grabar documento' }).click();
+      // await expect(iframe.locator('.toast')).toContainText('Documento a sido grabado');
     });
 
     await test.step('Verificar registro agregado por medio de busqueda', async () => {
-      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
-      await expect(iframeElement.getByRole('cell', { name: 'Documento vacío' })).toBeVisible();
-      await iframeElement.getByRole('button', { name: 'Buscar' }).click();
+      await iframe.getByRole('button', { name: 'Buscar documento' }).click();
+      await expect(iframe.getByRole('cell', { name: 'Documento vacío' })).toBeVisible();
+      await iframe.getByRole('button', { name: 'Buscar' }).click();
 
       // Use the extracted dynamic value to assert visibility
-      await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
-      await iframeElement.getByRole('button', { name: 'Cancelar' }).click();
+      await expect(iframe.getByRole('cell', { name: documentValue })).toBeVisible();
+      await iframe.getByRole('button', { name: 'Cancelar' }).click();
 
     });
 
     await test.step('Anular documento', async () => {
-      await iframeElement.getByRole('button', { name: 'Anular documento' }).click();
-      await iframeElement.getByRole('button', { name: 'Buscar' }).click();
-      await iframeElement.getByRole('row', { name: documentValue }).click();
+      await iframe.getByRole('button', { name: 'Anular documento' }).click();
+      await iframe.getByRole('button', { name: 'Buscar' }).click();
+      await iframe.getByRole('row', { name: documentValue }).click();
 
       let errorAlert = null;
 
@@ -368,7 +368,7 @@ test.describe('Modulo Compras', () => {
       });
 
       // Anular el documento
-      await iframeElement.locator('#btnConfirmNull').click();
+      await iframe.locator('#btnConfirmNull').click();
 
       await page.waitForTimeout(500);
 
@@ -376,7 +376,7 @@ test.describe('Modulo Compras', () => {
       expect(errorAlert).toBeNull();
 
       // Verificar que el documento ya no existe
-      await expect(iframeElement.getByRole('cell', { name: documentValue })).not.toBeVisible();
+      await expect(iframe.getByRole('cell', { name: documentValue })).not.toBeVisible();
     });
   });
 
@@ -385,47 +385,47 @@ test.describe('Modulo Compras', () => {
   //===============================================================================
 
   test('Polizas de importacion: Agregar registro', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const numeroPl = `PL-${Date.now()}`;
 
     await page.getByRole('link', { name: 'Pólizas de importación' }).click();
-    await expect(iframeElement.getByRole('button', { name: 'Agregar' })).toBeVisible();
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+    await expect(iframe.getByRole('button', { name: 'Agregar' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
 
     //Llenando el formulario
-    await iframeElement.getByRole('textbox', { name: 'Póliza No.:' }).fill(numeroPl);
+    await iframe.getByRole('textbox', { name: 'Póliza No.:' }).fill(numeroPl);
 
-    await iframeElement.getByRole('textbox', { name: 'Fecha de ingreso' }).fill('2025-04-21');
-    await iframeElement.getByRole('textbox', { name: 'Agencia que tramita' }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('textbox', { name: 'Fecha de ingreso' }).fill('2025-04-21');
+    await iframe.getByRole('textbox', { name: 'Agencia que tramita' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
 
-    await iframeElement.getByRole('textbox', { name: 'Inicio de trámites' }).fill('2025-04-01');
-    await iframeElement.getByRole('textbox', { name: 'Final de trámites' }).fill('2025-04-30');
-    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+    await iframe.getByRole('textbox', { name: 'Inicio de trámites' }).fill('2025-04-01');
+    await iframe.getByRole('textbox', { name: 'Final de trámites' }).fill('2025-04-30');
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
 
     //Confirmar que el registro fue creado
-    await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(numeroPl);
-    await expect(iframeElement.getByRole('cell', { name: numeroPl })).toBeVisible();
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(numeroPl);
+    await expect(iframe.getByRole('cell', { name: numeroPl })).toBeVisible();
   });
 
   test('Polizas de importacion: Eliminar', async () => {
     //TODO: Implementar la lógica para eliminar un registro en pólizas de importación
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const numeroPl = `PL-${Date.now()}`;
 
     await page.getByRole('link', { name: 'Pólizas de importación' }).click();
-    await expect(iframeElement.getByRole('button', { name: 'Agregar' })).toBeVisible();
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Póliza No.:' }).fill(numeroPl);
-    await iframeElement.getByRole('textbox', { name: 'Fecha de ingreso' }).fill('2025-04-21');
-    await iframeElement.getByRole('textbox', { name: 'Agencia que tramita' }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
-    await iframeElement.getByRole('textbox', { name: 'Inicio de trámites' }).fill('2025-04-01');
-    await iframeElement.getByRole('textbox', { name: 'Final de trámites' }).fill('2025-04-30');
-    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+    await expect(iframe.getByRole('button', { name: 'Agregar' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Póliza No.:' }).fill(numeroPl);
+    await iframe.getByRole('textbox', { name: 'Fecha de ingreso' }).fill('2025-04-21');
+    await iframe.getByRole('textbox', { name: 'Agencia que tramita' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('textbox', { name: 'Inicio de trámites' }).fill('2025-04-01');
+    await iframe.getByRole('textbox', { name: 'Final de trámites' }).fill('2025-04-30');
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
 
-    await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(numeroPl);
-    await expect(iframeElement.getByRole('cell', { name: numeroPl })).toBeVisible();
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(numeroPl);
+    await expect(iframe.getByRole('cell', { name: numeroPl })).toBeVisible();
 
 
     let errorAlert = null;
@@ -438,7 +438,7 @@ test.describe('Modulo Compras', () => {
       await dialog.dismiss(); // dismiss the dialog
     });
 
-    await iframeElement.getByRole('row', { name: numeroPl }).getByRole('button').nth(1).click();
+    await iframe.getByRole('row', { name: numeroPl }).getByRole('button').nth(1).click();
 
     expect(errorAlert).toBeNull(); //Si se muestra el mensaje de error, la prueba falla    
   });
@@ -449,7 +449,7 @@ test.describe('Modulo Compras', () => {
   //===============================================================================
 
   test('Compras al exterior: Agregar al registro', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
 
     await page.getByRole('link', { name: 'Compras al exterior' }).click();
 
@@ -460,51 +460,51 @@ test.describe('Modulo Compras', () => {
 
     await test.step('Agregando Item a tabla', async () => {
       // Proveedor exitente
-      await iframeElement.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
 
       // Agregar item a la tabla
-      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Producto' }).click();
-      const optionLocator = iframeElement.locator('[role="option"][data-index="1"]');
+      await iframe.getByRole('button', { name: 'Agregar' }).click();
+      await iframe.getByRole('textbox', { name: 'Producto' }).click();
+      const optionLocator = iframe.locator('[role="option"][data-index="1"]');
       const value = await optionLocator
         .locator('div[style="font-size:10px;line-height:12px;"]')
         .innerText();
       await optionLocator.click();
 
       // Detalles requeridos
-      await iframeElement.getByRole('spinbutton', { name: 'Costo unit' }).fill('100');
-      await iframeElement.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
+      await iframe.getByRole('spinbutton', { name: 'Costo unit' }).fill('100');
+      await iframe.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
 
       // Confirm
-      await iframeElement.locator('#btnConfirmAddLine').click();
-      await expect(iframeElement.getByRole('cell', { name: value })).toBeVisible();
+      await iframe.locator('#btnConfirmAddLine').click();
+      await expect(iframe.getByRole('cell', { name: value })).toBeVisible();
 
-      documentValue = await iframeElement.locator('input#coddoc').inputValue(); //Guarde en caso que se usara en tabla luego
+      documentValue = await iframe.locator('input#coddoc').inputValue(); //Guarde en caso que se usara en tabla luego
       //console.log('Documento generado:', documentValue);
     });
 
     await test.step('Grabar documento', async () => {
-      await iframeElement.getByRole('textbox', { name: 'Número de BL' }).fill(numeroBl);
-      await iframeElement.getByRole('textbox', { name: 'Factura proveedor:' }).fill(numeroFactura);
-      await iframeElement.getByRole('textbox', { name: 'Poliza de importación' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-      await iframeElement.getByRole('button', { name: 'Grabar documento' }).click();
+      await iframe.getByRole('textbox', { name: 'Número de BL' }).fill(numeroBl);
+      await iframe.getByRole('textbox', { name: 'Factura proveedor:' }).fill(numeroFactura);
+      await iframe.getByRole('textbox', { name: 'Poliza de importación' }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByRole('button', { name: 'Grabar documento' }).click();
     });
 
     await test.step('Verificar registro agregado por medio de busqueda', async () => {
-      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
-      await expect(iframeElement.getByRole('cell', { name: 'Documento vacío' })).toBeVisible();
-      await iframeElement.getByRole('button', { name: 'Buscar' }).click();
-      await expect(iframeElement.getByRole('cell', { name: numeroFactura })).toBeVisible();
+      await iframe.getByRole('button', { name: 'Buscar documento' }).click();
+      await expect(iframe.getByRole('cell', { name: 'Documento vacío' })).toBeVisible();
+      await iframe.getByRole('button', { name: 'Buscar' }).click();
+      await expect(iframe.getByRole('cell', { name: numeroFactura })).toBeVisible();
 
-      await iframeElement.getByRole('button', { name: 'Cancelar' }).click(); //Salir de la ventana de busqueda
+      await iframe.getByRole('button', { name: 'Cancelar' }).click(); //Salir de la ventana de busqueda
     });
 
     await test.step('Anular documento', async () => {
-      await iframeElement.getByRole('button', { name: 'Anular documento' }).click();
-      await iframeElement.getByRole('button', { name: 'Buscar' }).click();
-      await iframeElement.getByRole('row', { name: numeroFactura }).click();
+      await iframe.getByRole('button', { name: 'Anular documento' }).click();
+      await iframe.getByRole('button', { name: 'Buscar' }).click();
+      await iframe.getByRole('row', { name: numeroFactura }).click();
 
       let errorAlert = null;
 
@@ -517,18 +517,18 @@ test.describe('Modulo Compras', () => {
       });
 
       // Anular el documento
-      await iframeElement.locator('#btnConfirmNull').click();
+      await iframe.locator('#btnConfirmNull').click();
 
       expect(errorAlert).toBeNull();
 
-      await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+      await iframe.getByRole('button', { name: 'Si - proceder' }).click();
 
-      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
-      await iframeElement.getByRole('button', { name: 'Buscar' }).click();
+      await iframe.getByRole('button', { name: 'Buscar documento' }).click();
+      await iframe.getByRole('button', { name: 'Buscar' }).click();
       await page.waitForTimeout(500);
 
       //Verificar que el documento ahora posee un valor de 0.00
-      await expect(iframeElement.
+      await expect(iframe.
         getByRole('row', { name: numeroFactura }).
         getByRole('cell', { name: '0.00' })).
         toBeVisible();
@@ -541,74 +541,74 @@ test.describe('Modulo Compras', () => {
   //===============================================================================  
 
   test.fixme('Retaceo de costos: test 1', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
 
     await page.getByRole('link', { name: 'Retaceo de costos' }).click();
     //Los campos revelantes estan vacios
-    await expect(iframeElement.locator('#grid_gastos')
+    await expect(iframe.locator('#grid_gastos')
       .getByRole('cell', { name: 'Documento vacío' })).toBeVisible();
-    await expect(iframeElement.contentFrame().locator('#jsgrid_div')
+    await expect(iframe.contentFrame().locator('#jsgrid_div')
       .getByRole('cell', { name: 'Documento vacío' })).toBeVisible();
 
 
-    await iframeElement.getByRole('textbox', { name: 'Poliza:' }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('textbox', { name: 'Poliza:' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
 
     // Revisar que se lleno todo
-    await expect(iframeElement.locator('#grid_gastos').
+    await expect(iframe.locator('#grid_gastos').
       getByRole('cell', { name: 'Documento vacío' })).not.toBeVisible();
-    await expect(iframeElement.contentFrame().locator('#jsgrid_div').
+    await expect(iframe.contentFrame().locator('#jsgrid_div').
       getByRole('cell', { name: 'Documento vacío' })).not.toBeVisible();
 
     //Agregar datos para el retaceo (Asegurarse de que los dato existan, escoger entre los predefinidos)
 
-    await page.iframeElement.getByRole('cell', { name: 'Seguros' }).click();
-    await page.iframeElement.getByRole('spinbutton', { name: 'Valor:' }).fill('13');
-    await page.iframeElement.getByRole('button', { name: 'Actualizar' }).click();
+    await page.iframe.getByRole('cell', { name: 'Seguros' }).click();
+    await page.iframe.getByRole('spinbutton', { name: 'Valor:' }).fill('13');
+    await page.iframe.getByRole('button', { name: 'Actualizar' }).click();
 
-    await page.iframeElement.getByRole('cell', { name: 'Otros gastos' }).click();
-    await page.iframeElement.getByRole('spinbutton', { name: 'Valor:' }).fill('13');
-    await page.iframeElement.getByRole('button', { name: 'Actualizar' }).click();
+    await page.iframe.getByRole('cell', { name: 'Otros gastos' }).click();
+    await page.iframe.getByRole('spinbutton', { name: 'Valor:' }).fill('13');
+    await page.iframe.getByRole('button', { name: 'Actualizar' }).click();
 
   });
 
   //Al intentar agregar un item a la tabla no deberia ser posible y un mensaje de advertencia deberia aparecer
   test('Proveedores: Agregando a tabla sin llenar los campos requeridos', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
 
     //Click on Proveedores
     await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
     await expect(page.getByRole('link', { name: 'Proveedores Close' })).toBeVisible();
 
     //Click on Agregar
-    await expect(iframeElement.getByRole('button', { name: 'Agregar' })).toBeVisible();
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+    await expect(iframe.getByRole('button', { name: 'Agregar' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
 
-    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
 
     //Check for required field messages
-    await expect(iframeElement.locator('#parsley-id-7')
+    await expect(iframe.locator('#parsley-id-7')
       .getByText('Este valor es requerido.'))
       .toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-17')
+    await expect(iframe.locator('#parsley-id-17')
       .getByText('Este valor es requerido.'))
       .toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-19')
+    await expect(iframe.locator('#parsley-id-19')
       .getByText('Este valor es requerido.'))
       .toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-27')
+    await expect(iframe.locator('#parsley-id-27')
       .getByText('Este valor es requerido.'))
       .toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-37')
+    await expect(iframe.locator('#parsley-id-37')
       .getByText('Este valor es requerido.'))
       .toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-41')
+    await expect(iframe.locator('#parsley-id-41')
       .getByText('Este valor es requerido.'))
       .toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-45')
+    await expect(iframe.locator('#parsley-id-45')
       .getByText('Este valor es requerido.'))
       .toBeVisible();
-    await expect(iframeElement.locator('#parsley-id-51')
+    await expect(iframe.locator('#parsley-id-51')
       .getByText('Este valor es requerido.'))
       .toBeVisible();
 
@@ -616,38 +616,38 @@ test.describe('Modulo Compras', () => {
 
   test('Proveedores: Agregando a tabla', async () => {
     //iframe context
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const idProveedor = `PV-` + `${Date.now()}`.slice(-7);
     const nombreProveedor = `Proveedor ` + `${Date.now()}`.slice(-4);
 
     await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
 
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
 
-    await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(idProveedor);
+    await iframe.getByRole('textbox', { name: 'Codigo' }).fill(idProveedor);
 
-    await iframeElement.getByRole('textbox', { name: 'Tipo de persona' }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('textbox', { name: 'Tipo de persona' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
 
-    await iframeElement.getByRole('textbox', { name: 'Nombre' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Nombre' }).fill(nombreProveedor);
+    await iframe.getByRole('textbox', { name: 'Nombre' }).click();
+    await iframe.getByRole('textbox', { name: 'Nombre' }).fill(nombreProveedor);
 
-    await iframeElement.locator('#dirprov').fill('calle 1, ciudad 1, pais 1');
-    await iframeElement.getByRole('textbox', { name: 'Pais', exact: true }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
-    await iframeElement.getByRole('textbox', { name: 'Teléfono:' }).fill('7XXX7XXX');
-    await iframeElement.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
-    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+    await iframe.locator('#dirprov').fill('calle 1, ciudad 1, pais 1');
+    await iframe.getByRole('textbox', { name: 'Pais', exact: true }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('textbox', { name: 'Teléfono:' }).fill('7XXX7XXX');
+    await iframe.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
 
     //Verificar si fue guardado
-    await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(idProveedor);
-    await expect(iframeElement.getByRole('cell', { name: idProveedor, exact: true })).toBeVisible();
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(idProveedor);
+    await expect(iframe.getByRole('cell', { name: idProveedor, exact: true })).toBeVisible();
 
   });
 
   //Test complete de proveedores
   test('Proveedores: Crear, Editar y Eliminar', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const idProveedor = `PV-` + `${Date.now()}`.slice(-7);
     const nombreProveedor = `Proveedor ` + `${Date.now()}`.slice(-4);
     const nit = `${Date.now()}`.slice(-10);
@@ -656,41 +656,41 @@ test.describe('Modulo Compras', () => {
 
     //Crear
     await test.step('Crear proveedor', async () => {
-      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(idProveedor);
-      await iframeElement.getByRole('textbox', { name: 'Tipo de persona' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-      await iframeElement.getByRole('textbox', { name: 'Nombre' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Nombre' }).fill(nombreProveedor);
-      await iframeElement.locator('#dirprov').fill('calle 1, ciudad 1, pais 1');
-      await iframeElement.getByRole('textbox', { name: 'Pais', exact: true }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-      await iframeElement.getByRole('textbox', { name: 'Teléfono:' }).fill('7XXX7XXX');
-      await iframeElement.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
-      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+      await iframe.getByRole('button', { name: 'Agregar' }).click();
+      await iframe.getByRole('textbox', { name: 'Codigo' }).fill(idProveedor);
+      await iframe.getByRole('textbox', { name: 'Tipo de persona' }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByRole('textbox', { name: 'Nombre' }).click();
+      await iframe.getByRole('textbox', { name: 'Nombre' }).fill(nombreProveedor);
+      await iframe.locator('#dirprov').fill('calle 1, ciudad 1, pais 1');
+      await iframe.getByRole('textbox', { name: 'Pais', exact: true }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByRole('textbox', { name: 'Teléfono:' }).fill('7XXX7XXX');
+      await iframe.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
+      await iframe.getByRole('button', { name: 'Grabar' }).click();
 
-      await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(idProveedor);
-      await expect(iframeElement.getByRole('cell', { name: idProveedor, exact: true })).toBeVisible();
+      await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(idProveedor);
+      await expect(iframe.getByRole('cell', { name: idProveedor, exact: true })).toBeVisible();
     });
 
     //Editar
     await test.step('Editar proveedor', async () => {
-      await iframeElement.getByRole('row', { name: idProveedor }).getByRole('button').first().click();
-      await iframeElement.getByRole('textbox', { name: 'NIT' }).fill(nit);
-      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
-      await expect(iframeElement.getByRole('cell', { name: nit, exact: true })).toBeVisible();
+      await iframe.getByRole('row', { name: idProveedor }).getByRole('button').first().click();
+      await iframe.getByRole('textbox', { name: 'NIT' }).fill(nit);
+      await iframe.getByRole('button', { name: 'Grabar' }).click();
+      await expect(iframe.getByRole('cell', { name: nit, exact: true })).toBeVisible();
     });
 
     //Eliminar
     await test.step('Eliminar proveedor', async () => {
-      await iframeElement.getByRole('row', { name: idProveedor }).getByRole('button').nth(1).click();
-      await iframeElement.getByRole('button', { name: 'Eliminar' }).click();
-      await expect(iframeElement.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
-      await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+      await iframe.getByRole('row', { name: idProveedor }).getByRole('button').nth(1).click();
+      await iframe.getByRole('button', { name: 'Eliminar' }).click();
+      await expect(iframe.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
+      await iframe.getByRole('button', { name: 'Si - proceder' }).click();
       await page.waitForTimeout(500);
 
       //Verificando que ya no existe
-      await expect(iframeElement.getByRole('cell', { name: idProveedor, exact: true })).toHaveCount(0);
+      await expect(iframe.getByRole('cell', { name: idProveedor, exact: true })).toHaveCount(0);
     });
   });
 
@@ -698,25 +698,25 @@ test.describe('Modulo Compras', () => {
   // to have duplicate items so its tough writting a test for this 
   //TODO: 
   test.fixme('Grupos de proveedores: adding to table', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     await page.getByRole('link', { name: 'Grupos de proveedores' }).click();
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill('001');
-    await iframeElement.getByRole('textbox', { name: 'Nombre del grupo' }).fill('prueba1');
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Codigo' }).fill('001');
+    await iframe.getByRole('textbox', { name: 'Nombre del grupo' }).fill('prueba1');
     //If it fails here its because this test was written was a specific case in mind 
     //and the item from the table already exists
-    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
 
     // expect(page.locator('.mbsc-toast')).toHaveText('Ya existe en la base de datos');
 
-    await expect(iframeElement.getByRole('cell', { name: '001' })).toBeVisible();
+    await expect(iframe.getByRole('cell', { name: '001' })).toBeVisible();
     //await page.screenshot({ path: 'debug1.png', fullPage: true }); //Debug screenshot
   });
 
 
   //Prueba sera reescrita una vez la funcion se arreglada, por ahora esta con datos quemados
   test.fixme('Grupos de proveedores: deleting items from table', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const frame = await page.locator('iframe').first().contentFrame();
 
     await page.getByRole('link', { name: 'Grupos de proveedores' }).click();
@@ -726,8 +726,8 @@ test.describe('Modulo Compras', () => {
       .toBeVisible();
 
 
-    await iframeElement.getByRole('row', { name: 'prueba1' }).getByRole('button').nth(1).click();
-    await iframeElement.getByRole('button', { name: 'Cancelar' }).click();
+    await iframe.getByRole('row', { name: 'prueba1' }).getByRole('button').nth(1).click();
+    await iframe.getByRole('button', { name: 'Cancelar' }).click();
     //await page.screenshot({ path: 'debug1.png', fullPage: true }); //Debug screenshot
 
     //await expect(page.locator('iframe').contentFrame().getByRole('cell', { name: '001' })).toBeVisible();
@@ -739,30 +739,30 @@ test.describe('Modulo Compras', () => {
 
   //Add productos to table in 'Prodcutos' 
   test('Productos: Add product', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const uniqueId = `${Date.now()}`;
 
     await page.getByRole('link', { name: 'Productos' }).click();
 
     //Detalles
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-    await iframeElement.getByRole('textbox', { name: 'Descripcion', exact: true })
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
+    await iframe.getByRole('textbox', { name: 'Descripcion', exact: true })
       .fill('descripcion producto');
-    await iframeElement.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
-    await iframeElement.getByText('Contables').click();
-    await iframeElement.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
-    await iframeElement.getByText('Costo artículos producidos/').click();
-    await iframeElement.getByText('Precios').click();
-    await iframeElement.getByRole('spinbutton', { name: 'Precio 1 SIN IVA' }).fill('100');
+    await iframe.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByText('Contables').click();
+    await iframe.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
+    await iframe.getByText('Costo artículos producidos/').click();
+    await iframe.getByText('Precios').click();
+    await iframe.getByRole('spinbutton', { name: 'Precio 1 SIN IVA' }).fill('100');
 
     //Grabar
-    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
 
     //Verificar que fue creado
-    await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
-    await expect(iframeElement.getByRole('cell', { name: uniqueId, exact: true })).toBeVisible();
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
+    await expect(iframe.getByRole('cell', { name: uniqueId, exact: true })).toBeVisible();
 
     //await page.screenshot({ path: 'debug1.png', fullPage: true }); //Debug screenshot
   });
@@ -770,30 +770,30 @@ test.describe('Modulo Compras', () => {
   //Delete item from table Productos
   //Test keeps giving false positives from time to time. 
   test('Productos: Delete product', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const uniqueId = `${Date.now()}`;
 
     await page.getByRole('link', { name: 'Productos' }).click();
 
     // Llenar detalles
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-    await iframeElement.getByRole('textbox', { name: 'Descripcion', exact: true })
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
+    await iframe.getByRole('textbox', { name: 'Descripcion', exact: true })
       .fill('descripcion producto');
-    await iframeElement.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
-    await iframeElement.getByText('Contables').click();
-    await iframeElement.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
-    await iframeElement.getByText('Costo artículos producidos/').click();
-    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+    await iframe.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByText('Contables').click();
+    await iframe.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
+    await iframe.getByText('Costo artículos producidos/').click();
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
 
     // Buscar producto
-    await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
-    const cellLocator = iframeElement.getByRole('cell', { name: uniqueId, exact: true });
-    await expect(cellLocator).toBeVisible({ timeout: 5000 }); // Wait until it's there
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
+    const cellLocator = iframe.getByRole('cell', { name: uniqueId, exact: true });
+    await expect(cellLocator).toBeVisible(); 
 
     // Find the row that contains that unique ID
-    const rowLocator = iframeElement
+    const rowLocator = iframe
       .locator('tr')
       .filter({ has: cellLocator });
 
@@ -801,9 +801,9 @@ test.describe('Modulo Compras', () => {
     await rowLocator.locator('button').nth(1).click();
 
     // Confirm deletion
-    await iframeElement.getByRole('button', { name: 'Eliminar' }).click();
-    await expect(iframeElement.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
-    await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+    await iframe.getByRole('button', { name: 'Eliminar' }).click();
+    await expect(iframe.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Si - proceder' }).click();
     await page.waitForTimeout(500);
 
     // Wait until the cell is gone
@@ -813,103 +813,103 @@ test.describe('Modulo Compras', () => {
   //Agrega un item a la tabla de almacenes
   //Por la forma que se genera el id, puede que el test falle si no hay cuidado de borrar tablas
   test('Almacenes: Agregar, Editar y Eliminar', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const uniqueId = `${Date.now()}`.slice(-2);
     await page.getByRole('link', { name: 'Almacenes' }).click();
 
     //Crear
     await test.step('Agregar almacen', async () => {
-      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-      await iframeElement.getByRole('textbox', { name: 'Nombre del almacen' }).fill('almacen XX');
-      await iframeElement.getByRole('textbox', { name: 'Sucursal' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+      await iframe.getByRole('button', { name: 'Agregar' }).click();
+      await iframe.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
+      await iframe.getByRole('textbox', { name: 'Nombre del almacen' }).fill('almacen XX');
+      await iframe.getByRole('textbox', { name: 'Sucursal' }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByRole('button', { name: 'Grabar' }).click();
 
       //Verificar que fue creado
-      await iframeElement.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
-      await expect(iframeElement.getByRole('cell', { name: uniqueId })).toBeVisible();
+      await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
+      await expect(iframe.getByRole('cell', { name: uniqueId })).toBeVisible();
     });
 
     //Editar
     await test.step('Editar almacen', async () => {
-      await iframeElement.getByRole('row', { name: uniqueId }).getByRole('button').nth(0).click();
-      await iframeElement.getByRole('textbox', { name: 'Nombre del almacen' })
+      await iframe.getByRole('row', { name: uniqueId }).getByRole('button').nth(0).click();
+      await iframe.getByRole('textbox', { name: 'Nombre del almacen' })
         .fill('almacen ' + uniqueId);
-      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
-      await expect(iframeElement.getByRole('row', { name: uniqueId })
+      await iframe.getByRole('button', { name: 'Grabar' }).click();
+      await expect(iframe.getByRole('row', { name: uniqueId })
         .getByRole('cell', { name: 'almacen ' + uniqueId }))
         .toBeVisible();
     });
 
     //Eliminar
     await test.step('Eliminar almacen', async () => {
-      await iframeElement.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();
-      await iframeElement.getByRole('button', { name: 'Eliminar' }).click();
+      await iframe.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();
+      await iframe.getByRole('button', { name: 'Eliminar' }).click();
 
-      await expect(iframeElement.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
-      await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+      await expect(iframe.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
+      await iframe.getByRole('button', { name: 'Si - proceder' }).click();
 
       await page.waitForTimeout(500);
-      await expect(iframeElement.getByRole('cell', { name: uniqueId })).not.toBeVisible();
+      await expect(iframe.getByRole('cell', { name: uniqueId })).not.toBeVisible();
     });
 
   });
 
   //Delete item from table 'Almacenes'
   test.skip('Almacenes: Delete item from table', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const uniqueId = `${Date.now()}`.slice(-2);
 
     //First create item to be deleted
     await page.getByRole('link', { name: 'Almacenes' }).click();
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-    await iframeElement.getByRole('textbox', { name: 'Nombre del almacen' }).fill('almacen1');
-    await iframeElement.getByRole('textbox', { name: 'Sucursal' }).click();
-    await iframeElement.getByLabel('0', { exact: true }).getByText('01').click();
-    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
-    const cellLocator = iframeElement.getByRole('cell', { name: uniqueId, exact: true });
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
+    await iframe.getByRole('textbox', { name: 'Nombre del almacen' }).fill('almacen1');
+    await iframe.getByRole('textbox', { name: 'Sucursal' }).click();
+    await iframe.getByLabel('0', { exact: true }).getByText('01').click();
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
+    const cellLocator = iframe.getByRole('cell', { name: uniqueId, exact: true });
     await expect(cellLocator).toBeVisible();
 
     //await cellLocator.locator('button').nth(1).click();
-    await iframeElement.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();
-    await expect(iframeElement.getByRole('button', { name: 'Eliminar' })).toBeVisible();
-    await iframeElement.getByRole('button', { name: 'Eliminar' }).click();
+    await iframe.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();
+    await expect(iframe.getByRole('button', { name: 'Eliminar' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Eliminar' }).click();
 
-    await expect(iframeElement.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
-    await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+    await expect(iframe.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Si - proceder' }).click();
 
     await page.waitForTimeout(500);
-    await expect(iframeElement.getByRole('cell', { name: uniqueId })).not.toBeVisible();
+    await expect(iframe.getByRole('cell', { name: uniqueId })).not.toBeVisible();
   });
 
   test.skip('Almacenes: Crear y Eliminar almacenes', async () => {
-    const iframeElement = page.frameLocator('iframe');
+    const iframe = page.frameLocator('iframe');
     const uniqueId = `${Date.now()}`.slice(-2);
 
     //First create item to be deleted
     await page.getByRole('link', { name: 'Almacenes' }).click();
-    await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-    await iframeElement.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-    await iframeElement.getByRole('textbox', { name: 'Nombre del almacen' })
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
+    await iframe.getByRole('textbox', { name: 'Nombre del almacen' })
       .fill('almacen' + uniqueId);
-    await iframeElement.getByRole('textbox', { name: 'Sucursal' }).click();
-    await iframeElement.getByLabel('0', { exact: true }).getByText('01').click();
-    await iframeElement.getByRole('button', { name: 'Grabar' }).click();
-    const cellLocator = iframeElement.getByRole('cell', { name: uniqueId, exact: true });
+    await iframe.getByRole('textbox', { name: 'Sucursal' }).click();
+    await iframe.getByLabel('0', { exact: true }).getByText('01').click();
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
+    const cellLocator = iframe.getByRole('cell', { name: uniqueId, exact: true });
     await expect(cellLocator).toBeVisible();
 
     //await cellLocator.locator('button').nth(1).click();
-    await iframeElement.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();
-    await expect(iframeElement.getByRole('button', { name: 'Eliminar' })).toBeVisible();
-    await iframeElement.getByRole('button', { name: 'Eliminar' }).click();
+    await iframe.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();
+    await expect(iframe.getByRole('button', { name: 'Eliminar' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Eliminar' }).click();
 
-    await expect(iframeElement.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
-    await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+    await expect(iframe.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Si - proceder' }).click();
 
     await page.waitForTimeout(500);
-    await expect(iframeElement.getByRole('cell', { name: uniqueId })).not.toBeVisible();
+    await expect(iframe.getByRole('cell', { name: uniqueId })).not.toBeVisible();
 
   });
 
