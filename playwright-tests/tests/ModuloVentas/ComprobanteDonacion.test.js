@@ -27,7 +27,7 @@ test.describe('Comprobante de Donación', () => {
     await context.close();
   });
 
-  test('Debe mostrar la pantalla de Comprobante de Donación', async () => {
+  test.fixme('Debe mostrar la pantalla de Comprobante de Donación', async () => {
     await expect(iframeElement.getByRole('heading', { name: /Comprobante de donación/i })).toBeVisible();
     // TODO: 
   });

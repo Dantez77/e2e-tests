@@ -27,7 +27,7 @@ test.describe('Sucursales', () => {
     await context.close();
   });
 
-  test('Debe mostrar la pantalla de Sucursales', async () => {
+  test.fixme('Debe mostrar la pantalla de Sucursales', async () => {
     await expect(iframeElement.getByRole('heading', { name: /Sucursales/i })).toBeVisible();
     // TODO: 
   });

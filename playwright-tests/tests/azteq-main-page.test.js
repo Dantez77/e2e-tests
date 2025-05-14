@@ -1,29 +1,17 @@
 const { test, expect } = require('@playwright/test');
+const credentials = require('../config/credentials.js');
+const { login } = require('./helpers/login.js'); // Ajusta la ruta si es necesario
 
 test.describe('Modules Page Functionality', () => {
   let page;
   let context;
 
   test.beforeAll(async ({ browser }) => {
-    // context and page before all tests
     context = await browser.newContext(); 
     page = await context.newPage(); 
 
-    // login flow
-    await page.goto('https://azteq.club/azteq-club/login/');
-    await page.fill('#username', 'danq97@gmail.com');
-    await page.fill('#password', '1234');
-    await page.locator('#goLogin1').click();
-
-    await expect(page.locator('#login2')).toBeVisible();
-
-    const sucursal = page.locator('#cdsuc');
-    await sucursal.click();
-
-    const exactOption = page.getByRole('option', { name: 'Oficina central', exact: true });
-    await exactOption.click();
-
-    await page.locator('#goLogin2').click();
+    // login flow usando helper y credenciales
+    await login(page, credentials);
     await page.waitForURL('**/menu/menu.php', { timeout: 10000 });
     expect(page.url()).toContain('/menu/menu.php');
   });
