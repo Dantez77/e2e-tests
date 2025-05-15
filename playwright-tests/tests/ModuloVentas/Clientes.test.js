@@ -13,6 +13,8 @@ test.describe('Clientes', () => {
     context = await browser.newContext();
     page = await context.newPage();
     iframeElement = page.frameLocator('iframe');
+    uniqueId = `CL-` + `${Date.now()}`.slice(-7);
+    cliente = `Cliente ` + `${Date.now()}`.slice(-3);
 
     // Login and navigate to Modulo Ventas
     await test.step('Login and navigate to Modulo Ventas', async () => {
@@ -24,8 +26,7 @@ test.describe('Clientes', () => {
   });
 
   test.beforeEach(async () => {
-    uniqueId = `CL-` + `${Date.now()}`.slice(-7);
-    cliente = `Cliente ` + `${Date.now()}`.slice(-3);
+    
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
     await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
     await page.getByRole('link', { name: 'Clientes', exact: true }).click();
@@ -80,9 +81,8 @@ test.describe('Clientes', () => {
     await test.step('Eliminar cliente', async () => {
       await iframeElement.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();
       await iframeElement.getByRole('button', { name: 'Eliminar' }).click();
-      await page.waitForTimeout(500);
+      await expect(iframeElement.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
       await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
-      await page.waitForTimeout(500);
 
       // Verificar que el cliente fue eliminado
       await expect(

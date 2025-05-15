@@ -9,6 +9,7 @@
 
 
 async function crearCotizacion(page, iframeElement) {
+    let documentValue = undefined;
     await iframeElement.getByRole('textbox', { name: 'Cliente' }).click();
     await iframeElement.locator('[role="option"][data-index="2"]').click();
 
@@ -19,7 +20,7 @@ async function crearCotizacion(page, iframeElement) {
     await iframeElement.getByRole('option', { name: 'Contado' }).click();
 
     await iframeElement.getByRole('textbox', { name: 'Válido hasta' }).fill('2099-11-11');
-    let documentValue = await iframeElement.locator('input#coddoc').inputValue();
+    documentValue = await iframeElement.locator('input#coddoc').inputValue();
 
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
 
