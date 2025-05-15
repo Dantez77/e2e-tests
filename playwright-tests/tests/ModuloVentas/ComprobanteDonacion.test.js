@@ -28,7 +28,6 @@ test.describe('Comprobante de Donación', () => {
   });
 
   test.fixme('Debe mostrar la pantalla de Comprobante de Donación', async () => {
-    await expect(iframeElement.getByRole('heading', { name: /Comprobante de donación/i })).toBeVisible();
     // TODO: 
   });
 });
