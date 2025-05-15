@@ -19,7 +19,7 @@ async function crearCotizacion(page, iframeElement) {
     await iframeElement.getByRole('option', { name: 'Contado' }).click();
 
     await iframeElement.getByRole('textbox', { name: 'Válido hasta' }).fill('2099-11-11');
-    const documentValue = await iframeElement.locator('input#coddoc').inputValue();
+    let documentValue = await iframeElement.locator('input#coddoc').inputValue();
 
     await iframeElement.getByRole('button', { name: 'Agregar' }).click();
 

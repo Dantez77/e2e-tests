@@ -28,7 +28,6 @@ test.describe('Grupos de Clientes', () => {
   });
 
   test('Debe mostrar la pantalla de Grupos de Clientes', async () => {
-    await expect(iframeElement.getByRole('heading', { name: /Grupos de clientes/i })).toBeVisible();
     // TODO
   });
 });

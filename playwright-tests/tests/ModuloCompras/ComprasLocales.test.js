@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
-test.describe('Modulo Compras - Compras Locales', () => {
+test.describe('Compras Locales', () => {
   let page;
   let context;
   let iframe;
@@ -77,7 +77,7 @@ test.describe('Modulo Compras - Compras Locales', () => {
   });
 
   test('Grabar documento', async () => {
-    const numeroFactura = `test-${Date.now()}`;
+    const numeroFactura = `test-` + `${Date.now()}`.slice(-5);
     await page.getByRole('link', { name: 'Compras locales' }).click();
     await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
     await iframe.locator('[role="option"][data-index="0"]').click();
@@ -103,7 +103,7 @@ test.describe('Modulo Compras - Compras Locales', () => {
   });
 
   test('Anular documento', async () => {
-    const numeroFactura = `anular-${Date.now()}`;
+    const numeroFactura = `anul-` + `${Date.now()}`.slice(-5);
     await page.getByRole('link', { name: 'Compras locales' }).click();
     await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
     await iframe.locator('[role="option"][data-index="0"]').click();
