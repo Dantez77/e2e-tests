@@ -5,9 +5,10 @@ const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
 test.describe.serial('Credito Fiscal', () => {
-  let numeroCFF;
+  let numeroCFF = undefined;
   const tipoPago = 'Contado';
   const vendedor = 'Bob';
+  console.log(`Credito antes de asignar: ${numeroCFF}`);
 
   test.beforeAll(async ({ browser }) => {
     const context = await browser.newContext();
@@ -18,7 +19,7 @@ test.describe.serial('Credito Fiscal', () => {
     await login(page, credentials);
     await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
 
-    numeroCFF = await crearCreditoFiscal(page, iframe, tipoPago, vendedor); //Credito Fiscal
+    numeroCFF = await crearCreditoFiscal(page, iframe, tipoPago); //Credito Fiscal
 
     await page.close();
     await context.close();

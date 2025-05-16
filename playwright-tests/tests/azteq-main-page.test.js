@@ -7,8 +7,8 @@ test.describe('Modules Page Functionality', () => {
   let context;
 
   test.beforeAll(async ({ browser }) => {
-    context = await browser.newContext(); 
-    page = await context.newPage(); 
+    context = await browser.newContext();
+    page = await context.newPage();
 
     // login flow usando helper y credenciales
     await login(page, credentials);
@@ -17,8 +17,8 @@ test.describe('Modules Page Functionality', () => {
   });
 
   test.afterAll(async () => {
-    await page.close(); 
-    await context.close(); 
+    await page.close();
+    await context.close();
   });
 
   test('La pagina carga correctamente', async () => {
@@ -32,14 +32,14 @@ test.describe('Modules Page Functionality', () => {
     });
     expect(theme).toBe('dark');
 
-    await page.click('.slider-dark-bg'); 
+    await page.click('.slider-dark-bg');
 
     const themeAfterToggle = await page.evaluate(() => {
       return localStorage.getItem('azteqTheme');
     });
     expect(themeAfterToggle).toBe('light');
 
-    await page.click('span.slider.round.slider-light-bg'); 
+    await page.click('span.slider.round.slider-light-bg');
 
     const themeAfterSecondToggle = await page.evaluate(() => {
       return localStorage.getItem('azteqTheme');
@@ -98,7 +98,7 @@ test.describe('Modules Page Functionality', () => {
     // Check if the logout pop up shows up after clicking logout
     await expect(page.getByText('Logout')).toBeVisible();
     await expect(page.getByText('Desea terminar sesión?')).toBeVisible();
-    
+
     await expect(page.getByRole('button', { name: 'No - Cancelar' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
 
@@ -108,7 +108,7 @@ test.describe('Modules Page Functionality', () => {
     // Back to log in menu
     await page.waitForURL('**/login/index.php', { timeout: 10000 });
     expect(page.url()).toContain('/login/index.php');
-    
+
     // Check if the session really closed
     await page.click('#goLogin1');
     await expect(page.locator('.mbsc-toast')).toHaveText('ID o password incorrecto(s)');
@@ -141,65 +141,73 @@ test.describe('Modules Page Functionality', () => {
     await page.click("[id='changepassword']");
 
     //Checking every field is there
-    expect(page.locator("#u_nombres")).toBeVisible(); 
-    expect(page.locator("#u_apellidos")).toBeVisible(); 
-    expect(page.locator("#pwd_actual")).toBeVisible(); 
-    expect(page.locator("#pwd_new1")).toBeVisible(); 
-    expect(page.locator("#pwd_actual")).toBeVisible(); 
+    expect(page.locator("#u_nombres")).toBeVisible();
+    expect(page.locator("#u_apellidos")).toBeVisible();
+    expect(page.locator("#pwd_actual")).toBeVisible();
+    expect(page.locator("#pwd_new1")).toBeVisible();
+    expect(page.locator("#pwd_actual")).toBeVisible();
 
     //Checking they have the attribute [required] for so field is nto allowed to remain empty
-    const pwdActualReq = await page.locator("#pwd_actual").getAttribute("required");
-    expect(pwdActualReq).not.toBeNull();
-    const NewPwdReq = await page.locator("#pwd_actual").getAttribute("required");
-    expect(NewPwdReq).not.toBeNull();
-    const New2PwdReq = await page.locator("#pwd_actual").getAttribute("required");
-    expect(New2PwdReq).not.toBeNull();
+    await page.fill("#pwd_actual", "");
+    await page.fill("#pwd_new1", "");
+    await page.fill("#pwd_new2", "");
+
+
+    page.getByRole('button', { name: 'Cambiar clave' }).click();
+
+    await expect(page.locator('.mbsc-toast')).toHaveText('Completa todos los campos');
   });
 
   //Password change (For now it allows a password change to the same or previously used passwords)
-  //FIXME: Deberia fallar por que esto no se deberia poder hacer
   test('Cambio de contraseña: Se efectua el cambio efectivamente', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='changepassword']");
 
-    await page.fill("#pwd_actual","1234");
-    await page.click("#pwd_actual","1234");
-    await page.click("#pwd_actual","1234");
+    await page.fill("#pwd_actual", credentials.password);
+    await page.fill("#pwd_new1", credentials.password);
+    await page.fill("#pwd_new2", credentials.password);
 
-    page.once('dialog', async (dialog) => {
-      expect(dialog.type()).toBe('alert');
-      expect(dialog.message()).toBe('OK');
-    });
+    await Promise.all([
+      page.waitForEvent('dialog').then(async (dialog) => {
+        expect(dialog.type()).toBe('alert');
+        expect(dialog.message()).toBe('OK');
+        await dialog.accept();
+      }),
+      page.getByRole('button', { name: 'Cambiar clave' }).click(),
+    ]);
   });
 
   //Attempt to change password without having the correct password first
-  test('Cambio de contraseña: Verifica que el password sea el adecuado', async () => {
+  test('Cambio de contraseña: Verifica que el password actual sea el correcto', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='changepassword']");
 
-    await page.fill("#pwd_actual","wrongpassword");
-    await page.click("#pwd_actual","test");
-    await page.click("#pwd_actual","test");
+    await page.fill("#pwd_actual", "wrongpassword");
+    await page.fill("#pwd_new1", "newpassword");
+    await page.fill("#pwd_new2", "newpassword");
 
-    page.once('dialog', async (dialog) => {
-      expect(dialog.type()).toBe('alert');
-      expect(dialog.message()).toBe('ERROR: Incorrect user or password');
-    });
+    await Promise.all([
+      page.waitForEvent('dialog').then(async (dialog) => {
+        expect(dialog.type()).toBe('alert');
+        expect(dialog.message()).toBe('ERROR: Incorrect user or password');
+        await dialog.accept();
+      }),
+      page.getByRole('button', { name: 'Cambiar clave' }).click(),
+    ]);
   });
 
-  //FIXME: 
-  test('Cambio de contraseña: Verifica si el password puede ser cambiado a "" ', async () => {
+  test('Cambio de contraseña: Verifica si todos los campos poseen input valido', async () => {
     await page.click("[id='btnAccount']");
     await page.click("[id='changepassword']");
 
-    await page.fill("#pwd_actual","1234");
-    await page.click("#pwd_actual","");
-    await page.click("#pwd_actual","");
+    await page.fill("#pwd_actual", "wrongpassword");
+    await page.fill("#pwd_new1", "");
+    await page.fill("#pwd_new2", "");
 
-    page.once('dialog', async (dialog) => {
-      expect(dialog.type()).toBe('alert');
-      expect(dialog.message()).toBe('Error al digitar palabra clave. Verifique');
-    });
+
+    page.getByRole('button', { name: 'Cambiar clave' }).click();
+
+    await expect(page.locator('.mbsc-toast')).toHaveText('Completa todos los campos');
   });
 
   // For future reference this test will fail if account doesnt have a branch named 'Oficina central Norte'
@@ -209,11 +217,11 @@ test.describe('Modules Page Functionality', () => {
     await page.click("[id='configureaccount']");
 
     //Changing branch
-    await page.click('[placeholder="Sucursal"]'); 
+    await page.click('[placeholder="Sucursal"]');
     await page.click('text="Oficina central norte"');
 
     //Changing back to avoid issues
-    await page.click('[placeholder="Sucursal"]'); 
+    await page.click('[placeholder="Sucursal"]');
     await page.click('text="Oficina central"');
 
     //Checking it saves new configuration
@@ -230,7 +238,7 @@ test.describe('Modules Page Functionality', () => {
     //Loads new tab and checks for important elements 
     const pagePromise = page.waitForEvent('popup');
     const newTab = await pagePromise;
-    await newTab.waitForLoadState(); 
+    await newTab.waitForLoadState();
     await expect(newTab).toHaveURL(/https:\/\/billing\.stripe\.com\/.*/);
     await expect(newTab.locator('[data-test="update-subscription"]')).toBeVisible();
     await expect(newTab.locator('[data-test="cancel-subscription"]')).toBeVisible();
@@ -253,25 +261,25 @@ test.describe('Modules Page Functionality', () => {
     // Open account menu and change company
     await page.click("[id='btnAccount']");
     await page.click("[id='changecompany']");
-  
+
     await page.waitForURL('**/menu/cambiar_empresa.php', { timeout: 10000 });
     expect(page.url()).toContain('/menu/cambiar_empresa.php');
-  
+
     // Select enterprise
-    await page.click('[id="dbschm_dummy"]'); 
+    await page.click('[id="dbschm_dummy"]');
     await page.click('[role="option"][data-index="0"]');
-  
+
     // Select branch
-    await page.click('[id="cdsuc_dummy"]'); 
+    await page.click('[id="cdsuc_dummy"]');
     const selectedCdsuc = await page.locator('[role="option"][data-index="0"] div[style="font-size:16px;line-height:18px;"]').innerText();
     await page.click('[role="option"][data-index="0"]');
-  
+
     // Confirm changes 
-    await page.click('[id="cambiarEmpresa"]'); 
-  
+    await page.click('[id="cambiarEmpresa"]');
+
     await page.waitForURL('**/menu/menu.php', { timeout: 10000 });
     expect(page.url()).toContain('/menu/menu.php');
-  
+
     // Get branch name from main menu
     const fullLabel = await page.locator('.b4-sucurs-name.pl-2').innerText();
 
