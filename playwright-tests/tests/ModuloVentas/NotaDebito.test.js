@@ -35,7 +35,7 @@ test.describe('Nota de Débito', () => {
 
   test.beforeEach(async () => {
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
+    await page.getByRole('link', { name: 'btn-moduloContabilidad' }).click();
     await page.getByRole('link', { name: 'Nota de débito', exact: true }).click();
     iframeElement = page.frameLocator('iframe');
   });

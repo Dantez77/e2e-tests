@@ -36,9 +36,7 @@ async function crearCreditoFiscal(page, iframe, tipoPago) {
     if (!documentValue || documentValue.trim() === '') {
       throw new Error('No document number was generated');
     }
-    
-    console.log(`Credito Fiscal: ${documentValue}`);
-    
+        
     return documentValue;
   } catch (error) {
     console.error(`Error creating Credit Fiscal: ${error.message}`);

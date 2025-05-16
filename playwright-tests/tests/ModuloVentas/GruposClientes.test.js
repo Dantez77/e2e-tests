@@ -27,7 +27,7 @@ test.describe('Grupos de Clientes', () => {
     await context.close();
   });
 
-  test('Debe mostrar la pantalla de Grupos de Clientes', async () => {
+  test.fixme('Debe mostrar la pantalla de Grupos de Clientes', async () => {
     // TODO
   });
 });

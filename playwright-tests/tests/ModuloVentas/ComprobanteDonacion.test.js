@@ -45,7 +45,6 @@ test.describe('Comprobante de Donación', () => {
 
     await iframe.locator('#btnConfirmAddLine').click();
     documentValue = await iframe.locator('input#coddoc').inputValue();
-    console.log(documentValue);
     await iframe.getByRole('button', { name: 'Grabar documento' }).click();
 
     await expect(iframe.locator('.mbsc-toast')).toHaveText('Documento ha sido grabado');

@@ -36,7 +36,7 @@ test.describe.serial('Credito Fiscal', () => {
     await page.getByRole('link', { name: 'Crédito fiscal' }).click();
   });
 
-  test('Validar nuevo documento', async ({ page }) => {
+  test('Buscar nuevo documento', async ({ page }) => {
     test.skip(!numeroCFF, 'No document was created in beforeAll');
 
     const iframe = page.frameLocator('iframe');

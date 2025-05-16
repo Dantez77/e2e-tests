@@ -28,7 +28,6 @@ test.describe('Sucursales', () => {
   });
 
   test.fixme('Debe mostrar la pantalla de Sucursales', async () => {
-    await expect(iframeElement.getByRole('heading', { name: /Sucursales/i })).toBeVisible();
     // TODO: 
   });
 });
