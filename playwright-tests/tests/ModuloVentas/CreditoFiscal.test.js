@@ -50,10 +50,8 @@ test.describe.serial('Credito Fiscal', () => {
 
     const iframe = page.frameLocator('iframe');
     await busquedaDoc(page, iframe, numeroCFF);
-
     await iframe.getByRole('cell', { name: numeroCFF }).click();
 
-    const nuevoVendedor = 'Alice';
     await iframe.getByRole('textbox', { name: 'Vendedor:' }).click();
     await iframe.locator('[role="option"][data-index="1"]').click();
 
@@ -94,43 +92,5 @@ test.describe.serial('Credito Fiscal', () => {
     await expect(
       iframe.getByRole('row', { name: numeroCFF })
     ).toHaveCount(0);
-  });
-
-  // Optional: Recovery test in case annulment fails
-  test.skip('Fallback: Ensure document is annulled', async ({ page }) => {
-    if (!numeroCFF) return;
-
-    const iframe = page.frameLocator('iframe');
-    await busquedaDoc(page, iframe, numeroCFF);
-
-    const documentExists = await iframe.getByRole('cell', { name: numeroCFF }).count() > 0;
-
-    if (documentExists) {
-      await iframe.getByRole('button', { name: 'Agregar:' }).click();
-      await iframe.getByRole('button', { name: 'Anular documento:' }).click();
-
-      await busquedaDoc(page, iframe, numeroCFF);
-
-      await iframe.getByRole('cell', { name: numeroCFF }).click();
-
-      const anularButton = iframe.getByRole('button', { name: 'Anular Documento' });
-      await expect(anularButton).toBeVisible();
-      await anularButton.click();
-
-      const confirmButton = iframe.locator('#btnConfirmNull');
-      await expect(confirmButton).toBeVisible();
-      await confirmButton.click();
-
-      const proceedButton = iframe.getByRole('button', { name: 'Si - proceder' });
-      await expect(proceedButton).toBeVisible();
-      await proceedButton.click();
-
-      await iframe.getByRole('button', { name: 'Buscar documento' }).click();
-      await busquedaDoc(page, iframe, numeroCFF);
-
-      await expect(
-        iframe.getByRole('row', { name: numeroCFF })
-      ).toHaveCount(0);
-    }
   });
 });
