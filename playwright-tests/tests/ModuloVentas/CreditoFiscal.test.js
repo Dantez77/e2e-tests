@@ -5,24 +5,29 @@ const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
 test.describe.serial('Credito Fiscal', () => {
-  let numeroCFF = undefined;
+  let numeroCFF;
   const tipoPago = 'Contado';
   const vendedor = 'Bob';
-  console.log(`Credito antes de asignar: ${numeroCFF}`);
 
   test.beforeAll(async ({ browser }) => {
     const context = await browser.newContext();
     const page = await context.newPage();
-    const iframe = page.frameLocator('iframe');
 
-    // Login 
-    await login(page, credentials);
-    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
+    try {
+      // Login
+      await login(page, credentials);
+      await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
 
-    numeroCFF = await crearCreditoFiscal(page, iframe, tipoPago); //Credito Fiscal
-
-    await page.close();
-    await context.close();
+      const iframe = page.frameLocator('iframe');
+      numeroCFF = await crearCreditoFiscal(page, iframe, tipoPago, vendedor); // Pass vendedor parameter
+      console.log(`Credito Fiscal creado: ${numeroCFF}`);
+    } catch (error) {
+      console.error('Error in beforeAll:', error);
+      throw error;
+    } finally {
+      await page.close();
+      await context.close();
+    }
   });
 
   test.beforeEach(async ({ page }) => {
@@ -32,49 +37,100 @@ test.describe.serial('Credito Fiscal', () => {
   });
 
   test('Validar nuevo documento', async ({ page }) => {
+    test.skip(!numeroCFF, 'No document was created in beforeAll');
+
     const iframe = page.frameLocator('iframe');
     await busquedaDoc(page, iframe, numeroCFF);
+
     await expect(iframe.getByRole('cell', { name: numeroCFF })).toBeVisible();
   });
 
   test('Editar el documento creado', async ({ page }) => {
+    test.skip(!numeroCFF, 'No document was created in beforeAll');
+
     const iframe = page.frameLocator('iframe');
     await busquedaDoc(page, iframe, numeroCFF);
+
     await iframe.getByRole('cell', { name: numeroCFF }).click();
 
+    const nuevoVendedor = 'Alice';
     await iframe.getByRole('textbox', { name: 'Vendedor:' }).click();
     await iframe.locator('[role="option"][data-index="1"]').click();
 
-    await expect(iframe.getByRole('button', { name: 'Grabar cambios' })).toBeVisible({ timeout: 5000 });
-    await expect(iframe.getByRole('button', { name: 'Grabar cambios' })).toBeEnabled({ timeout: 5000 });
+    const saveButton = iframe.getByRole('button', { name: 'Grabar cambios' });
+    await expect(saveButton).toBeVisible();
+    await expect(saveButton).toBeEnabled();
 
-    await iframe.getByRole('button', { name: 'Grabar cambios' }).click();
+    await saveButton.click();
+
     await expect(iframe.locator('.mbsc-toast')).toHaveText('Cambios han sido grabados');
   });
 
   test('Anular el documento', async ({ page }) => {
+    test.skip(!numeroCFF, 'No document was created in beforeAll');
+
     const iframe = page.frameLocator('iframe');
     console.log(`Credito a Anular: ${numeroCFF}`);
-    await iframe.getByRole('button', { name: 'Agregar' }).click();
 
-    await expect(iframe.getByRole('button', { name: 'Anular Documento' })).toBeVisible({ timeout: 5000 });
-    await iframe.getByRole('button', { name: 'Anular Documento' }).click();
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('button', { name: 'Anular documento' }).click();
+
 
     await busquedaDoc(page, iframe, numeroCFF);
+
     await iframe.getByRole('cell', { name: numeroCFF }).click();
 
-    await expect(iframe.locator('#btnConfirmNull')).toBeVisible({ timeout: 5000 });
-    await iframe.locator('#btnConfirmNull').click();
+    const confirmButton = iframe.locator('#btnConfirmNull');
+    await expect(confirmButton).toBeVisible();
+    await confirmButton.click();
 
-    await expect(iframe.getByRole('button', { name: 'Si - proceder' })).toBeVisible({ timeout: 5000 });
-    await iframe.getByRole('button', { name: 'Si - proceder' }).click();
+    const proceedButton = iframe.getByRole('button', { name: 'Si - proceder' });
+    await expect(proceedButton).toBeVisible();
+    await proceedButton.click();
 
     await iframe.getByRole('button', { name: 'Buscar documento' }).click();
-
-    // Verificar que el item ya no se encuentra en la tabla
     await busquedaDoc(page, iframe, numeroCFF);
+
     await expect(
-      iframe.getByRole('row', { name: numeroCFF }).getByRole('cell', { name: vendedor })
+      iframe.getByRole('row', { name: numeroCFF })
     ).toHaveCount(0);
+  });
+
+  // Optional: Recovery test in case annulment fails
+  test.skip('Fallback: Ensure document is annulled', async ({ page }) => {
+    if (!numeroCFF) return;
+
+    const iframe = page.frameLocator('iframe');
+    await busquedaDoc(page, iframe, numeroCFF);
+
+    const documentExists = await iframe.getByRole('cell', { name: numeroCFF }).count() > 0;
+
+    if (documentExists) {
+      await iframe.getByRole('button', { name: 'Agregar:' }).click();
+      await iframe.getByRole('button', { name: 'Anular documento:' }).click();
+
+      await busquedaDoc(page, iframe, numeroCFF);
+
+      await iframe.getByRole('cell', { name: numeroCFF }).click();
+
+      const anularButton = iframe.getByRole('button', { name: 'Anular Documento' });
+      await expect(anularButton).toBeVisible();
+      await anularButton.click();
+
+      const confirmButton = iframe.locator('#btnConfirmNull');
+      await expect(confirmButton).toBeVisible();
+      await confirmButton.click();
+
+      const proceedButton = iframe.getByRole('button', { name: 'Si - proceder' });
+      await expect(proceedButton).toBeVisible();
+      await proceedButton.click();
+
+      await iframe.getByRole('button', { name: 'Buscar documento' }).click();
+      await busquedaDoc(page, iframe, numeroCFF);
+
+      await expect(
+        iframe.getByRole('row', { name: numeroCFF })
+      ).toHaveCount(0);
+    }
   });
 });

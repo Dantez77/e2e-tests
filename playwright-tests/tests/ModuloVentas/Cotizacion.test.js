@@ -77,6 +77,8 @@ test.describe('Cotización', () => {
 
     await iframeElement.locator('#btnConfirmNull').click();
     await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+    
+    await expect(iframe.locator('.mbsc-toast')).toHaveText('Cambios han sido grabados');
 
     await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
     await busquedaDoc(page, iframeElement, documentValue);

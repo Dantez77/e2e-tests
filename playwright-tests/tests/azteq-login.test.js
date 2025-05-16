@@ -1,15 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const { todo } = require('node:test');
-
-
-test.beforeAll(async () => {
-  //console.log('Starting with login tests');
-});
-
-test.afterAll('Teardown', async () => {
-  //console.log('Done with login tests');
-});
-
+const credentials = require('../config/credentials');
 
 test.describe('Login Functionality', () => {
 
@@ -39,8 +30,8 @@ test.describe('Login Functionality', () => {
 
   // Combinacion de usuario y contraseña con login exitoso 
   test('Combinacion de usuario y contraseña con login exitoso', async ({ page }) => {
-    await page.fill('#username', 'danq97@gmail.com');
-    await page.fill('#password', '1234');
+    await page.fill('#username', credentials.username);
+    await page.fill('#password', credentials.password);
     await page.click('#goLogin1');
     const welcomeText = await page.locator('#login2 .login-title').innerText();
     expect(welcomeText).toContain('BIENVENID@');
@@ -48,8 +39,8 @@ test.describe('Login Functionality', () => {
   
   //Dropdowns available after login: Empresa & Sucursal
   test('Dropdowns visibles despues de hacer login', async ({ page }) => {
-    await page.fill('#username', 'danq97@gmail.com');
-    await page.fill('#password', '1234');
+    await page.fill('#username', credentials.username);
+    await page.fill('#password', credentials.password);
     await page.locator('#goLogin1').click();
 
     await expect(page.locator('#login2')).toBeVisible();
@@ -65,8 +56,8 @@ test.describe('Login Functionality', () => {
 
   //Keyboard login triggers login with "Enter"
   test('Se puede hacer login con "ENTER"', async ({ page }) => {
-    await page.fill('#username', 'danq97@gmail.com');
-    await page.fill('#password', '1234');
+    await page.fill('#username', credentials.username);
+    await page.fill('#password', credentials.password);
     await page.press('#password', 'Enter');
     const welcomeText = await page.locator('#login2 .login-title').innerText();
     expect(welcomeText).toContain('BIENVENID@');
@@ -74,8 +65,8 @@ test.describe('Login Functionality', () => {
 
   //No error messages after login test
   test('Login correcto y sin errores', async ({ page }) => {
-    await page.fill('#username', 'danq97@gmail.com');
-    await page.fill('#password', '1234');
+    await page.fill('#username', credentials.username);
+    await page.fill('#password', credentials.password);
     await page.click('#goLogin1');
     await expect(page.locator('.error-message')).toHaveCount(0);
   });
@@ -86,7 +77,7 @@ test.describe('Login Functionality', () => {
   });
 
   test('Login sin password', async ({ page }) => {
-    await page.fill('#username', 'danq97@gmail.com');
+    await page.fill('#username', credentials.username);
     await page.click('#goLogin1');
     await expect(page.locator('.mbsc-toast')).toHaveText('ID o password incorrecto(s)');
   });
@@ -121,7 +112,7 @@ test.describe('Login Functionality', () => {
 
     for (let i = 0; i < 40; i++) {
       pass += 1;
-      await page.fill('#username', 'danq97@gmail.com');
+      await page.fill('#username', credentials.username);
       await page.fill('#password', pass.toString());
       await page.click('#goLogin1');
 
@@ -169,7 +160,7 @@ test.describe('Login Functionality', () => {
 
   test('Recover password: With registered email ', async ({ page }) => {
     await page.click('#recupera_pwd');
-    await page.fill('#correo_usr', 'danq97@gmail.com');
+    await page.fill('#correo_usr', credentials.username);
     await page.click('#recuperar');
 
     await expect(page.locator('.mbsc-toast')).toHaveText('Correo enviado!');
@@ -177,8 +168,8 @@ test.describe('Login Functionality', () => {
   
 
   test('Complete login flow ', async ({ page }) => {  
-    await page.fill('#username', 'danq97@gmail.com');
-    await page.fill('#password', '1234');
+    await page.fill('#username', credentials.username);
+    await page.fill('#password', credentials.password);
     await page.locator('#goLogin1').click();
   
     await expect(page.locator('#login2')).toBeVisible();
@@ -203,8 +194,8 @@ test.describe('Login Functionality', () => {
 
   //Verificando que PHPSESSID esta puesta y persiste atreves de requests nos asegura que los usuarios fueron autenticados
   test('Validate auth cookies after login', async ({ page }) => {
-    await page.fill('#username', 'danq97@gmail.com');
-    await page.fill('#password', '1234');
+    await page.fill('#username', credentials.username);
+    await page.fill('#password', credentials.password);
     await page.locator('#goLogin1').click();
   
     await expect(page.locator('#login2')).toBeVisible();
