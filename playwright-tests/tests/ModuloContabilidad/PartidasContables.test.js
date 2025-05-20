@@ -45,7 +45,7 @@ test.describe.serial('Consulta de Partidas', () => {
     await iframe.getByRole('spinbutton', { name: 'Valor:' }).fill('1');
     await iframe.locator('#btnConfirmAddLine').click();
 
-    //Agregar: Haber
+    //Agregar: HABER
     await iframe.locator('#btnAddLine').click();
     await iframe.getByRole('textbox', { name: 'Debe/Haber' }).click();
     await iframe.locator('[role="option"][data-index="1"]').click(); //HABER esta en index 1

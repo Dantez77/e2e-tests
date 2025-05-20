@@ -33,7 +33,29 @@ test.describe('Consulta de Partidas', () => {
     await context.close();
   });
 
-  test.fixme('Test ...', async () => {
-    //TODO:
+  test('Busqueda de partidas contables', async () => {
+    //TODO: Busqueda de partidas contables 
+    await expect(iframe.getByRole('cell', { name: 'Documento vacío' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Buscar' }, { exact: true }).click();
+    await expect(iframe.getByRole('cell', { name: 'Documento vacío' })).not.toBeVisible();
+  });
+
+  test('Navegacion consulta de partidas contables', async () => {
+    //TODO: Navegacion entre partidas contables
+    await iframe.getByRole('button', { name: 'Buscar' }, { exact: true }).click();
+    await iframe.getByRole('cell', { name: 'P01' }).first().click();
+    await expect(iframe.getByRole('button', { name: '<-- Anterior' })).toBeVisible();
+    await expect(iframe.getByRole('button', { name: 'Siguiente -->' })).toBeVisible();
+    await expect(iframe.getByRole('button', { name: 'Regresar a búsqueda' })).toBeVisible();      
+    await iframe.getByRole('button', { name: 'Regresar a búsqueda' }, { exact: true }).click();
+    await expect(iframe.getByRole('heading', { name: 'Buscar partida contable' })).toBeVisible();      
+
+  });
+
+  test.fixme('Imprimir partida contable', async () => {
+    //TODO: Imprimir de partida contable
+    await iframe.getByRole('button', { name: 'Buscar' }, { exact: true }).click();
+    await iframe.getByRole('cell', { name: 'P01' }).first().click();
+
   });
 });
