@@ -64,7 +64,7 @@ test.describe('Nota de Crédito', () => {
     await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
     await iframeElement.locator('[role="option"][data-index="1"]').click();
 
-    await expect(iframeElement.getByRole('button', { name: 'Grabar cambios' })).toBeVisible();
+    await expect(iframeElement.getByRole('button', { name: 'Grabar cambios' })).toBeEnabled();
     await iframeElement.getByRole('button', { name: 'Grabar cambios' }).click();
 
     // Luego de grabar cambios regreso a la pagina principal de notas de crédito y vuelvo a buscar

@@ -5,14 +5,14 @@ const { login } = require('../helpers/login.js');
 test.describe('Clientes', () => {
   let page;
   let context;
-  let iframeElement;
+  let iframe;
   let uniqueId;
   let cliente;
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    iframeElement = page.frameLocator('iframe');
+    iframe = page.frameLocator('iframe');
     uniqueId = `CL-` + `${Date.now()}`.slice(-7);
     cliente = `Cliente ` + `${Date.now()}`.slice(-3);
 
@@ -26,11 +26,10 @@ test.describe('Clientes', () => {
   });
 
   test.beforeEach(async () => {
-    
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
     await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
     await page.getByRole('link', { name: 'Clientes', exact: true }).click();
-    iframeElement = page.frameLocator('iframe');
+    iframe = page.frameLocator('iframe');
   });
 
   test.afterAll(async () => {
@@ -38,56 +37,57 @@ test.describe('Clientes', () => {
     await context.close();
   });
 
-  test('Agregar, Editar y Eliminar Cliente', async () => {
-    // Agregar cliente
-    await test.step('Agregar cliente', async () => {
-      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Codigo cliente:' }).fill(uniqueId);
-      await iframeElement.getByRole('textbox', { name: 'Razon social:' }).fill('RZ');
-      await iframeElement.getByRole('textbox', { name: 'Nombre comercial:' }).fill(cliente);
-      await iframeElement.locator('#direc').fill('direccion');
-      await iframeElement.getByRole('textbox', { name: 'Giro' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-      await iframeElement.getByRole('textbox', { name: 'Vendedor asignado' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-      await iframeElement.getByRole('textbox', { name: 'Cod país (MH El Salvador)' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Type to filter' }).fill('el s');
-      await iframeElement.getByText(': EL SALVADOR').click();
-      await iframeElement.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
-      await iframeElement.getByRole('textbox', { name: 'Telefono 1' }).fill('77776666');
-      await iframeElement.getByRole('textbox', { name: 'Tipo de cliente:' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-      await iframeElement.getByRole('textbox', { name: 'Departamento:' }).click();
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+  test('Agregar cliente', async () => {
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Codigo cliente:' }).fill(uniqueId);
+    await iframe.getByRole('textbox', { name: 'Razon social:' }).fill('RZ');
+    await iframe.getByRole('textbox', { name: 'Nombre comercial:' }).fill(cliente);
+    await iframe.locator('#direc').fill('direccion');
+    await iframe.getByRole('textbox', { name: 'Giro' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('textbox', { name: 'Vendedor asignado' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('textbox', { name: 'Cod país (MH El Salvador)' }).click();
+    await iframe.getByRole('textbox', { name: 'Type to filter' }).fill('el s');
+    await iframe.getByText(': EL SALVADOR').click();
+    await iframe.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
+    await iframe.getByRole('textbox', { name: 'Telefono 1' }).fill('77776666');
+    await iframe.getByRole('textbox', { name: 'Tipo de cliente:' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('textbox', { name: 'Departamento:' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
 
-      // Verificar que el cliente fue agregado
-      await expect(iframeElement.getByRole('cell', { name: uniqueId })).toBeVisible();
-    });
+    // Verificar que el cliente fue agregado
+    await expect(iframe.locator('.mbsc-toast')).toHaveText('Un registro grabado');
+  });
 
-    // Editar cliente
-    await test.step('Editar cliente', async () => {
-      await iframeElement.getByRole('row', { name: uniqueId }).getByRole('button').first().click();
-      await iframeElement.getByRole('textbox', { name: 'Telefono 1' }).fill('77776667');
-      await iframeElement.getByRole('button', { name: 'Grabar' }).click();
+  test('Editar cliente', async () => {
+    // Asegúrate que el cliente existe antes de editar
+    await expect(iframe.getByRole('cell', { name: uniqueId })).toBeVisible();
 
-      // Confirmar que se realizó la edición
-      await expect(
-        iframeElement.getByRole('row', { name: uniqueId }).getByRole('cell', { name: '77776667' })
-      ).toBeVisible();
-    });
+    await iframe.getByRole('row', { name: uniqueId }).getByRole('button').first().click();
+    await iframe.getByRole('textbox', { name: 'Telefono 1' }).fill('77776667');
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
 
-    // Eliminar cliente
-    await test.step('Eliminar cliente', async () => {
-      await iframeElement.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();
-      await iframeElement.getByRole('button', { name: 'Eliminar' }).click();
-      await expect(iframeElement.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
-      await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+    // Confirmar que se realizó la edición
+    await expect(
+      iframe.getByRole('row', { name: uniqueId }).getByRole('cell', { name: '77776667' })
+    ).toBeVisible();
+  });
 
-      // Verificar que el cliente fue eliminado
-      await expect(
-        iframeElement.getByRole('row', { name: uniqueId })
-      ).toHaveCount(0);
-    });
+  test('Eliminar cliente', async () => {
+    // Asegúrate que el cliente existe antes de eliminar
+    await expect(iframe.getByRole('cell', { name: uniqueId })).toBeVisible();
+
+    await iframe.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();
+    await iframe.getByRole('button', { name: 'Eliminar' }).click();
+    await expect(iframe.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Si - proceder' }).click();
+
+    // Verificar que el cliente fue eliminado
+    await expect(
+      iframe.getByRole('row', { name: uniqueId })
+    ).toHaveCount(0);
   });
 });

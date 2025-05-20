@@ -35,7 +35,7 @@ test.describe('Nota de Débito', () => {
 
   test.beforeEach(async () => {
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloContabilidad' }).click();
+    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
     await page.getByRole('link', { name: 'Nota de débito', exact: true }).click();
     iframeElement = page.frameLocator('iframe');
   });
@@ -48,7 +48,7 @@ test.describe('Nota de Débito', () => {
   test('Validando Creación de Nota de Débito', async () => {
     await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
     await busquedaDoc(page, iframeElement, documentValue);
-    await expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
+    await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
   });
 
   test('Editando Nota de Débito', async () => {

@@ -6,12 +6,12 @@ const { login } = require('../helpers/login.js');
 test.describe('Consulta de Partidas', () => {
   let page;
   let context;
-  let iframeElement;
+  let iframe;
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    iframeElement = page.frameLocator('iframe');
+    iframe = page.frameLocator('iframe');
 
     // Login and navigate to Modulo Ventas
     await test.step('Login and navigate to Modulo Ventas', async () => {
@@ -26,7 +26,7 @@ test.describe('Consulta de Partidas', () => {
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
     await page.getByRole('link', { name: 'btn-moduloContabilidad' }).click();
     await page.getByRole('link', { name: 'Partidas contables', exact: true }).click();
-    iframeElement = page.frameLocator('iframe');
+    iframe = page.frameLocator('iframe');
   });
 
   test.afterAll(async () => {
@@ -34,7 +34,31 @@ test.describe('Consulta de Partidas', () => {
     await context.close();
   });
 
-  test.fixme('Test ...', async () => {
+  test('Crear documento', async () => {
+    await iframe.getByRole('textbox', { name: 'Prefijo:' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+
+    //Agregar: DEBE
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Cod. Cuenta' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('spinbutton', { name: 'Valor:' }).fill('1');
+    await iframe.locator('#btnConfirmAddLine').click();
+
+    //Agregar: Haber
+    await iframe.locator('#btnAddLine').click();
+    await iframe.getByRole('textbox', { name: 'Debe/Haber' }).click();
+    await iframe.locator('#mobiscroll1747667705333').getByRole('option', { name: 'Haber' }).click();
+    await iframe.getByRole('spinbutton', { name: 'Valor:' }).fill('1');
+    await iframe.locator('#btnConfirmAddLine').click();
+
+    //Grabar cambios
+    await iframe.getByRole('button', { name: 'Grabar cambios' }).click();
+
+    await expect(iframe.locator('.mbsc-toast')).toHaveText('Documento ha sido grabado');
+  });
+
+  test.fixme('Test 2', async () => {
     //TODO:
   });
 });

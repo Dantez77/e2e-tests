@@ -73,7 +73,6 @@ test.describe.serial('Credito Fiscal', () => {
     await iframe.getByRole('button', { name: 'Agregar' }).click();
     await iframe.getByRole('button', { name: 'Anular documento' }).click();
 
-
     await busquedaDoc(page, iframe, numeroCFF);
 
     await iframe.getByRole('cell', { name: numeroCFF }).click();
