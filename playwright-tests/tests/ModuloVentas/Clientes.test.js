@@ -64,6 +64,7 @@ test.describe('Clientes', () => {
 
   test('Editar cliente', async () => {
     // Asegúrate que el cliente existe antes de editar
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
     await expect(iframe.getByRole('cell', { name: uniqueId })).toBeVisible();
 
     await iframe.getByRole('row', { name: uniqueId }).getByRole('button').first().click();
@@ -78,6 +79,7 @@ test.describe('Clientes', () => {
 
   test('Eliminar cliente', async () => {
     // Asegúrate que el cliente existe antes de eliminar
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
     await expect(iframe.getByRole('cell', { name: uniqueId })).toBeVisible();
 
     await iframe.getByRole('row', { name: uniqueId }).getByRole('button').nth(1).click();

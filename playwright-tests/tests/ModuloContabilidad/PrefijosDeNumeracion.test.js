@@ -13,18 +13,17 @@ test.describe('Consulta de Partidas', () => {
     page = await context.newPage();
     iframeElement = page.frameLocator('iframe');
 
-    // Login and navigate to Modulo Ventas
-    await test.step('Login and navigate to Modulo Ventas', async () => {
+    // Login
+    await test.step('Login', async () => {
       await login(page, credentials);
-      const contabilidadBtn = page.getByRole('link', { name: 'btn-moduloContabilidad' });
-      await expect(contabilidadBtn).toBeVisible();
-      await contabilidadBtn.click();
     });
   });
 
   test.beforeEach(async () => {
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloContabilidad' }).click();
+    const contabilidadBtn = page.getByRole('link', { name: 'btn-moduloContabilidad' });
+    await expect(contabilidadBtn).toBeVisible();
+    await contabilidadBtn.click();
     await page.getByRole('link', { name: 'Prefijos de numeración', exact: true }).click();
     iframeElement = page.frameLocator('iframe');
   });
