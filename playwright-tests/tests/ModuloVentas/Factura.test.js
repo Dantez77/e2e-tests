@@ -7,13 +7,13 @@ const { login } = require('../helpers/login.js');
 test.describe('Factura', () => {
   let page;
   let context;
-  let iframeElement;
-  let documentValue;
+  let iframe;
+  let idFactura;
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    iframeElement = page.frameLocator('iframe');
+    iframe = page.frameLocator('iframe');
 
     // Login and navigate to "Modulo Ventas"
     await test.step('Login and navigate to Modulo Ventas', async () => {
@@ -29,6 +29,7 @@ test.describe('Factura', () => {
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
     await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
     await page.getByRole('link', { name: 'Factura', exact: true }).click();
+    iframe = page.frameLocator('iframe');
   });
 
   test.afterAll(async () => {
@@ -37,61 +38,48 @@ test.describe('Factura', () => {
     await context.close();
   });
 
-  test('Factura', async () => {
-    // TODO: Añadir las funcionalidades posibles dentro de Facturacion, esto incluye:
-    // - Crear un documento de facturacion (indice de exito: Verificacion de documento creado) - INCOMPLETO FALTA VERIFICACION
-    // - Editar un documento de facturacion (indice de exito: Verificacion de documento editado) - COMPLETO
-    // - Anular un documento de facturacion (indice de exito: Verificacion de que el documento fue anulado) - COMPLETO
-    // - Obtener cotizacion -PENDIENTE <============
+  test('Debe crear un documento de facturación', async () => {
+    idFactura = await crearFactura(page, iframe);
+    await iframe.getByRole('button', { name: 'Buscar documento' }).click();
+    await iframe.getByRole('button', { name: 'Por número de documento' }).click();
+    await iframe.getByRole('textbox', { name: 'Num. Documento' }).fill(idFactura);
+    await expect(iframe.getByRole('row', { name: idFactura })).toBeVisible();
+  });
 
-    const iframeElement = page.frameLocator('iframe');
-    let documentValue = ''; //Facturas posee un id auto generado, usamos esta variable para extraerlo y verificacion
+  test('Debe editar el documento de facturación', async () => {
+    // Si el documento no existe, créalo primero
+    if (!idFactura) {
+      idFactura = await crearFactura(page, iframe);
+    }
+    await iframe.getByRole('cell', { name: idFactura }).click();
+    await iframe.getByRole('textbox', { name: 'Vendedor:' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('button', { name: 'Grabar cambios' }).click();
+    await iframe.getByRole('button', { name: 'Buscar documento' }).click();
+    //Verificar que el documento fue editado
+    await expect(
+      iframe
+        .getByRole('row', { name: idFactura })
+        .getByRole('cell', { name: 'John Doe' }) // Cambiar John Doe por variable si es necesario
+    ).toBeVisible();
+  });
 
-    await test.step('Grabando un nuevo documento', async () => {
-      documentValue = await crearFactura(page, iframeElement);
-      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
-      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
-      await expect(iframeElement.getByRole('row', { name: documentValue })).toBeVisible();
-    });
-
-    await test.step('Editando el documento creado', async () => {
-      iframeElement.getByRole('cell', { name: documentValue }).click();
-      await iframeElement.getByRole('textbox', { name: 'Vendedor:' }).click();
-      //El elemento aqui se llama John Doe, pero sera diferente en caso cambien las credenciales actualmente utilizadas
-      await iframeElement.locator('[role="option"][data-index="0"]').click();
-      await iframeElement.getByRole('button', { name: 'Grabar cambios' }).click();
-      //Se busca otra vez
-      await iframeElement.getByRole('button', { name: 'Buscar documento' }).click();
-
-      //Verificar que el documento fue editado
-      await expect(iframeElement
-        .getByRole('row', { name: documentValue })
-        .getByRole('cell', { name: 'John Doe' })).toBeVisible();
-    });
-
-    await test.step('Anulando el documento', async () => {
-      await iframeElement.getByRole('button', { name: 'Agregar' }).click();
-      await iframeElement.getByRole('button', { name: 'Anular Documento' }).click();
-
-      await iframeElement.getByRole('button', { name: 'Por número de documento' }).click();
-      await iframeElement.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
-
-      await iframeElement.getByRole('button', { name: 'Buscar', exact: true }).click();
-      
-      await iframeElement
-        .getByRole('row', { name: documentValue })
-        .getByRole('cell', { name: 'John Doe' }).click();
-
-      await iframeElement.locator('#btnConfirmNull').click();
-
-
-      await page.waitForTimeout(500);
-
-      await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
-    
-      await expect(iframeElement.locator('.mbsc-toast')).toHaveText('Cambios han sido grabados');
-
-    });
+  test('Debe anular el documento de facturación', async () => {
+    // Si el documento no existe, créalo primero
+    if (!idFactura) {
+      idFactura = await crearFactura(page, iframe);
+    }
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('button', { name: 'Anular Documento' }).click();
+    await iframe.getByRole('button', { name: 'Por número de documento' }).click();
+    await iframe.getByRole('textbox', { name: 'Num. Documento' }).fill(idFactura);
+    await iframe.getByRole('button', { name: 'Buscar', exact: true }).click();
+    await iframe
+      .getByRole('row', { name: idFactura })
+      .getByRole('cell', { name: 'John Doe' }).click();
+    await iframe.locator('#btnConfirmNull').click();
+    await page.waitForTimeout(500);
+    await iframe.getByRole('button', { name: 'Si - proceder' }).click();
+    await expect(iframe.locator('.mbsc-toast')).toHaveText('Cambios han sido grabados');
   });
 });
