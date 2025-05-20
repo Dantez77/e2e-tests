@@ -4,7 +4,7 @@ const { busquedaDoc } = require('../helpers/busquedaDoc');
 const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
-test.describe('Factura', () => {
+test.describe.serial('Factura', () => {
   let page;
   let context;
   let iframe;
@@ -15,30 +15,27 @@ test.describe('Factura', () => {
     page = await context.newPage();
     iframe = page.frameLocator('iframe');
 
-    // Login and navigate to "Modulo Ventas"
-    await test.step('Login and navigate to Modulo Ventas', async () => {
+    // Login
+    await test.step('Login', async () => {
       await login(page, credentials);
-      const ventasBtn = page.getByRole('link', { name: 'btn-moduloVentas' });
-      await expect(ventasBtn).toBeVisible();
-      await ventasBtn.click();
+
     });
   });
 
   test.beforeEach(async () => {
-    // Navigate to "Factura" section
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
-    await page.getByRole('link', { name: 'Factura', exact: true }).click();
+    const ventasBtn = page.getByRole('link', { name: 'btn-moduloVentas' });
+    await expect(ventasBtn).toBeVisible();
+    await ventasBtn.click(); await page.getByRole('link', { name: 'Factura', exact: true }).click();
     iframe = page.frameLocator('iframe');
   });
 
   test.afterAll(async () => {
-    // Clean up resources
     await page.close();
     await context.close();
   });
 
-  test('Debe crear un documento de facturación', async () => {
+  test('Crear un documento de facturación', async () => {
     idFactura = await crearFactura(page, iframe);
     await iframe.getByRole('button', { name: 'Buscar documento' }).click();
     await iframe.getByRole('button', { name: 'Por número de documento' }).click();
@@ -46,8 +43,7 @@ test.describe('Factura', () => {
     await expect(iframe.getByRole('row', { name: idFactura })).toBeVisible();
   });
 
-  test('Debe editar el documento de facturación', async () => {
-    // Si el documento no existe, créalo primero
+  test('Editar el documento de facturación', async () => {
     if (!idFactura) {
       idFactura = await crearFactura(page, iframe);
     }
@@ -64,8 +60,7 @@ test.describe('Factura', () => {
     ).toBeVisible();
   });
 
-  test('Debe anular el documento de facturación', async () => {
-    // Si el documento no existe, créalo primero
+  test('Anular el documento de facturación', async () => {
     if (!idFactura) {
       idFactura = await crearFactura(page, iframe);
     }
@@ -78,8 +73,18 @@ test.describe('Factura', () => {
       .getByRole('row', { name: idFactura })
       .getByRole('cell', { name: 'John Doe' }).click();
     await iframe.locator('#btnConfirmNull').click();
-    await page.waitForTimeout(500);
     await iframe.getByRole('button', { name: 'Si - proceder' }).click();
     await expect(iframe.locator('.mbsc-toast')).toHaveText('Cambios han sido grabados');
+  });
+
+  // Solo correr para limpiar la tabla de pruebas
+  test.skip('Limpiar tabla', async () => {
+    const serie = '17TS000F';
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('button', { name: 'Anular Documento' }).click();
+    await iframe.getByRole('row', { name: serie }).first().click();
+    await iframe.locator('#btnConfirmNull').click();
+    await iframe.getByRole('button', { name: 'Si - proceder' }).click();
+    //await expect(iframe.locator('.mbsc-toast')).toHaveText('Cambios han sido grabados');
   });
 });
