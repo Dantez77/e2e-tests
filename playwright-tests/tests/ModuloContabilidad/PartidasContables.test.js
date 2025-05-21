@@ -3,7 +3,7 @@ const { busquedaDoc } = require('../helpers/busquedaDoc');
 const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
-test.describe.serial('Consulta de Partidas', () => {
+test.describe.serial('Partidas contables', () => {
   let page;
   let context;
   let iframe;

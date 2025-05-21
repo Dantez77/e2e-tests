@@ -3,7 +3,7 @@ const { busquedaDoc } = require('../helpers/busquedaDoc');
 const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
-test.describe('Consulta de Partidas', () => {
+test.describe('Partidas automáticas', () => {
   let page;
   let context;
   let iframeElement;

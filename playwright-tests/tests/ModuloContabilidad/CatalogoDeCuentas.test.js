@@ -33,7 +33,6 @@ test.describe.serial('Catálogo de cuentas', () => {
     await context.close();
   });
 
-  // Test taking failure into account since this fails due to weird text fields
   test('Agregar cuenta contable', async () => {
     const codCuenta = 'CC-' + `${Date.now()}`.slice(-7);
     const nomCuenta = 'Cuenta Prueba'
@@ -49,10 +48,20 @@ test.describe.serial('Catálogo de cuentas', () => {
   });
 
   test('Modificar cuenta contable', async () => {
-    //TODO: Modificar cuenta contable y verificacion de modificacion al final
+    const nomCuenta = 'Cuenta Modificada'
+
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('CC-');
+    await iframe.getByRole('row', { name: /^CC-/ }).first().getByRole('button').nth(0).click();
+    await iframe.getByRole('textbox', { name: 'Nombre' }).fill(nomCuenta);
+    await iframe.getByRole('button', { name: 'Grabar cambios' }).click();
+    await expect(iframe.getByRole('cell', { name: nomCuenta })).toBeVisible();
   });
 
   test('Eliminar cuenta contable', async () => {
-    //TODO: Eliminar cuenta contable y verificacion de eliminacion al final
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('CC-');
+    await iframe.getByRole('row', { name: /^CC-/ }).first().getByRole('button').nth(1).click();
+    await iframe.getByRole('button', { name: 'Eliminar' }).click();
+    await iframe.getByRole('button', { name: 'Si - proceder' }).click();
+    await expect(iframe.getByRole('cell', { name: 'CC-' })).toHaveCount(0);
   });
 });
