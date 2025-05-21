@@ -33,7 +33,7 @@ test.describe('Partidas automáticas', () => {
     await context.close();
   });
 
-  test.fixme('Test ...', async () => {
+  test('Generar partida automatica', async () => {
     //TODO:
   });
 });

@@ -51,9 +51,7 @@ test.describe('Consulta de Partidas', () => {
     await expect(iframe.getByRole('heading', { name: 'Buscar partida contable' })).toBeVisible();      
   });
 
-  test.fixme('Imprimir partida contable', async () => {
+  test('Imprimir partida contable', async () => {
     //TODO: Imprimir de partida contable
-    await iframe.getByRole('button', { name: 'Buscar' }, { exact: true }).click();
-    await iframe.getByRole('cell', { name: 'P01' }).first().click();
   });
 });

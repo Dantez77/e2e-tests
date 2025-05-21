@@ -3,15 +3,15 @@ const { busquedaDoc } = require('../helpers/busquedaDoc');
 const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
-test.describe('Prefijos de numeración', () => {
+test.describe.serial('Prefijos de numeración', () => {
   let page;
   let context;
-  let iframeElement;
+  let iframe;
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    iframeElement = page.frameLocator('iframe');
+    iframe = page.frameLocator('iframe');
 
     // Login
     await test.step('Login', async () => {
@@ -25,7 +25,7 @@ test.describe('Prefijos de numeración', () => {
     await expect(contabilidadBtn).toBeVisible();
     await contabilidadBtn.click();
     await page.getByRole('link', { name: 'Prefijos de numeración', exact: true }).click();
-    iframeElement = page.frameLocator('iframe');
+    iframe = page.frameLocator('iframe');
   });
 
   test.afterAll(async () => {
@@ -33,7 +33,32 @@ test.describe('Prefijos de numeración', () => {
     await context.close();
   });
 
-  test.fixme('Test ...', async () => {
-    //TODO:
+  test('Crear prefijo de numeración', async () => {
+    const codPrefijo = 'P' + `${Date.now()}`.slice(-2);
+    const nomNumeracion = 'Prefijo de prueba';
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Prefijo' }).fill(codPrefijo);
+    await iframe.getByRole('textbox', { name: 'Nombre de la numeración' }).fill(nomNumeracion);
+    await iframe.getByRole('spinbutton', { name: 'Ultimo número' }).fill('1');
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
+    await expect(iframe.locator('.mbsc-toast')).toHaveText('Un registro grabado');
+  });
+
+  test('Editar prefijo de numeración', async () => {
+    const nomNumeracion = 'Prefijo Editado';
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('P');
+    await iframe.getByRole('row', { name: /prueba/ }).first().getByRole('button').nth(0).click();
+    await iframe.getByRole('textbox', { name: 'Nombre de la numeración' }).fill(nomNumeracion);
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
+    await expect(iframe.getByRole('cell', { name: nomNumeracion })).toBeVisible();
+  });
+
+  test('Eliminar prefijo de numeración', async () => {
+    const nomNumeracion = 'Prefijo Editado';
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('P');
+    await iframe.getByRole('row', { name: /Editado/ }).first().getByRole('button').nth(1).click(); 
+    await iframe.getByRole('button', { name: 'Eliminar' }).click();
+    await iframe.getByRole('button', { name: 'Si - proceder' }).click();
+    await expect(iframe.getByRole('cell', { name: nomNumeracion })).toHaveCount(0);
   });
 });
