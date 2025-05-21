@@ -10,10 +10,12 @@ test.describe('Modules Page Functionality', () => {
     context = await browser.newContext();
     page = await context.newPage();
 
-    // login flow usando helper y credenciales
+    // login
     await login(page, credentials);
-    await page.waitForURL('**/menu/menu.php', { timeout: 10000 });
-    expect(page.url()).toContain('/menu/menu.php');
+  });
+
+  test.beforeEach(async () => {
+    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
   });
 
   test.afterAll(async () => {
@@ -89,29 +91,6 @@ test.describe('Modules Page Functionality', () => {
 
     const postData = request.postDataJSON();
     expect(postData).toEqual({ toalert: true });
-  });
-
-  test('Logout desde opciones de usuario', async () => {
-    await page.click("[id='btnAccount']");
-    await page.click("[id='logout']");
-
-    // Check if the logout pop up shows up after clicking logout
-    await expect(page.getByText('Logout')).toBeVisible();
-    await expect(page.getByText('Desea terminar sesión?')).toBeVisible();
-
-    await expect(page.getByRole('button', { name: 'No - Cancelar' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
-
-    // Log out
-    await page.getByRole('button', { name: 'Si - proceder' }).click();
-
-    // Back to log in menu
-    await page.waitForURL('**/login/index.php', { timeout: 10000 });
-    expect(page.url()).toContain('/login/index.php');
-
-    // Check if the session really closed
-    await page.click('#goLogin1');
-    await expect(page.locator('.mbsc-toast')).toHaveText('ID o password incorrecto(s)');
   });
 
   test.skip('Actualizar repositorios estandar: Checks for success mesage', async () => {
@@ -285,5 +264,28 @@ test.describe('Modules Page Functionality', () => {
 
     // Validate branch once we are again in the mian menu
     expect(fullLabel).toContain(selectedCdsuc);
+  });
+
+  test('Logout desde opciones de usuario', async () => {
+    await page.click("[id='btnAccount']");
+    await page.click("[id='logout']");
+
+    // Check if the logout pop up shows up after clicking logout
+    await expect(page.getByText('Logout')).toBeVisible();
+    await expect(page.getByText('Desea terminar sesión?')).toBeVisible();
+
+    await expect(page.getByRole('button', { name: 'No - Cancelar' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
+
+    // Log out
+    await page.getByRole('button', { name: 'Si - proceder' }).click();
+
+    // Back to log in menu
+    await page.waitForURL('**/login/index.php', { timeout: 10000 });
+    expect(page.url()).toContain('/login/index.php');
+
+    // Check if the session really closed
+    await page.click('#goLogin1');
+    await expect(page.locator('.mbsc-toast')).toHaveText('ID o password incorrecto(s)');
   });
 });
