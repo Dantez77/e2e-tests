@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const credentials = require('../../../config/credentials.js');
 const { login } = require('../../helpers/login.js');
 
-test.describe.serial('Compras por producto', () => {
+test.describe.serial('Libro de sucursal', () => {
   let page;
   let context;
   let iframe;
@@ -22,7 +22,7 @@ test.describe.serial('Compras por producto', () => {
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
     await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
     await page.getByRole('button', { name: 'Informes y consultas', exact: true }).click();
-    await page.getByText('Compras por producto').click();
+    await page.getByText('Compras por sucursal').click();
     iframe = page.frameLocator('iframe');
   });
 
@@ -31,11 +31,12 @@ test.describe.serial('Compras por producto', () => {
     await context.close();
   });
 
-  test('Generar doc de compras por producto', async () => {
+  test('Generar doc de retaceo de póliza de importación', async () => {
     await expect(iframe.getByRole('button', { name: 'Salida en PDF' })).toBeVisible();
     await expect(iframe.getByRole('button', { name: 'Salida en XLS' })).toBeVisible();
-    await iframe.getByRole('textbox', { name: 'Desde Fecha:' }).fill('2023-05-01');
-    await iframe.getByRole('textbox', { name: 'Hasta Fecha:' }).fill('2023-05-31');
+
+    await iframe.getByRole('textbox', { name: 'Desde Sucursal:' }).fill('1');
+
     await iframe.getByRole('button', { name: 'Salida en PDF' }).click();
     await expect(iframe.getByText('100', { exact: true })).toBeVisible();
   });

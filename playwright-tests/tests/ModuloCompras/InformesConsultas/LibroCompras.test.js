@@ -31,8 +31,17 @@ test.describe.serial('Libro de compras', () => {
     await context.close();
   });
 
-  test('Grabar libro de compras', async () => {
+  test('Generar doc de libro de compras', async () => {
     // Probar salida PDF correcta del Libro de Compras
     await expect(iframe.getByRole('button', { name: 'Salida en PDF' })).toBeVisible();
+    await expect(iframe.getByRole('button', { name: 'Salida en XLS' })).toBeVisible();
+    await iframe.getByRole('textbox', { name: 'Desde Fecha:' }).fill('2023-05-01');
+    await iframe.getByRole('textbox', { name: 'Hasta Fecha:' }).fill('2023-05-31');
+
+    await iframe.getByRole('textbox', { name: 'Sucursal:' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+
+    await iframe.getByRole('button', { name: 'Salida en PDF' }).click();
+    await expect(iframe.getByText('100', { exact: true })).toBeVisible();
   });
 });

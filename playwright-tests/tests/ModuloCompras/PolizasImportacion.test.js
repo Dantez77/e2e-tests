@@ -2,10 +2,11 @@ const { test, expect } = require('@playwright/test');
 const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
-test.describe('Modulo Compras - Pólizas de importación', () => {
+test.describe.serial('Modulo Compras - Pólizas de importación', () => {
   let page;
   let context;
   let iframe;
+  const numeroPl = `PL-` + `${Date.now()}`.slice(-7);
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
@@ -27,8 +28,6 @@ test.describe('Modulo Compras - Pólizas de importación', () => {
   });
 
   test('Agregar registro de póliza de importación', async () => {
-    const numeroPl = `PL-${Date.now()}`;
-
     await page.getByRole('link', { name: 'Pólizas de importación' }).click();
     await expect(iframe.getByRole('button', { name: 'Agregar' })).toBeVisible();
     await iframe.getByRole('button', { name: 'Agregar' }).click();
@@ -48,19 +47,7 @@ test.describe('Modulo Compras - Pólizas de importación', () => {
   });
 
   test('Eliminar registro de póliza de importación', async () => {
-    const numeroPl = `PL-${Date.now()}`;
-
     await page.getByRole('link', { name: 'Pólizas de importación' }).click();
-    await expect(iframe.getByRole('button', { name: 'Agregar' })).toBeVisible();
-    await iframe.getByRole('button', { name: 'Agregar' }).click();
-    await iframe.getByRole('textbox', { name: 'Póliza No.:' }).fill(numeroPl);
-    await iframe.getByRole('textbox', { name: 'Fecha de ingreso' }).fill('2025-04-21');
-    await iframe.getByRole('textbox', { name: 'Agencia que tramita' }).click();
-    await iframe.locator('[role="option"][data-index="0"]').click();
-    await iframe.getByRole('textbox', { name: 'Inicio de trámites' }).fill('2025-04-01');
-    await iframe.getByRole('textbox', { name: 'Final de trámites' }).fill('2025-04-30');
-    await iframe.getByRole('button', { name: 'Grabar' }).click();
-
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(numeroPl);
     await expect(iframe.getByRole('cell', { name: numeroPl })).toBeVisible();
 
@@ -74,7 +61,6 @@ test.describe('Modulo Compras - Pólizas de importación', () => {
     });
 
     await iframe.getByRole('row', { name: numeroPl }).getByRole('button').nth(1).click();
-
     expect(errorAlert).toBeNull(); // Si se muestra el mensaje de error, la prueba falla
   });
 });
