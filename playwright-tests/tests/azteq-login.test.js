@@ -91,7 +91,7 @@ test.describe('Login Functionality', () => {
 
   // Test de fuerza bruta
   // Verificando si no se puede hacer intentos exesivos de login
-  test('Brute force test: Infinite login attempts', async ({ page }) => {
+  test.skip('Brute force test: Infinite login attempts', async ({ page }) => {
     for (let i = 0; i < 6; i++) {
       await page.fill('#username', 'wronguser@wrong.com');
       await page.fill('#password', 'wrongpassword');

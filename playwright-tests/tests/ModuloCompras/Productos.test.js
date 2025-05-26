@@ -6,6 +6,9 @@ test.describe('Modulo Compras - Productos', () => {
   let page;
   let context;
   let iframe;
+  const uniqueId = `P-` + `${Date.now()}`.slice(-7);
+  const producto = `Producto ` + `${Date.now()}`.slice(-4);
+
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
@@ -27,44 +30,34 @@ test.describe('Modulo Compras - Productos', () => {
   });
 
   test('Agregar producto', async () => {
-    const uniqueId = `${Date.now()}`;
-    await page.getByRole('link', { name: 'Productos' }).click();
 
-    //Detalles
-    await iframe.getByRole('button', { name: 'Agregar' }).click();
-    await iframe.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-    await iframe.getByRole('textbox', { name: 'Descripcion', exact: true }).fill('descripcion producto');
-    await iframe.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
-    await iframe.locator('[role="option"][data-index="0"]').click();
-    await iframe.getByText('Contables').click();
-    await iframe.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
-    await iframe.getByText('Costo artículos producidos/').click();
-    await iframe.getByText('Precios').click();
-    await iframe.getByRole('spinbutton', { name: 'Precio 1 SIN IVA' }).fill('100');
+    await page.getByRole('link', { name: 'Productos', exact: true }).click();
 
-    //Grabar
-    await iframe.getByRole('button', { name: 'Grabar' }).click();
-
-    //Verificar que fue creado
-    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
-    await expect(iframe.getByRole('cell', { name: uniqueId, exact: true })).toBeVisible();
+    await test.step('Agregando el item a la tabla', async () => {
+      await iframe.getByRole('button', { name: 'Agregar' }).click();
+      await iframe.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
+      await iframe.getByRole('textbox', { name: 'Descripcion', exact: true }).fill(producto);
+      await iframe.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByText('NoSí').first().click();
+      await iframe.getByText('NoSí').nth(2).click();
+      await iframe.getByText('NoSí').nth(1).click();
+      await iframe.getByText('Contables').click();
+      await iframe.getByRole('textbox', { name: 'Concepto de gastos de importación' }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
+      await iframe.locator('[role="option"][data-index="0"]').click();
+      await iframe.getByText('Precios').click();
+      await iframe.getByRole('spinbutton', { name: 'Precio 1 SIN IVA' }).fill('20');
+      await iframe.getByRole('spinbutton', { name: 'Precio 2 SIN IVA' }).fill('22');
+      await iframe.getByRole('button', { name: 'Grabar' }).click();
+      await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
+      await expect(iframe.getByRole('cell', { name: uniqueId })).toBeVisible();
+    });
   });
 
   test('Eliminar producto', async () => {
-    const uniqueId = `${Date.now()}`;
     await page.getByRole('link', { name: 'Productos' }).click();
-
-    // Crear producto para eliminar
-    await iframe.getByRole('button', { name: 'Agregar' }).click();
-    await iframe.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-    await iframe.getByRole('textbox', { name: 'Descripcion', exact: true }).fill('descripcion producto');
-    await iframe.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
-    await iframe.locator('[role="option"][data-index="0"]').click();
-    await iframe.getByText('Contables').click();
-    await iframe.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
-    await iframe.getByText('Costo artículos producidos/').click();
-    await iframe.getByRole('button', { name: 'Grabar' }).click();
-
     // Buscar producto
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
     const cellLocator = iframe.getByRole('cell', { name: uniqueId, exact: true });

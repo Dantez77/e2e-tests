@@ -26,35 +26,6 @@ test.describe('Compras Locales', () => {
     await context.close();
   });
 
-  test('Agregar item a Productos', async () => {
-    const uniqueId = `P-` + `${Date.now()}`.slice(-7);
-    const producto = `Producto ` + `${Date.now()}`.slice(-4);
-
-    await page.getByRole('link', { name: 'Productos', exact: true }).click();
-
-    await test.step('Agregando el item a la tabla', async () => {
-      await iframe.getByRole('button', { name: 'Agregar' }).click();
-      await iframe.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
-      await iframe.getByRole('textbox', { name: 'Descripcion', exact: true }).fill(producto);
-      await iframe.getByRole('textbox', { name: 'Cod Uni. Med' }).click();
-      await iframe.locator('[role="option"][data-index="0"]').click();
-      await iframe.getByText('NoSí').first().click();
-      await iframe.getByText('NoSí').nth(2).click();
-      await iframe.getByText('NoSí').nth(1).click();
-      await iframe.getByText('Contables').click();
-      await iframe.getByRole('textbox', { name: 'Concepto de gastos de importación' }).click();
-      await iframe.locator('[role="option"][data-index="0"]').click();
-      await iframe.getByRole('textbox', { name: 'Tipo de costo/gasto' }).click();
-      await iframe.locator('[role="option"][data-index="0"]').click();
-      await iframe.getByText('Precios').click();
-      await iframe.getByRole('spinbutton', { name: 'Precio 1 SIN IVA' }).fill('20');
-      await iframe.getByRole('spinbutton', { name: 'Precio 2 SIN IVA' }).fill('22');
-      await iframe.getByRole('button', { name: 'Grabar' }).click();
-      await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
-      await expect(iframe.getByRole('cell', { name: uniqueId })).toBeVisible();
-    });
-  });
-
   test('Borrar elementos del registro', async () => {
     await page.getByRole('link', { name: 'Compras locales' }).click();
     await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();

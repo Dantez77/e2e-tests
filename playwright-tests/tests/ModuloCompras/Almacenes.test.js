@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
-test.describe('Modulo Compras - Almacenes', () => {
+test.describe('lmacenes', () => {
   let page;
   let context;
   let iframe;
@@ -27,7 +27,7 @@ test.describe('Modulo Compras - Almacenes', () => {
   });
 
   test('Agregar, Editar y Eliminar Almacen', async () => {
-    const uniqueId = `${Date.now()}`.slice(-2);
+    const uniqueId = `99`;
 
     await page.getByRole('link', { name: 'Almacenes' }).click();
 

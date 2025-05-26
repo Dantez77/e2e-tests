@@ -85,8 +85,7 @@ test.describe('Modulo Compras - Proveedores', () => {
       await iframe.getByRole('button', { name: 'Eliminar' }).click();
       await expect(iframe.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
       await iframe.getByRole('button', { name: 'Si - proceder' }).click();
-      await page.waitForTimeout(500);
-
+      await expect(iframe.locator('.mbsc-toast')).toHaveText('Registro eliminado');
       //Verificando que ya no existe
       await expect(iframe.getByRole('cell', { name: idProveedor, exact: true })).toHaveCount(0);
     });
