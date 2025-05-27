@@ -6,6 +6,8 @@ test.describe('Modulo Compras - Proveedores', () => {
   let page;
   let context;
   let iframe;
+  const idProveedor = `PV-` + `${Date.now()}`.slice(-7);
+  const nombreProveedor = `Proveedor ` + `${Date.now()}`.slice(-4);
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
@@ -45,49 +47,50 @@ test.describe('Modulo Compras - Proveedores', () => {
     await expect(iframe.locator('#parsley-id-51').getByText('Este valor es requerido.')).toBeVisible();
   });
 
-  test('Agregar, Editar y Eliminar proveedor', async () => {
-    const idProveedor = `PV-` + `${Date.now()}`.slice(-7);
-    const nombreProveedor = `Proveedor ` + `${Date.now()}`.slice(-4);
-    const nit = `${Date.now()}`.slice(-10);
-
+  test('Agregar proveedor', async () => {
     await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
 
-    // Crear
-    await test.step('Crear proveedor', async () => {
-      await iframe.getByRole('button', { name: 'Agregar' }).click();
-      await iframe.getByRole('textbox', { name: 'Codigo' }).fill(idProveedor);
-      await iframe.getByRole('textbox', { name: 'Tipo de persona' }).click();
-      await iframe.locator('[role="option"][data-index="0"]').click();
-      await iframe.getByRole('textbox', { name: 'Nombre' }).click();
-      await iframe.getByRole('textbox', { name: 'Nombre' }).fill(nombreProveedor);
-      await iframe.locator('#dirprov').fill('calle 1, ciudad 1, pais 1');
-      await iframe.getByRole('textbox', { name: 'Pais', exact: true }).click();
-      await iframe.locator('[role="option"][data-index="0"]').click();
-      await iframe.getByRole('textbox', { name: 'Teléfono:' }).fill('7XXX7XXX');
-      await iframe.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
-      await iframe.getByRole('button', { name: 'Grabar' }).click();
+    await iframe.getByRole('button', { name: 'Agregar' }).click();
+    await iframe.getByRole('textbox', { name: 'Codigo' }).fill(idProveedor);
+    await iframe.getByRole('textbox', { name: 'Tipo de persona' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('textbox', { name: 'Nombre' }).click();
+    await iframe.getByRole('textbox', { name: 'Nombre' }).fill(nombreProveedor);
+    await iframe.locator('#dirprov').fill('calle 1, ciudad 1, pais 1');
+    await iframe.getByRole('textbox', { name: 'Pais', exact: true }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('textbox', { name: 'Teléfono:' }).fill('7XXX7XXX');
+    await iframe.getByRole('textbox', { name: 'Email:' }).fill('mail@mail.com');
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
 
-      await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(idProveedor);
-      await expect(iframe.getByRole('cell', { name: idProveedor, exact: true })).toBeVisible();
-    });
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(idProveedor);
+    await expect(iframe.getByRole('cell', { name: idProveedor, exact: true })).toBeVisible();
+  });
 
-    // Editar
-    await test.step('Editar proveedor', async () => {
-      await iframe.getByRole('row', { name: idProveedor }).getByRole('button').first().click();
-      await iframe.getByRole('textbox', { name: 'NIT' }).fill(nit);
-      await iframe.getByRole('button', { name: 'Grabar' }).click();
-      await expect(iframe.getByRole('cell', { name: nit, exact: true })).toBeVisible();
-    });
+  test('Editar proveedor', async () => {
+    await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(idProveedor);
+    await expect(iframe.getByRole('cell', { name: idProveedor, exact: true })).toBeVisible();
 
-    // Eliminar
-    await test.step('Eliminar proveedor', async () => {
-      await iframe.getByRole('row', { name: idProveedor }).getByRole('button').nth(1).click();
-      await iframe.getByRole('button', { name: 'Eliminar' }).click();
-      await expect(iframe.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
-      await iframe.getByRole('button', { name: 'Si - proceder' }).click();
-      await expect(iframe.locator('.mbsc-toast')).toHaveText('Registro eliminado');
-      //Verificando que ya no existe
-      await expect(iframe.getByRole('cell', { name: idProveedor, exact: true })).toHaveCount(0);
-    });
+    await iframe.getByRole('row', { name: idProveedor }).getByRole('button').first().click();
+    await iframe.getByRole('textbox', { name: 'Teléfono:' }).fill('7777-7777');
+    await iframe.getByRole('button', { name: 'Grabar' }).click();
+    await expect(iframe.getByRole('row', { name: idProveedor })
+      .getByRole('cell', { name: '7777-7777' }))
+      .toBeVisible();
+    //await expect(iframe.locator('.mbsc-toast')).toHaveText('Cambios han sido grabados');
+  });
+
+  test('Eliminar proveedor', async () => {
+    await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(idProveedor);
+    await expect(iframe.getByRole('cell', { name: idProveedor, exact: true })).toBeVisible();
+
+    await iframe.getByRole('row', { name: idProveedor }).getByRole('button').nth(1).click();
+    await iframe.getByRole('button', { name: 'Eliminar' }).click();
+    await expect(iframe.getByRole('button', { name: 'Si - proceder' })).toBeVisible();
+    await iframe.getByRole('button', { name: 'Si - proceder' }).click();
+    await expect(iframe.locator('.mbsc-toast')).toHaveText('Registro eliminado');
+    await expect(iframe.getByRole('cell', { name: idProveedor, exact: true })).toHaveCount(0);
   });
 });

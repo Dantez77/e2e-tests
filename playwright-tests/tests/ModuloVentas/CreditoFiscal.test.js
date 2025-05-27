@@ -5,13 +5,15 @@ const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
 test.describe.serial('Credito Fiscal', () => {
+  let page;
+  let context;
   let numeroCFF;
   const tipoPago = 'Contado';
   const vendedor = 'Bob';
 
   test.beforeAll(async ({ browser }) => {
-    const context = await browser.newContext();
-    const page = await context.newPage();
+    context = await browser.newContext();
+    page = await context.newPage();
 
     try {
       // Login
@@ -19,15 +21,17 @@ test.describe.serial('Credito Fiscal', () => {
       await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
 
       const iframe = page.frameLocator('iframe');
-      numeroCFF = await crearCreditoFiscal(page, iframe, tipoPago, vendedor); // Pass vendedor parameter
+      numeroCFF = await crearCreditoFiscal(page, iframe, tipoPago, vendedor); 
       console.log(`Credito Fiscal creado: ${numeroCFF}`);
     } catch (error) {
       console.error('Error in beforeAll:', error);
       throw error;
-    } finally {
-      await page.close();
-      await context.close();
-    }
+    } 
+  });
+
+  test.afterAll(async ({ browser }) => {
+    await page.close();
+    await context.close();
   });
 
   test.beforeEach(async ({ page }) => {

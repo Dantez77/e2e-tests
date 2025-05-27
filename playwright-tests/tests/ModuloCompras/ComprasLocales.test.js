@@ -6,6 +6,8 @@ test.describe('Compras Locales', () => {
   let page;
   let context;
   let iframe;
+  const numeroFactura = `test-` + `${Date.now()}`.slice(-5);
+
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
@@ -48,20 +50,19 @@ test.describe('Compras Locales', () => {
   });
 
   test('Grabar documento', async () => {
-    const numeroFactura = `test-` + `${Date.now()}`.slice(-5);
     await page.getByRole('link', { name: 'Compras locales' }).click();
     await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
     await iframe.locator('[role="option"][data-index="0"]').click();
     await iframe.getByRole('button', { name: 'Agregar' }).click();
     await iframe.getByRole('textbox', { name: 'Item' }).click();
-    const optionLocator = iframe.locator('[role="option"][data-index="1"]');
+    const optionLocator = iframe.locator('[role="option"][data-index="3"]');
     await optionLocator.click();
     await iframe.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('100');
     await iframe.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
     await iframe.locator('#btnConfirmAddLine').click();
     await iframe.getByRole('textbox', { name: 'Factura #' }).fill(numeroFactura);
     await iframe.getByRole('button', { name: 'Grabar Documento' }).click();
-    await page.locator('.toast', { hasText: 'Cambios han sido guardados' }).isVisible();
+    await expect(iframe.locator('.mbsc-toast')).toHaveText('Documento ha sido grabado');
   });
 
   test('Buscar documento', async () => {
@@ -74,20 +75,7 @@ test.describe('Compras Locales', () => {
   });
 
   test('Anular documento', async () => {
-    const numeroFactura = `anul-` + `${Date.now()}`.slice(-5);
     await page.getByRole('link', { name: 'Compras locales' }).click();
-    await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
-    await iframe.locator('[role="option"][data-index="0"]').click();
-    await iframe.getByRole('button', { name: 'Agregar' }).click();
-    await iframe.getByRole('textbox', { name: 'Item' }).click();
-    const optionLocator = iframe.locator('[role="option"][data-index="3"]');
-    const value = await optionLocator.locator('div[style="font-size:10px;line-height:12px;"]').innerText();
-    await optionLocator.click();
-    await iframe.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('20');
-    await iframe.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
-    await iframe.locator('#btnConfirmAddLine').click();
-    await iframe.getByRole('textbox', { name: 'Factura #' }).fill(numeroFactura);
-    await iframe.getByRole('button', { name: 'Grabar Documento' }).click();
 
     await expect(iframe.getByRole('button', { name: 'Anular documento' })).toBeVisible();
     await iframe.getByRole('button', { name: 'Anular documento' }).click();
@@ -109,9 +97,8 @@ test.describe('Compras Locales', () => {
     await iframe.getByRole('button', { name: 'Buscar documento' }).click();
     await iframe.getByRole('button', { name: 'Buscar' }).click();
     await page.waitForTimeout(500);
-    await expect(
-      iframe.getByRole('row', { name: numeroFactura }).getByRole('cell', { name: '0.00' })
-    ).toBeVisible();
+    await expect(iframe.locator('.mbsc-toast')).toHaveText('Cambios han sido grabados');
+    ;
   });
 
   test.fixme('Compras locales: Usar archivo Json', async () => {

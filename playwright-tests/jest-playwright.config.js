@@ -1,9 +1,11 @@
-module.exports = {
-  browsers: ['chromium'],
-  launchOptions: {
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
     headless: true,
+    browserName: 'chromium',
   },
   workers: 1,
-  exitOnPageError: false, // Prevent tests from failing on page errors
-
-};
+  fullyParallel: false,
+});

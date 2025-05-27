@@ -4,16 +4,16 @@ const { busquedaDoc } = require('../helpers/busquedaDoc');
 const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
-test.describe('Cotización', () => {
+test.describe.serial('Cotización', () => {
   let page;
   let context;
-  let iframeElement;
+  let iframe;
   let documentValue = '';
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    iframeElement = page.frameLocator('iframe');
+    iframe = page.frameLocator('iframe');
 
     // Login and navigate to Modulo Ventas
     await test.step('Login and navigate to Modulo Ventas', async () => {
@@ -28,7 +28,7 @@ test.describe('Cotización', () => {
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
     await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
     await page.getByRole('link', { name: 'Cotización', exact: true }).click();
-    iframeElement = page.frameLocator('iframe');
+    iframe = page.frameLocator('iframe');
   });
 
   test.afterAll(async () => {
@@ -37,53 +37,51 @@ test.describe('Cotización', () => {
   });
 
   test('Crear Cotización', async () => {
-    documentValue = await crearCotizacion(page, iframeElement);
-    await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
-    await busquedaDoc(page, iframeElement, documentValue);
-    await expect(iframeElement.getByRole('cell', { name: documentValue })).toBeVisible();
+    documentValue = await crearCotizacion(page, iframe);
+    await iframe.getByRole('button', { name: 'Buscar Documento' }).click();
+    await busquedaDoc(page, iframe, documentValue);
+    await expect(iframe.getByRole('cell', { name: documentValue })).toBeVisible();
   });
 
   test('Editar Cotización', async () => {
-    // Asegúrate de tener una cotización creada
-    if (!documentValue) documentValue = await crearCotizacion(page, iframeElement);
+    if (!documentValue) documentValue = await crearCotizacion(page, iframe);
 
-    await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
-    await busquedaDoc(page, iframeElement, documentValue);
-    await iframeElement.getByRole('cell', { name: documentValue }).click();
+    await iframe.getByRole('button', { name: 'Buscar Documento' }).click();
+    await busquedaDoc(page, iframe, documentValue);
+    await iframe.getByRole('cell', { name: documentValue }).click();
 
     // Editar Vendedor
-    await iframeElement.getByRole('textbox', { name: 'Vendedor' }).click();
-    await iframeElement.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('textbox', { name: 'Vendedor' }).click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
 
-    await iframeElement.getByRole('button', { name: 'Grabar cambios' }).click();
-    await iframeElement.getByRole('button', { name: 'Cancel' }).click();
+    await iframe.getByRole('button', { name: 'Grabar cambios' }).click();
+    await iframe.getByRole('button', { name: 'Cancel' }).click();
 
     // Verificar cambios
-    await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
-    await busquedaDoc(page, iframeElement, documentValue);
+    await iframe.getByRole('button', { name: 'Buscar Documento' }).click();
+    await busquedaDoc(page, iframe, documentValue);
     await expect(
-      iframeElement.getByRole('row', { name: documentValue })
+      iframe.getByRole('row', { name: documentValue })
         .getByRole('cell', { name: 'John Doe' }) // Ajusta el nombre si es necesario
     ).toBeVisible();
   });
 
   test('Anular Cotización', async () => {
-    // Asegúrate de tener una cotización creada
-    if (!documentValue) documentValue = await crearCotizacion(page, iframeElement);
+    if (!documentValue) documentValue = await crearCotizacion(page, iframe);
 
-    await iframeElement.getByRole('button', { name: 'Anular Documento' }).click();
-    await busquedaDoc(page, iframeElement, documentValue);
-    await iframeElement.getByRole('cell', { name: documentValue }).click();
+    await iframe.getByRole('button', { name: 'Anular Documento' }).click();
+    await busquedaDoc(page, iframe, documentValue);
+    await iframe.getByRole('cell', { name: documentValue }).click();
 
-    await iframeElement.locator('#btnConfirmNull').click();
-    await iframeElement.getByRole('button', { name: 'Si - proceder' }).click();
+    await iframe.locator('#btnConfirmNull').click();
+    await iframe.getByRole('button', { name: 'Si - proceder' }).click();
     
     await expect(iframe.locator('.mbsc-toast')).toHaveText('Cambios han sido grabados');
 
-    await iframeElement.getByRole('button', { name: 'Buscar Documento' }).click();
-    await busquedaDoc(page, iframeElement, documentValue);
+    await iframe.getByRole('button', { name: 'Buscar Documento' }).click();
+    await busquedaDoc(page, iframe, documentValue);
 
-    const row = iframeElement.locator('tr', { hasText: documentValue });
+    const row = iframe.locator('tr', { hasText: documentValue });
     await expect(row).toHaveCount(0);
   });
 });
