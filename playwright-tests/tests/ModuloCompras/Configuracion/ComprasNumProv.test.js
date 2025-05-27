@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const credentials = require('../../../config/credentials.js');
 const { login } = require('../../helpers/login.js');
 
-test.describe.serial('Periodo de trabajo', () => {
+test.describe.serial('Compras con Numero Provisional', () => {
   let page;
   let context;
   let iframe;
@@ -22,7 +22,7 @@ test.describe.serial('Periodo de trabajo', () => {
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
     await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
     await page.getByRole('button', { name: 'Configuración', exact: true }).click();
-    await page.getByText('Período de trabajo').click();
+    await page.getByText('Compras con número provisional').click();
     iframe = page.frameLocator('iframe');
   });
 
@@ -31,7 +31,7 @@ test.describe.serial('Periodo de trabajo', () => {
     await context.close();
   });
 
-  test.fixme('Configurar periodo de trabajo', async () => {
-    //TODO; Opcion esta deshabilitada en el entorno actual
+  test.fixme('Configurar compras con número provisional', async () => {
+    //La funcionabilidad no esta implementada aun
   });
 });

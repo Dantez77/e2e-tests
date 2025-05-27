@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const credentials = require('../../../config/credentials.js');
 const { login } = require('../../helpers/login.js');
 
-test.describe.serial('Periodo de trabajo', () => {
+test.describe.serial('Datos de la empresa', () => {
   let page;
   let context;
   let iframe;
@@ -22,7 +22,7 @@ test.describe.serial('Periodo de trabajo', () => {
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
     await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
     await page.getByRole('button', { name: 'Configuración', exact: true }).click();
-    await page.getByText('Período de trabajo').click();
+    await page.getByText('Datos de la empresa').click();
     iframe = page.frameLocator('iframe');
   });
 
@@ -31,7 +31,9 @@ test.describe.serial('Periodo de trabajo', () => {
     await context.close();
   });
 
-  test.fixme('Configurar periodo de trabajo', async () => {
-    //TODO; Opcion esta deshabilitada en el entorno actual
+  test('Observar que abre la pagina y se muestran todos los elementos', async () => {
+    await expect(iframe.getByRole('listitem')).toBeVisible();
+    await expect(iframe.getByRole('button', { name: 'Grabar' })).toBeVisible();
+    await expect(iframe.getByRole('textbox', { name: 'Nombre de la empresa' })).toBeVisible();
   });
 });
