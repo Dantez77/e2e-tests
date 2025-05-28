@@ -21,17 +21,18 @@ test.describe.serial('Credito Fiscal', () => {
       await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
 
       const iframe = page.frameLocator('iframe');
-      numeroCFF = await crearCreditoFiscal(page, iframe, tipoPago, vendedor); 
+      numeroCFF = await crearCreditoFiscal(page, iframe, tipoPago, vendedor);
       console.log(`Credito Fiscal creado: ${numeroCFF}`);
     } catch (error) {
       console.error('Error in beforeAll:', error);
       throw error;
-    } 
+    }
   });
 
   test.afterAll(async ({ browser }) => {
     await page.close();
     await context.close();
+    numeroCFF = undefined;
   });
 
   test.beforeEach(async ({ page }) => {

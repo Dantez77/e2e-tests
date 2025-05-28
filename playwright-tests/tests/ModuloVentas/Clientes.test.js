@@ -56,6 +56,10 @@ test.describe('Clientes', () => {
     await iframe.locator('[role="option"][data-index="0"]').click();
     await iframe.getByRole('textbox', { name: 'Departamento:' }).click();
     await iframe.locator('[role="option"][data-index="0"]').click();
+
+    await iframe.getByText('Datos comerciales').click();
+    await iframe.getByRole('textbox', { name: 'N.R.C.' }).fill('10000');
+
     await iframe.getByRole('button', { name: 'Grabar' }).click();
 
     // Verificar que el cliente fue agregado

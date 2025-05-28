@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
-test.describe.serial('Modulo Compras - Pólizas de importación', () => {
+test.describe.serial('Pólizas de importación', () => {
   let page;
   let context;
   let iframe;
@@ -28,6 +28,7 @@ test.describe.serial('Modulo Compras - Pólizas de importación', () => {
   });
 
   test('Agregar registro de póliza de importación', async () => {
+    test.slow();
     await page.getByRole('link', { name: 'Pólizas de importación' }).click();
     await expect(iframe.getByRole('button', { name: 'Agregar' })).toBeVisible();
     await iframe.getByRole('button', { name: 'Agregar' }).click();

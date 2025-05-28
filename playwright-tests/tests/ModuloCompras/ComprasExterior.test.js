@@ -2,10 +2,13 @@ const { test, expect } = require('@playwright/test');
 const credentials = require('../../config/credentials.js');
 const { login } = require('../helpers/login.js');
 
-test.describe('Modulo Compras - Compras al exterior', () => {
+test.describe('Compras al exterior', () => {
   let page;
   let context;
   let iframe;
+  let documentValue = '';
+  const numeroFactura = `F-` + `${Date.now()}`.slice(-7);
+  const numeroBl = `BL-` + `${Date.now()}`.slice(-7);
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
@@ -27,10 +30,6 @@ test.describe('Modulo Compras - Compras al exterior', () => {
   });
 
   test('Agregar, grabar, buscar y anular registro de compra al exterior', async () => {
-    let documentValue = '';
-    const numeroFactura = `F-${Date.now()}`;
-    const numeroBl = `BL-${Date.now()}`;
-
     // Agregar item a la tabla
     await page.getByRole('link', { name: 'Compras al exterior' }).click();
     await test.step('Agregando Item a tabla', async () => {

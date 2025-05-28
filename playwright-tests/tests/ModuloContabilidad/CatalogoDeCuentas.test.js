@@ -64,4 +64,20 @@ test.describe.serial('Catálogo de cuentas', () => {
     await iframe.getByRole('button', { name: 'Si - proceder' }).click();
     await expect(iframe.getByRole('cell', { name: 'CC-' })).toHaveCount(0);
   });
+
+  //Solo usar para limpiar las tablas
+  test.skip('Limpiar todas las cuentas restantes', async () => {
+    test.fail();
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('CC-');
+    // Loop while there are rows matching /^CC-/
+    while (await iframe.getByRole('row', { name: /^CC-/ }).count() > 0) {
+      await iframe.getByRole('row', { name: /^CC-/ }).first().getByRole('button').nth(1).click();
+      await iframe.getByRole('button', { name: 'Eliminar' }).click();
+      await iframe.getByRole('button', { name: 'Si - proceder' }).click();
+      // Wait for the row to disappear before next iteration
+      await expect(iframe.getByRole('row', { name: /^CC-/ }).first()).toBeHidden({ timeout: 5000 }).catch(() => {});
+    }
+    // Assert no CC- rows remain
+    await expect(iframe.getByRole('cell', { name: /CC-/ })).toHaveCount(0);
+  });
 });
