@@ -1,9 +1,9 @@
 const { test, expect } = require('@playwright/test');
-const { crearCreditoFiscal } = require('../helpers/crearCreditoFiscal');
-const { crearNota } = require('../helpers/crearNota');
-const { busquedaDoc } = require('../helpers/busquedaDoc');
-const credentials = require('../../config/credentials.js');
-const { login } = require('../helpers/login.js');
+const { crearCreditoFiscal } = require('@helpers/crearCreditoFiscal');
+const { crearNota } = require('@helpers/crearNota');
+const { busquedaDoc } = require('@helpers/busquedaDoc');
+const credentials = require('@config/credentials.js');
+const { login } = require('@helpers/login.js');
 
 test.describe('Nota de Débito', () => {
   let page;

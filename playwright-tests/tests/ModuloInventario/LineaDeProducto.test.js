@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
-const { busquedaDoc } = require('../helpers/busquedaDoc');
-const credentials = require('../../config/credentials.js');
-const { login } = require('../helpers/login.js');
+const { busquedaDoc } = require('@helpers/busquedaDoc');
+const credentials = require('@config/credentials.js');
+const { login } = require('@helpers/login.js');
 
 test.describe.serial('Lineas de productos', () => {
   let page;

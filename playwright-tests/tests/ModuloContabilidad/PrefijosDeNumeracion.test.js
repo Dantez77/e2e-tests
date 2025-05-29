@@ -7,6 +7,9 @@ test.describe.serial('Prefijos de numeración', () => {
   let page;
   let context;
   let iframe;
+  const nomNumeracion = 'Prefijo de prueba';
+  const nomNumEditado = 'Prefijo prueba editado';
+  const codPrefijo = 'P' + `${Date.now()}`.slice(-2);
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
@@ -34,8 +37,6 @@ test.describe.serial('Prefijos de numeración', () => {
   });
 
   test('Crear prefijo de numeración', async () => {
-    const codPrefijo = 'P' + `${Date.now()}`.slice(-2);
-    const nomNumeracion = 'Prefijo de prueba';
     await iframe.getByRole('button', { name: 'Agregar' }).click();
     await iframe.getByRole('textbox', { name: 'Prefijo' }).fill(codPrefijo);
     await iframe.getByRole('textbox', { name: 'Nombre de la numeración' }).fill(nomNumeracion);
@@ -45,20 +46,18 @@ test.describe.serial('Prefijos de numeración', () => {
   });
 
   test('Editar prefijo de numeración', async () => {
-    const nomNumeracion = 'Prefijo Editado';
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('P');
-    await iframe.getByRole('row', { name: /prueba/ }).first().getByRole('button').nth(0).click();
-    await iframe.getByRole('textbox', { name: 'Nombre de la numeración' }).fill(nomNumeracion);
+    await iframe.getByRole('row', { name: nomNumeracion }).first().getByRole('button').nth(0).click();
+    await iframe.getByRole('textbox', { name: 'Nombre de la numeración' }).fill(nomNumEditado);
     await iframe.getByRole('button', { name: 'Grabar' }).click();
-    await expect(iframe.getByRole('cell', { name: nomNumeracion })).toBeVisible();
+    await expect(iframe.getByRole('cell', { name: nomNumEditado })).toBeVisible();
   });
 
   test('Eliminar prefijo de numeración', async () => {
-    const nomNumeracion = 'Prefijo Editado';
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('P');
-    await iframe.getByRole('row', { name: /Editado/ }).first().getByRole('button').nth(1).click(); 
+    await iframe.getByRole('row', { name: /prueba/ }).first().getByRole('button').nth(1).click(); 
     await iframe.getByRole('button', { name: 'Eliminar' }).click();
     await iframe.getByRole('button', { name: 'Si - proceder' }).click();
-    await expect(iframe.getByRole('cell', { name: nomNumeracion })).toHaveCount(0);
+    await expect(iframe.getByRole('cell', { name: nomNumEditado })).toHaveCount(0);
   });
-});
+}); 

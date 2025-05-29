@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
-const credentials = require('../../config/credentials.js');
-const { login } = require('../helpers/login.js');
+const credentials = require('@config/credentials.js');
+const { login } = require('@helpers/login.js');
 
 test.describe.serial('Pólizas de importación', () => {
   let page;

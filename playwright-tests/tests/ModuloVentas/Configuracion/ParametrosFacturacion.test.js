@@ -1,17 +1,16 @@
 const { test, expect } = require('@playwright/test');
-const { busquedaDoc } = require('@helpers/busquedaDoc');
 const credentials = require('@config/credentials.js');
 const { login } = require('@helpers/login.js');
 
-test.describe('Partidas automáticas', () => {
+test.describe.serial('Para para facturar', () => {
   let page;
   let context;
-  let iframeElement;
+  let iframe;
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    iframeElement = page.frameLocator('iframe');
+    iframe = page.frameLocator('iframe');
 
     // Login
     await test.step('Login', async () => {
@@ -21,11 +20,10 @@ test.describe('Partidas automáticas', () => {
 
   test.beforeEach(async () => {
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    const contabilidadBtn = page.getByRole('link', { name: 'btn-moduloContabilidad' });
-    await expect(contabilidadBtn).toBeVisible();
-    await contabilidadBtn.click(); 
-    await page.getByRole('link', { name: 'Generar partidas automáticas', exact: true }).click();
-    iframeElement = page.frameLocator('iframe');
+    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
+    await page.getByRole('button', { name: 'Configuracion', exact: true }).click();
+    await page.getByText('Para para facturar').click();
+    iframe = page.frameLocator('iframe');
   });
 
   test.afterAll(async () => {
@@ -33,7 +31,8 @@ test.describe('Partidas automáticas', () => {
     await context.close();
   });
 
-  test('Generar partida automatica', async () => {
-    //TODO:
+  test.fixme('Libro de ventas a consumidor final', async () => {
+    await expect(iframe.getByRole('button', { name: 'Grabar' })).toBeVisible();
+    //TODO: Verificar que todos los elementos cargaron correctamente
   });
 });

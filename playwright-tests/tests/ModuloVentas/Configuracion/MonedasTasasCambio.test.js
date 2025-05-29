@@ -1,8 +1,10 @@
 const { test, expect } = require('@playwright/test');
 const credentials = require('@config/credentials.js');
 const { login } = require('@helpers/login.js');
+const { LoginPage } = require('../../../POM/loginPage.js');
+const { VentasPage } = require('../../../POM/ventasPage.js');
 
-test.describe.serial('Transferencia con numero provisional', () => {
+test.describe.serial('Monedas y tasas de cambio', () => {
   let page;
   let context;
   let iframe;
@@ -14,15 +16,15 @@ test.describe.serial('Transferencia con numero provisional', () => {
 
     // Login
     await test.step('Login', async () => {
-      await login(page, credentials);
+      const login = new LoginPage(page);
+      await login.login(credentials);
     });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
-    await page.getByRole('button', { name: 'Configuración', exact: true }).click();
-    await page.getByText('Transferencia con numero provisional').click();
+    const ventasPage = new VentasPage(page);
+    await ventasPage.goToMonedasYtasaCambio();
+
     iframe = page.frameLocator('iframe');
   });
 
@@ -31,7 +33,8 @@ test.describe.serial('Transferencia con numero provisional', () => {
     await context.close();
   });
 
-  test.fixme('Agregar documento', async () => {
-    //TODO: Opcion esta deshabilitada en el entorno actual
+  test('Monedas y tasas de cambio', async () => {
+    await expect(iframe.getByRole('button', { name: 'Agregar' })).toBeVisible();
+
   });
 });

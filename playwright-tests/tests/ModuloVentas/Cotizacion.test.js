@@ -1,8 +1,8 @@
 const { test, expect } = require('@playwright/test');
-const { crearCotizacion } = require('../helpers/crearCotizacion');
-const { busquedaDoc } = require('../helpers/busquedaDoc');
-const credentials = require('../../config/credentials.js');
-const { login } = require('../helpers/login.js');
+const { crearCotizacion } = require('@helpers/crearCotizacion');
+const { busquedaDoc } = require('@helpers/busquedaDoc');
+const credentials = require('@config/credentials.js');
+const { login } = require('helpers/login.js');
 
 test.describe.serial('Cotización', () => {
   let page;

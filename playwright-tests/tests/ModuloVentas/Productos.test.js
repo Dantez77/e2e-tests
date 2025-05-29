@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
-const credentials = require('../../config/credentials.js');
-const { login } = require('../helpers/login.js');
-const { crearProducto } = require('../helpers/crearProducto.js');
+const credentials = require('@config/credentials.js');
+const { login } = require('@helpers/login.js');
+const { crearProducto } = require('@helpers/crearProducto.js');
 
 test.describe('Productos', () => {
   let page;

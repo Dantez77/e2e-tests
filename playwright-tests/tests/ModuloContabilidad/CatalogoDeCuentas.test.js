@@ -1,12 +1,16 @@
 const { test, expect } = require('@playwright/test');
-const { busquedaDoc } = require('../helpers/busquedaDoc');
-const credentials = require('../../config/credentials.js');
-const { login } = require('../helpers/login.js');
+const { busquedaDoc } = require('@helpers/busquedaDoc');
+const credentials = require('@config/credentials.js');
+const { login } = require('@helpers/login.js');
 
 test.describe.serial('Catálogo de cuentas', () => {
   let page;
   let context;
   let iframe;
+  const codCuenta = 'CC-' + `${Date.now()}`.slice(-7);
+  const nomCuenta = 'Cuenta Prueba'
+  const nomCuentaEdita = 'Cuenta Modificada'
+
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
@@ -34,8 +38,6 @@ test.describe.serial('Catálogo de cuentas', () => {
   });
 
   test('Agregar cuenta contable', async () => {
-    const codCuenta = 'CC-' + `${Date.now()}`.slice(-7);
-    const nomCuenta = 'Cuenta Prueba'
     await iframe.getByRole('button', { name: 'Agregar' }).click();
     await iframe.getByRole('textbox', { name: 'Código' }).fill(codCuenta);
     await iframe.getByRole('textbox', { name: 'Nombre' }).fill(nomCuenta);
@@ -48,18 +50,17 @@ test.describe.serial('Catálogo de cuentas', () => {
   });
 
   test('Modificar cuenta contable', async () => {
-    const nomCuenta = 'Cuenta Modificada'
 
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('CC-');
-    await iframe.getByRole('row', { name: /^CC-/ }).first().getByRole('button').nth(0).click();
-    await iframe.getByRole('textbox', { name: 'Nombre' }).fill(nomCuenta);
+    await iframe.getByRole('row', { name: /CC-/ }).first().getByRole('button').nth(0).click();
+    await iframe.getByRole('textbox', { name: 'Nombre' }).fill(nomCuentaEdita);
     await iframe.getByRole('button', { name: 'Grabar cambios' }).click();
-    await expect(iframe.getByRole('cell', { name: nomCuenta })).toBeVisible();
+    await expect(iframe.getByRole('cell', { name: nomCuentaEdita })).toBeVisible();
   });
 
   test('Eliminar cuenta contable', async () => {
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('CC-');
-    await iframe.getByRole('row', { name: /^CC-/ }).first().getByRole('button').nth(1).click();
+    await iframe.getByRole('row', { name: /CC-/ }).first().getByRole('button').nth(1).click();
     await iframe.getByRole('button', { name: 'Eliminar' }).click();
     await iframe.getByRole('button', { name: 'Si - proceder' }).click();
     await expect(iframe.getByRole('cell', { name: 'CC-' })).toHaveCount(0);
@@ -70,12 +71,12 @@ test.describe.serial('Catálogo de cuentas', () => {
     test.fail();
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('CC-');
     // Loop while there are rows matching /^CC-/
-    while (await iframe.getByRole('row', { name: /^CC-/ }).count() > 0) {
-      await iframe.getByRole('row', { name: /^CC-/ }).first().getByRole('button').nth(1).click();
+    while (await iframe.getByRole('row', { name: /CC-/ }).count() > 0) {
+      await iframe.getByRole('row', { name: /CC-/ }).first().getByRole('button').nth(1).click();
       await iframe.getByRole('button', { name: 'Eliminar' }).click();
       await iframe.getByRole('button', { name: 'Si - proceder' }).click();
       // Wait for the row to disappear before next iteration
-      await expect(iframe.getByRole('row', { name: /^CC-/ }).first()).toBeHidden({ timeout: 5000 }).catch(() => {});
+      await expect(iframe.getByRole('row', { name: /CC-/ }).first()).toBeHidden({ timeout: 5000 }).catch(() => { });
     }
     // Assert no CC- rows remain
     await expect(iframe.getByRole('cell', { name: /CC-/ })).toHaveCount(0);

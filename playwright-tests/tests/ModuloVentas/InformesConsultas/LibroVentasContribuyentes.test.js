@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const credentials = require('@config/credentials.js');
 const { login } = require('@helpers/login.js');
 
-test.describe.serial('Clientes en orden de código', () => {
+test.describe.serial('Libro de ventas a contribuyentes', () => {
   let page;
   let context;
   let iframe;
@@ -22,7 +22,7 @@ test.describe.serial('Clientes en orden de código', () => {
     await page.goto('https://azteq.club/azteq-club/menu/menu.php');
     await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
     await page.getByRole('button', { name: 'Informes y consultas', exact: true }).click();
-    await page.getByText('Clientes en orden de código').click();
+    await page.getByText('Libro de ventas a contribuyentes').click();
     iframe = page.frameLocator('iframe');
   });
 
@@ -31,10 +31,16 @@ test.describe.serial('Clientes en orden de código', () => {
     await context.close();
   });
 
-  test('Lista de clientes por codigo', async () => {
+  test('Libro de ventas a contribuyentes', async () => {
     await expect(iframe.getByRole('button', { name: 'Salida en PDF' })).toBeVisible();
     await expect(iframe.getByRole('button', { name: 'Salida en XLS' })).toBeVisible();
+    await iframe.getByRole('textbox', { name: 'Desde fecha' }).fill('2023-05-01');
+    await iframe.getByRole('textbox', { name: 'Hasta fecha' }).fill('2023-05-31');
 
+    await iframe.getByRole('textbox', { name: 'Sucursal' }).click();
+    await iframe.getByRole('option', { name: 'Oficina central 01' }).click();
+
+    await iframe.locator('html').click();
     await iframe.getByRole('button', { name: 'Salida en PDF' }).click();
 
     await expect(iframe.getByText('100', { exact: true })).toBeVisible();

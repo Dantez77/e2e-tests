@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const { todo } = require('node:test');
-const credentials = require('../config/credentials');
+const credentials = require('@config/credentials');
 
 test.describe('Login Functionality', () => {
 

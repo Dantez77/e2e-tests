@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
-const credentials = require('../config/credentials.js');
-const { login } = require('./helpers/login.js'); // Ajusta la ruta si es necesario
+const credentials = require('@config/credentials.js');
+const { login } = require('@helpers/login.js');
 
 test.describe('Modules Page Functionality', () => {
   let page;
