@@ -8,8 +8,8 @@
       "@helpers/*": [
         "helpers/*"
       ],
-      "@DOM/*": [
-        "DOM/*"
+      "@POM/*": [
+        "POM/*"
       ]
     }
   }

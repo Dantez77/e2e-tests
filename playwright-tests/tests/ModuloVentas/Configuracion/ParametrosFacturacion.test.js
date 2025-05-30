@@ -1,8 +1,9 @@
 const { test, expect } = require('@playwright/test');
 const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+const { LoginPage } = require('@POM/loginPage.js');
+const { VentasPage } = require('@POM/ventasPage.js');
 
-test.describe.serial('Para para facturar', () => {
+test.describe.serial('Parametros para facturar', () => {
   let page;
   let context;
   let iframe;
@@ -14,15 +15,14 @@ test.describe.serial('Para para facturar', () => {
 
     // Login
     await test.step('Login', async () => {
-      await login(page, credentials);
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
     });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
-    await page.getByRole('button', { name: 'Configuracion', exact: true }).click();
-    await page.getByText('Para para facturar').click();
+    const ventasPage = new VentasPage(page);
+    await ventasPage.goToConfiguraciones(VentasPage.CONFIGURACIONES.PARAMETROS_FACTURACION);
     iframe = page.frameLocator('iframe');
   });
 

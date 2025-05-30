@@ -1,8 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
-const { LoginPage } = require('../../../POM/loginPage.js');
-const { VentasPage } = require('../../../POM/ventasPage.js');
+const { LoginPage } = require('@POM/loginPage.js');
+const { VentasPage } = require('@POM/ventasPage.js');
 
 test.describe.serial('Monedas y tasas de cambio', () => {
   let page;
@@ -16,15 +15,14 @@ test.describe.serial('Monedas y tasas de cambio', () => {
 
     // Login
     await test.step('Login', async () => {
-      const login = new LoginPage(page);
-      await login.login(credentials);
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
     });
   });
 
   test.beforeEach(async () => {
     const ventasPage = new VentasPage(page);
-    await ventasPage.goToMonedasYtasaCambio();
-
+    await ventasPage.goToConfiguraciones(VentasPage.CONFIGURACIONES.MONEDA_TASA_CAMBIO);
     iframe = page.frameLocator('iframe');
   });
 

@@ -1,6 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+const { LoginPage } = require('@POM/loginPage.js');
+const { VentasPage } = require('@POM/ventasPage');
 
 test.describe.serial('Detalle de ventas por día', () => {
   let page;
@@ -14,15 +15,14 @@ test.describe.serial('Detalle de ventas por día', () => {
 
     // Login
     await test.step('Login', async () => {
-      await login(page, credentials);
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
     });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
-    await page.getByRole('button', { name: 'Informes y consultas', exact: true }).click();
-    await page.getByText('Detalle de ventas por día').click();
+    const ventasPage = new VentasPage(page);
+    await ventasPage.goToInformesYconsultas(VentasPage.INFORMES.DETALLE_DE_VENTAS_POR_DIA); 
     iframe = page.frameLocator('iframe');
   });
 

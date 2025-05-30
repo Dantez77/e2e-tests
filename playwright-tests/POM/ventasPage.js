@@ -1,46 +1,71 @@
-
 class VentasPage {
+  static INFORMES = {
+    CLIENTES_POR_CODIGO: 'clientesPorCodigo',
+    DETALLE_DE_VENTAS_POR_DIA: 'detalleDeVentasPorDia',
+    FACTURAS_PENDIENTES_DE_COBRO: 'facturasPendientesDeCobro',
+    LIBRO_VENTAS_CONSUMIDOR_FINAL: 'libroVentasConsumidorFinal',
+    LIBRO_DE_VENTAS_CONTRIBUYENTES: 'libroDeVentasContribuyentes',
+    RESUMEN_VENTAS_ENTRE_FECHAS: 'resumenVentasEntreFechas',
+    VENTAS_POR_CLIENTE: 'ventasPorCliente',
+    VENTAS_POR_VENDEDOR: 'ventasPorVendedor',
+  };
+
+  static CONFIGURACIONES = {
+    MONEDA_TASA_CAMBIO: 'monedaTasaCambio',
+    DATOS_DE_LA_EMPRESA: 'datosDeLaEmpresa',
+    PARAMETROS_FACTURACION: 'parametrosFacturacion',
+    ZONAS_DE_MERCADEO: 'zonasDeMercadeo',
+    NUMERACION_DOCUMENTOS: 'numeracionDocs',
+  };
+
   constructor(page) {
     this.page = page;
+    this.baseUrl = 'https://azteq.club/azteq-club/menu/menu.php';
 
-    //Modulo Ventas
     this.moduloVentas = page.getByRole('link', { name: 'btn-moduloVentas' });
 
-    //Opciones principales
-    this.informesConsultas = page.getByRole('button', { name: 'Informes y consultas', exact: true });
-    this.configuraciones = page.getByRole('button', { name: 'Configuración', exact: true });
+    this.main = {
+      informesConsultas: page.getByRole('button', { name: 'Informes y consultas', exact: true }),
+      configuraciones: page.getByRole('button', { name: 'Configuración', exact: true }),
+    };
 
-    //Informes y consultas
-    this.clientesPorCodigo = page.getByText('Clientes en orden de código');
+    this.informes = {
+      clientesPorCodigo: page.getByText('Clientes en orden de código'),
+      detalleDeVentasPorDia: page.getByText('Detalle de ventas por día'),
+      facturasPendientesDeCobro: page.getByText('Facturas pendientes de cobro'),
+      libroVentasConsumidorFinal: page.getByText('Libro de ventas a consumidor final'),
+      libroDeVentasContribuyentes: page.getByText('Libro de ventas a contribuyentes'),
+      resumenVentasEntreFechas: page.getByText('Resumen de ventas entre fechas'),
+      ventasPorCliente: page.getByText('Ventas por cliente'),
+      ventasPorVendedor: page.getByText('Ventas por vendedor'),
+    };
 
+    this.configuraciones = {
+      monedaTasaCambio: page.getByText('Monedas y tasas de cambio'),
+      datosDeLaEmpresa: page.getByText('Datos de la empresa'),
+      parametrosFacturacion: page.getByText('Parámetros para facturar'),
+      zonasDeMercadeo: page.getByText('Zonas de mercadeo'),
+      numeracionDocs: page.getByText('Numeración de documentos'),
 
-    //Configuraciones
-    this.monedaTasaCambio = page.getByText('Monedas y tasas de cambio');
-    this.datoEmpresa = page.getByText('Datos de la empresa');
-
-
+    };
   }
 
   async goto() {
-    await this.page.goto('https://azteq.club/azteq-club/menu/menu.php');
+    await this.page.goto(this.baseUrl);
     await this.moduloVentas.click();
   }
 
-  async goToConfiguraciones() {
+  async goToConfiguraciones(nombre) {
     await this.goto();
-    await this.configuraciones.click();
+    await this.main.configuraciones.click();
+    await this.configuraciones[nombre].click();
+
   }
 
-  // Datos de la Empresa
-  async goToDatosEmpresa() {
-    await this.goToConfiguraciones();
-    await this.datoEmpresa.click();
-  }
-
-  // Monedas y Tasas de cambio
-  async goToMonedasYtasaCambio() {
-    await this.goToConfiguraciones();
-    await this.monedaTasaCambio.click();
+  async goToInformesYconsultas(nombre) {
+    await this.goto();
+    await this.main.informesConsultas.click();
+    await this.informes[nombre].click();
   }
 }
 
