@@ -1,7 +1,7 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
-const { crearProducto } = require('@helpers/crearProducto.js');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { login } from '@helpers/login.js';
+import { crearProducto } from '@helpers/crearProducto.js';
 
 test.describe('Productos', () => {
   let page;

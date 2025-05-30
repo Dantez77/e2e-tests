@@ -1,8 +1,8 @@
-const { test, expect } = require('@playwright/test');
-const { crearCreditoFiscal } = require('@helpers/crearCreditoFiscal');
-const { busquedaDoc } = require('@helpers/busquedaDoc');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { test, expect } from '@playwright/test';
+import { crearCreditoFiscal } from '@helpers/crearCreditoFiscal';
+import { busquedaDoc } from '@helpers/busquedaDoc';
+import credentials from '@config/credentials.js';
+import { login } from '@helpers/login.js';
 
 test.describe.serial('Credito Fiscal', () => {
   let page;

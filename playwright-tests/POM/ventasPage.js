@@ -1,4 +1,8 @@
 class VentasPage {
+  static MAIN = {
+    CLIENTES: 'clientes',
+  };
+  
   static INFORMES = {
     CLIENTES_POR_CODIGO: 'clientesPorCodigo',
     DETALLE_DE_VENTAS_POR_DIA: 'detalleDeVentasPorDia',
@@ -16,6 +20,10 @@ class VentasPage {
     PARAMETROS_FACTURACION: 'parametrosFacturacion',
     ZONAS_DE_MERCADEO: 'zonasDeMercadeo',
     NUMERACION_DOCUMENTOS: 'numeracionDocs',
+    LOGO_DE_LA_EMPRESA: 'logoDeLaEmpresa',
+    NOMBRES_LISTAS_PRODUCTOS: 'nombresListasProductos',
+    NUMEROS_AUTORIZACION_DOCUMENTOS: 'numerosAutorizacionDocumentos',
+    LINEAS_DE_PRODUCTOS: 'lineasDeProductos'
   };
 
   constructor(page) {
@@ -27,6 +35,11 @@ class VentasPage {
     this.main = {
       informesConsultas: page.getByRole('button', { name: 'Informes y consultas', exact: true }),
       configuraciones: page.getByRole('button', { name: 'Configuración', exact: true }),
+
+      //SubModulos
+      //TODO: Fill out all the options
+      clientes: page.getByRole('link', { name: 'Clientes', exact: true }),
+
     };
 
     this.informes = {
@@ -46,7 +59,10 @@ class VentasPage {
       parametrosFacturacion: page.getByText('Parámetros para facturar'),
       zonasDeMercadeo: page.getByText('Zonas de mercadeo'),
       numeracionDocs: page.getByText('Numeración de documentos'),
-
+      logoDeLaEmpresa: page.getByText('Logo de la empresa'),
+      nombresListasProductos: page.getByText('Nombres de listas de precios'),
+      numerosAutorizacionDocumentos: page.getByText('Números de autorización de documentos'),
+      lineasDeProductos: page.getByText('Lineas de Productos')
     };
   }
 
@@ -55,11 +71,15 @@ class VentasPage {
     await this.moduloVentas.click();
   }
 
+  async goToSubModule(nombre) {
+    await this.goto();
+    await this.main[nombre].click();
+  }
+
   async goToConfiguraciones(nombre) {
     await this.goto();
     await this.main.configuraciones.click();
     await this.configuraciones[nombre].click();
-
   }
 
   async goToInformesYconsultas(nombre) {

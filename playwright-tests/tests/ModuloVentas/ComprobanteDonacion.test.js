@@ -1,7 +1,7 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
-const { busquedaDoc } = require('@helpers/busquedaDoc');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { login } from '@helpers/login.js';
+import { busquedaDoc } from '@helpers/busquedaDoc';
 
 //REQUIERE DOCUMENTO DE DONACION DN DE DE NUMERACION DE DOCUMENTOS POR SUCURSAL
 

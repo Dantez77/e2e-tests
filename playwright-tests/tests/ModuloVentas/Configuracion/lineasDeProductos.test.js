@@ -2,11 +2,13 @@ import { test, expect } from '@playwright/test';
 import credentials from '@config/credentials.js';
 import { LoginPage } from '@POM/loginPage.js';
 import { VentasPage } from '@POM/ventasPage.js';
+import { randomUUID } from 'crypto';
 
-test.describe.serial('Parametros para facturar', () => {
+test.describe.serial('Lineas de productos', () => {
   let page;
   let context;
   let iframe;
+  const uniqueId = randomUUID().slice(-6);
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
@@ -22,7 +24,7 @@ test.describe.serial('Parametros para facturar', () => {
 
   test.beforeEach(async () => {
     const ventasPage = new VentasPage(page);
-    await ventasPage.goToConfiguraciones(VentasPage.CONFIGURACIONES.PARAMETROS_FACTURACION);
+    await ventasPage.goToConfiguraciones(VentasPage.CONFIGURACIONES.LINEAS_DE_PRODUCTOS);
     iframe = page.frameLocator('iframe');
   });
 
@@ -31,8 +33,7 @@ test.describe.serial('Parametros para facturar', () => {
     await context.close();
   });
 
-  test.fixme('Libro de ventas a consumidor final', async () => {
-    await expect(iframe.getByRole('button', { name: 'Grabar' })).toBeVisible();
-    //TODO: Verificar que todos los elementos cargaron correctamente
+  test.skip('Agregar lineas de productos', async () => {
+    //TODO: FUNCIONALIDAD YA SE PRUEBA EN EL MODULO DE INVENTARIO
   });
 });

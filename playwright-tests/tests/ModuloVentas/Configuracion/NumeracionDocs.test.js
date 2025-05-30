@@ -1,11 +1,11 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
-const { LoginPage } = require('@POM/loginPage.js');
-const { VentasPage } = require('@POM/ventasPage.js');
-const { randomUUID } = require('crypto');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { login } from '@helpers/login.js';
+import { LoginPage } from '@POM/loginPage.js';
+import { VentasPage } from '@POM/ventasPage.js';
+import { randomUUID } from 'crypto';
 
-test.describe.serial('Zonas de Mercadeo', () => {
+test.describe.serial('Numeracion de Documentos', () => {
   let page;
   let context;
   let iframe;
@@ -34,7 +34,7 @@ test.describe.serial('Zonas de Mercadeo', () => {
     await context.close();
   });
 
-  test('Agregar zona de mercadeo', async () => {
+  test('Agregar documento', async () => {
     await iframe.getByRole('textbox', { name: 'Sucursal:' }).click();
     await iframe.getByRole('option', { name: 'Oficina central 01', exact: true }).click();
 
@@ -52,7 +52,7 @@ test.describe.serial('Zonas de Mercadeo', () => {
     await expect(iframe.locator('.mbsc-toast')).toHaveText('Registro grabado');
   });
 
-  test('Editar zona de mercadeo', async () => {
+  test('Editar documento', async () => {
     await iframe.getByRole('textbox', { name: 'Sucursal:' }).click();
     await iframe.getByRole('option', { name: 'Oficina central 01', exact: true }).click();
     await iframe.getByRole('cell', { name: 'Abono a Factura' }).click();
@@ -61,7 +61,7 @@ test.describe.serial('Zonas de Mercadeo', () => {
     await expect(iframe.locator('.mbsc-toast')).toHaveText('Registro grabado');
   });
 
-  test('Eliminar zona de mercadeo', async () => {
+  test('Eliminar documento', async () => {
     await iframe.getByRole('textbox', { name: 'Sucursal:' }).click();
     await iframe.getByRole('option', { name: 'Oficina central 01', exact: true }).click();
 
@@ -69,7 +69,7 @@ test.describe.serial('Zonas de Mercadeo', () => {
       await dialog.accept();
     });
     await iframe.getByRole('row', { name: 'Abono a Factura' }).getByRole('button').click();
-    
+
     await expect(iframe.locator('.mbsc-toast')).toHaveText('Registro eliminado');
   });
 

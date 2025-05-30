@@ -1,7 +1,7 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { LoginPage } = require('@POM/loginPage.js');
-const { VentasPage } = require('@POM/ventasPage');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { LoginPage } from '@POM/loginPage.js';
+import { VentasPage } from '@POM/ventasPage';
 
 test.describe.serial('Ventas por cliente', () => {
   let page;

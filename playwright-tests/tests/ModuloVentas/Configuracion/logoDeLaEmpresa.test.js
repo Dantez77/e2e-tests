@@ -3,7 +3,7 @@ import credentials from '@config/credentials.js';
 import { LoginPage } from '@POM/loginPage.js';
 import { VentasPage } from '@POM/ventasPage.js';
 
-test.describe.serial('Parametros para facturar', () => {
+test.describe.serial('Logo de la empresa', () => {
   let page;
   let context;
   let iframe;
@@ -22,7 +22,7 @@ test.describe.serial('Parametros para facturar', () => {
 
   test.beforeEach(async () => {
     const ventasPage = new VentasPage(page);
-    await ventasPage.goToConfiguraciones(VentasPage.CONFIGURACIONES.PARAMETROS_FACTURACION);
+    await ventasPage.goToConfiguraciones(VentasPage.CONFIGURACIONES.LOGO_DE_LA_EMPRESA);
     iframe = page.frameLocator('iframe');
   });
 
@@ -31,8 +31,8 @@ test.describe.serial('Parametros para facturar', () => {
     await context.close();
   });
 
-  test.fixme('Libro de ventas a consumidor final', async () => {
-    await expect(iframe.getByRole('button', { name: 'Grabar' })).toBeVisible();
-    //TODO: Verificar que todos los elementos cargaron correctamente
+  test('Logo de la empresa', async () => {
+    await expect(iframe.getByText('Arrastre archivo aqui')).toBeVisible();
+    //TODO: Reminder to improve test later...
   });
 });

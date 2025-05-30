@@ -1,8 +1,8 @@
-const { test, expect } = require('@playwright/test');
-const { crearFactura } = require('@helpers/crearFactura');
-const { busquedaDoc } = require('@helpers/busquedaDoc');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { test, expect } from '@playwright/test';
+import { crearFactura } from '@helpers/crearFactura';
+import { busquedaDoc } from '@helpers/busquedaDoc';
+import credentials from '@config/credentials.js';
+import { login } from '@helpers/login.js';
 
 test.describe.serial('Factura', () => {
   let page;

@@ -1,9 +1,9 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
-const { LoginPage } = require('@POM/loginPage.js');
-const { VentasPage } = require('@POM/ventasPage.js');
-const { randomUUID } = require('crypto');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { login } from '@helpers/login.js';
+import { LoginPage } from '@POM/loginPage.js';
+import { VentasPage } from '@POM/ventasPage.js';
+import { randomUUID } from 'crypto';
 
 test.describe.serial('Zonas de Mercadeo', () => {
   let page;
