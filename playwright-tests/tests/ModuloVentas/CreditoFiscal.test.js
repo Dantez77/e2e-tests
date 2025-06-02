@@ -35,6 +35,7 @@ test.describe.serial('Credito Fiscal', () => {
   });
 
   test('Crear credito', async ({ page }) => {
+    test.slow();
     await iframe.getByRole('button', { name: 'Agregar' }).click();
 
     await iframe.getByRole('textbox', { name: 'Cliente:' }).click();

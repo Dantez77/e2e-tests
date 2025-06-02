@@ -1,7 +1,7 @@
-const { test, expect } = require('@playwright/test');
-const { busquedaDoc } = require('@helpers/busquedaDoc');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { LoginPage } from '@POM/loginPage';
+import { InventarioPage } from '@POM/inventarioPage';
 
 test.describe.serial('Entradas', () => {
   let page;
@@ -14,18 +14,16 @@ test.describe.serial('Entradas', () => {
     page = await context.newPage();
     iframe = page.frameLocator('iframe');
 
-    // Login
+    // Login 
     await test.step('Login', async () => {
-      await login(page, credentials);
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
     });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    const inventarioBtn = page.getByRole('link', { name: 'btn-moduloInventario' });
-    await expect(inventarioBtn).toBeVisible();
-    await inventarioBtn.click();
-    await page.getByRole('link', { name: 'Entradas', exact: true }).click();
+    const inventarioPage = new InventarioPage(page);
+    await inventarioPage.goToSubModule(InventarioPage.MAIN.ENTRADAS);
     iframe = page.frameLocator('iframe');
   });
 
