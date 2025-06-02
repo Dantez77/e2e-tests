@@ -3,14 +3,14 @@ import { crearCreditoFiscal } from '@helpers/crearCreditoFiscal';
 import { crearNota } from '@helpers/crearNota';
 import { busquedaDoc } from '@helpers/busquedaDoc';
 import credentials from '@config/credentials.js';
-import { login } from '@helpers/login.js';
+import { LoginPage } from '@POM/loginPage';
+import { VentasPage } from '@POM/ventasPage';
 
-// REQUIERE PARA FUNCIONAR: Creacion previa de credito fiscal. crearCreditoFiscal(page, iframe);
 test.describe('Nota de Crédito', () => {
   let page;
   let context;
   let iframe;
-  let numeroCFF = '';
+  let numeroCFF;
   let documentValue;
   const tipoPago = 'Contado';
   const tipoNota = 'Nota de crédito';
@@ -20,23 +20,22 @@ test.describe('Nota de Crédito', () => {
     page = await context.newPage();
     iframe = page.frameLocator('iframe');
 
-    // Login and navigate to Modulo Ventas
-    await test.step('Login and navigate to Modulo Ventas', async () => {
-      await login(page, credentials);
-      const ventasBtn = page.getByRole('link', { name: 'btn-moduloVentas' });
-      await expect(ventasBtn).toBeVisible();
-      await ventasBtn.click();
+    // Login 
+    await test.step('Login', async () => {
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
     });
 
-    // Crear un Credito Fiscal y una Nota de Crédito asociada
-    numeroCFF = await crearCreditoFiscal(page, iframe, tipoPago);
-    documentValue = await crearNota(page, iframe, numeroCFF, tipoNota);
+    await test.step('Crear credito', async () => {
+      const ventasPage = new VentasPage(page);
+      await ventasPage.goToSubModule(VentasPage.MAIN.CREDITO_FISCAL);
+      numeroCFF = await crearCreditoFiscal(page, iframe, tipoPago);
+    });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
-    await page.getByRole('link', { name: 'Nota de crédito', exact: true }).click();
+    const ventasPage = new VentasPage(page);
+    await ventasPage.goToSubModule(VentasPage.MAIN.NOTA_DE_CREDITO);
     iframe = page.frameLocator('iframe');
   });
 
@@ -45,7 +44,12 @@ test.describe('Nota de Crédito', () => {
     await context.close();
   });
 
-  test('Validando Creación de Nota de Crédito', async () => {
+  test('Creación de Nota de Crédito', async () => {
+    documentValue = await crearNota(page, iframe, numeroCFF, tipoNota);
+    await expect(iframe.locator('.mbsc-toast')).toHaveText('Documento aplicado correctamente');
+  });
+
+  test('Buscar Nota de Crédito', async () => {
     await iframe.getByRole('button', { name: 'Buscar documento' }).click();
     await busquedaDoc(page, iframe, documentValue);
     await expect(iframe.getByRole('cell', { name: documentValue })).toBeVisible();

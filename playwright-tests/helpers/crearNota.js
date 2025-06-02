@@ -10,9 +10,9 @@
  */
 
 async function crearNota(page, iframeElement, numeroCFF, tipoNota) {
-  await page.getByRole('link', { name: tipoNota, exact: true }).click();
+  //await page.getByRole('link', { name: tipoNota, exact: true }).click();
 
-  await page.waitForTimeout(500);
+//  await page.waitForTimeout(500);
 
 
   await iframeElement.getByRole('textbox', { name: 'Cliente:' }).click();

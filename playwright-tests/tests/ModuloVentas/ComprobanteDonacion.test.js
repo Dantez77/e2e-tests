@@ -2,6 +2,8 @@ import { test, expect } from '@playwright/test';
 import credentials from '@config/credentials.js';
 import { login } from '@helpers/login.js';
 import { busquedaDoc } from '@helpers/busquedaDoc';
+import { LoginPage } from '@POM/loginPage';
+import { VentasPage } from '@POM/ventasPage';
 
 //REQUIERE DOCUMENTO DE DONACION DN DE DE NUMERACION DE DOCUMENTOS POR SUCURSAL
 
@@ -15,14 +17,17 @@ test.describe('Comprobante de Donación', () => {
     context = await browser.newContext();
     page = await context.newPage();
     iframe = page.frameLocator('iframe');
-    await login(page, credentials);
-    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
+
+    // Login and navigate to Modulo Ventas
+    await test.step('Login', async () => {
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
+    });
   });
 
-  test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
-    await page.getByRole('link', { name: 'Comprobante de donación', exact: true }).click();
+  test.beforeEach(async () => {    
+    const ventasPage = new VentasPage(page);
+    await ventasPage.goToSubModule(VentasPage.MAIN.COMPROBANTE_DONACION);
     iframe = page.frameLocator('iframe');
   });
 

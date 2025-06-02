@@ -1,9 +1,20 @@
 class VentasPage {
   static MAIN = {
     CLIENTES: 'clientes',
+    COMPROBANTE_DONACION: 'comprobanteDedonacion',
+    COTIZACION: 'cotizacion',
+    CREDITO_FISCAL: 'creditoFiscal',
+    FACTURA: 'factura',
+    FACTURA_EXPORTACION: 'facturaExportacion',
+    GRUPOS_CLIENTES: 'gruposClientes',
+    NOTA_DE_CREDITO: 'notaDeCredito',
+    NOTA_DE_DEBITO: 'notaDeDebito',
+    PRODUCTOS: 'productos',
+    SUCURSALES: 'sucursales',
+    VENDEDORES: 'vendedores'
   };
   
-  static INFORMES = {
+  static INFORMES = { 
     CLIENTES_POR_CODIGO: 'clientesPorCodigo',
     DETALLE_DE_VENTAS_POR_DIA: 'detalleDeVentasPorDia',
     FACTURAS_PENDIENTES_DE_COBRO: 'facturasPendientesDeCobro',
@@ -37,9 +48,18 @@ class VentasPage {
       configuraciones: page.getByRole('button', { name: 'Configuración', exact: true }),
 
       //SubModulos
-      //TODO: Fill out all the options
       clientes: page.getByRole('link', { name: 'Clientes', exact: true }),
-
+      comprobanteDedonacion: page.getByRole('link', { name: 'Comprobante de donación', exact: true}),
+      cotizacion: page.getByRole('link', { name: 'Cotización', exact: true }),
+      creditoFiscal: page.getByRole('link', { name: 'Crédito fiscal', exact: true }),
+      factura: page.getByRole('link', { name: 'Factura', exact: true }),
+      facturaExportacion: page.getByRole('link', { name: 'Factura de exportación', exact: true }),
+      gruposClientes: page.getByRole('link', { name: 'Grupos de clientes', exact: true }),
+      notaDeCredito: page.getByRole('link', { name: 'Nota de crédito', exact: true }),
+      notaDeDebito: page.getByRole('link', { name: 'Nota de débito', exact: true }),
+      productos: page.getByRole('link', { name: 'Productos', exact: true }),
+      sucursales: page.getByRole('link', { name: 'Sucursales', exact: true }),
+      vendedores: page.getByRole('link', { name: 'Vendedores', exact: true }),
     };
 
     this.informes = {

@@ -1,28 +1,30 @@
 import { test, expect } from '@playwright/test';
 import credentials from '@config/credentials.js';
-import { login } from '@helpers/login.js';
+import { LoginPage } from '@POM/loginPage';
+import { VentasPage } from '@POM/ventasPage';
 
 test.describe.serial('Factura de Exportación', () => {
   let page;
   let context;
   let iframe;
-  let documentValue;
+  let numeroFE;
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
     iframe = page.frameLocator('iframe');
+
+    // Login 
     await test.step('Login', async () => {
-      await login(page, credentials);
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
     });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    const ventasBtn = page.getByRole('link', { name: 'btn-moduloVentas' });
-    await expect(ventasBtn).toBeVisible();
-    await ventasBtn.click();
-    await page.getByRole('link', { name: 'Factura de exportación', exact: true }).click();
+    const ventasPage = new VentasPage(page);
+    await ventasPage.goToSubModule(VentasPage.MAIN.FACTURA_EXPORTACION);
+    iframe = page.frameLocator('iframe');
   });
 
   test.afterAll(async () => {
@@ -31,8 +33,7 @@ test.describe.serial('Factura de Exportación', () => {
   });
 
   test('Crear Factura de exportacion', async () => {
-    await page.waitForTimeout(500);
-    documentValue = await iframe.locator('input#coddoc').inputValue();
+    numeroFE = await iframe.locator('input#coddoc').inputValue();
 
     await iframe.getByRole('textbox', { name: 'Cliente:' }).click();
     await iframe.locator('[role="option"][data-index="0"]').click();
@@ -66,18 +67,18 @@ test.describe.serial('Factura de Exportación', () => {
     // Verificar que fue creado
     await iframe.getByRole('button', { name: 'Buscar documento' }).click();
     await iframe.getByRole('button', { name: 'Por número' }).click();
-    await iframe.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+    await iframe.getByRole('textbox', { name: 'Num. Documento' }).fill(numeroFE);
     await iframe.getByRole('button', { name: 'Buscar', exact: true }).click();
-    await expect(iframe.getByRole('cell', { name: documentValue })).toBeVisible();
+    await expect(iframe.getByRole('cell', { name: numeroFE })).toBeVisible();
   });
 
   test('Editar Factura de exportacion', async () => {
     // Buscar el documento creado previamente
     await iframe.getByRole('button', { name: 'Buscar documento' }).click();
     await iframe.getByRole('button', { name: 'Por número' }).click();
-    await iframe.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+    await iframe.getByRole('textbox', { name: 'Num. Documento' }).fill(numeroFE);
     await iframe.getByRole('button', { name: 'Buscar', exact: true }).click();
-    await iframe.getByRole('cell', { name: documentValue }).click();
+    await iframe.getByRole('cell', { name: numeroFE }).click();
 
     await iframe.getByRole('textbox', { name: 'Vendedor:' }).click();
     await iframe.locator('[role="option"][data-index="0"]').click();
@@ -87,10 +88,10 @@ test.describe.serial('Factura de Exportación', () => {
     // Verificar que el documento fue editado
     await iframe.getByRole('button', { name: 'Buscar documento' }).click();
     await iframe.getByRole('button', { name: 'Por número' }).click();
-    await iframe.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+    await iframe.getByRole('textbox', { name: 'Num. Documento' }).fill(numeroFE);
     await iframe.getByRole('button', { name: 'Buscar', exact: true }).click();
     await expect(
-      iframe.getByRole('row', { name: documentValue }).getByRole('cell', { name: 'John Doe' })
+      iframe.getByRole('row', { name: numeroFE }).getByRole('cell', { name: 'John Doe' })
     ).toBeVisible();
   });
 
@@ -99,18 +100,18 @@ test.describe.serial('Factura de Exportación', () => {
     await iframe.getByRole('button', { name: 'Anular Documento' }).click();
 
     await iframe.getByRole('button', { name: 'Por número' }).click();
-    await iframe.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
-    await iframe.getByRole('cell', { name: documentValue }).click();
+    await iframe.getByRole('textbox', { name: 'Num. Documento' }).fill(numeroFE);
+    await iframe.getByRole('cell', { name: numeroFE }).click();
     await iframe.locator('#btnConfirmNull').click();
     await iframe.getByRole('button', { name: 'Si - proceder' }).click();
 
     // Confirmar que fue anulado
     await iframe.getByRole('button', { name: 'Buscar documento' }).click();
     await iframe.getByRole('button', { name: 'Por número' }).click();
-    await iframe.getByRole('textbox', { name: 'Num. Documento' }).fill(documentValue);
+    await iframe.getByRole('textbox', { name: 'Num. Documento' }).fill(numeroFE);
     await iframe.getByRole('button', { name: 'Buscar', exact: true }).click();
     await expect(
-      iframe.getByRole('row', { name: documentValue }).getByRole('cell', { name: 'John Doe' })
+      iframe.getByRole('row', { name: numeroFE }).getByRole('cell', { name: 'John Doe' })
     ).toHaveCount(0);
   });
 

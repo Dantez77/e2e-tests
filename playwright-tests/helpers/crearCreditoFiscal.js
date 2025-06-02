@@ -7,9 +7,7 @@
  */
 async function crearCreditoFiscal(page, iframe, tipoPago) {
   let documentValue = undefined;
-  try {
-    await page.getByRole('link', { name: 'Crédito fiscal' }).click();
-    
+  try {    
     await iframe.getByRole('button', { name: 'Agregar' }).click();
     
     await iframe.getByRole('textbox', { name: 'Cliente:' }).click();

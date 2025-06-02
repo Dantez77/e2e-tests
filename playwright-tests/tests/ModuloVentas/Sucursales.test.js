@@ -1,26 +1,31 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { LoginPage } from '@POM/loginPage';
+import { VentasPage } from '@POM/ventasPage';
 
 test.describe('Sucursales', () => {
   let page;
   let context;
-  let iframeElement;
+  let iframe;
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    iframeElement = page.frameLocator('iframe');
-    await login(page, credentials);
-    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
+    iframe = page.frameLocator('iframe');
+
+    // Login 
+    await test.step('Login', async () => {
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
+    });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
-    await page.getByRole('link', { name: 'Sucursales', exact: true }).click();
-    iframeElement = page.frameLocator('iframe');
+    const ventasPage = new VentasPage(page);
+    await ventasPage.goToSubModule(VentasPage.MAIN.SUCURSALES);
+    iframe = page.frameLocator('iframe');
   });
+
 
   test.afterAll(async () => {
     await page.close();

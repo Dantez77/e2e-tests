@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test';
 import { crearFactura } from '@helpers/crearFactura';
 import { busquedaDoc } from '@helpers/busquedaDoc';
 import credentials from '@config/credentials.js';
-import { login } from '@helpers/login.js';
+import { LoginPage } from '@POM/loginPage';
+import { VentasPage } from '@POM/ventasPage';
 
 test.describe.serial('Factura', () => {
   let page;
@@ -15,18 +16,16 @@ test.describe.serial('Factura', () => {
     page = await context.newPage();
     iframe = page.frameLocator('iframe');
 
-    // Login
+    // Login 
     await test.step('Login', async () => {
-      await login(page, credentials);
-
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
     });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    const ventasBtn = page.getByRole('link', { name: 'btn-moduloVentas' });
-    await expect(ventasBtn).toBeVisible();
-    await ventasBtn.click(); await page.getByRole('link', { name: 'Factura', exact: true }).click();
+    const ventasPage = new VentasPage(page);
+    await ventasPage.goToSubModule(VentasPage.MAIN.FACTURA);
     iframe = page.frameLocator('iframe');
   });
 

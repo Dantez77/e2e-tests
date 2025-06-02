@@ -1,34 +1,30 @@
 import { test, expect } from '@playwright/test';
 import credentials from '@config/credentials.js';
-import { login } from '@helpers/login.js';
+import { LoginPage } from '@POM/loginPage';
+import { VentasPage } from '@POM/ventasPage';
 
 test.describe('Clientes', () => {
   let page;
   let context;
   let iframe;
-  let uniqueId;
-  let cliente;
+  let uniqueId = `CL-` + `${Date.now()}`.slice(-7);
+  let cliente = `Cliente ` + `${Date.now()}`.slice(-3);
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
     iframe = page.frameLocator('iframe');
-    uniqueId = `CL-` + `${Date.now()}`.slice(-7);
-    cliente = `Cliente ` + `${Date.now()}`.slice(-3);
 
-    // Login and navigate to Modulo Ventas
-    await test.step('Login and navigate to Modulo Ventas', async () => {
-      await login(page, credentials);
-      const ventasBtn = page.getByRole('link', { name: 'btn-moduloVentas' });
-      await expect(ventasBtn).toBeVisible();
-      await ventasBtn.click();
+    // Login 
+    await test.step('Login', async () => {
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
     });
   });
 
-  test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloVentas' }).click();
-    await page.getByRole('link', { name: 'Clientes', exact: true }).click();
+  test.beforeEach(async () => {    
+    const ventasPage = new VentasPage(page);
+    await ventasPage.goToSubModule(VentasPage.MAIN.CLIENTES);
     iframe = page.frameLocator('iframe');
   });
 
