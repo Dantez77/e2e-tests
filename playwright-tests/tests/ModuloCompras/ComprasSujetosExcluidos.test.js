@@ -1,23 +1,29 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { LoginPage } from '@POM/loginPage';
+import { ComprasPage } from '@POM/comprasPage';
 
 test.describe('Modulo Compras - Compras a sujetos excluidos', () => {
   let page;
   let context;
   let iframe;
+  let documentValue = '';
 
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    await login(page, credentials);
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
     iframe = page.frameLocator('iframe');
+
+    // Login 
+    await test.step('Login', async () => {
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
+    });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
+    const comprasPage = new ComprasPage(page);
+    await comprasPage.goToSubModule(ComprasPage.MAIN.COMPRAS_SUJETOS_EXCLUIDOS);
     iframe = page.frameLocator('iframe');
   });
 
@@ -27,10 +33,7 @@ test.describe('Modulo Compras - Compras a sujetos excluidos', () => {
   });
 
   test('Agregar, grabar, buscar y anular registro', async () => {
-    let documentValue = '';
-
     // Agregar item a la tabla
-    await page.getByRole('link', { name: 'Compras a sujetos excluidos' }).click();
     await test.step('Agregando Item a tabla', async () => {
       await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
       await iframe.locator('[role="option"][data-index="0"]').click();
@@ -55,7 +58,6 @@ test.describe('Modulo Compras - Compras a sujetos excluidos', () => {
       await iframe.getByRole('textbox', { name: 'Comprador', exact: true }).click();
       await iframe.locator('[role="option"][data-index="0"]').click();
       await iframe.getByRole('button', { name: 'Grabar documento' }).click();
-      // Puedes agregar aquí un expect para el toast si lo deseas
     });
 
     // Verificar registro agregado por medio de búsqueda

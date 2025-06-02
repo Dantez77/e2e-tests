@@ -1,8 +1,9 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { LoginPage } from '@POM/loginPage';
+import { ComprasPage } from '@POM/comprasPage';
 
-test.describe('Modulo Compras - Productos', () => {
+test.describe('Productos', () => {
   let page;
   let context;
   let iframe;
@@ -13,14 +14,18 @@ test.describe('Modulo Compras - Productos', () => {
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    await login(page, credentials);
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
     iframe = page.frameLocator('iframe');
+
+    // Login 
+    await test.step('Login', async () => {
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
+    });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
+    const comprasPage = new ComprasPage(page);
+    await comprasPage.goToSubModule(ComprasPage.MAIN.PRODUCTOS);
     iframe = page.frameLocator('iframe');
   });
 
@@ -30,9 +35,6 @@ test.describe('Modulo Compras - Productos', () => {
   });
 
   test('Agregar producto', async () => {
-
-    await page.getByRole('link', { name: 'Productos', exact: true }).click();
-
     await test.step('Agregando el item a la tabla', async () => {
       await iframe.getByRole('button', { name: 'Agregar' }).click();
       await iframe.getByRole('textbox', { name: 'Codigo' }).fill(uniqueId);
@@ -57,7 +59,6 @@ test.describe('Modulo Compras - Productos', () => {
   });
 
   test('Eliminar producto', async () => {
-    await page.getByRole('link', { name: 'Productos' }).click();
     // Buscar producto
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(uniqueId);
     const cellLocator = iframe.getByRole('cell', { name: uniqueId, exact: true });

@@ -1,6 +1,7 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { LoginPage } from '@POM/loginPage';
+import { ComprasPage } from '@POM/comprasPage';
 
 test.describe.serial('Numeración de documentos', () => {
   let page;
@@ -14,17 +15,16 @@ test.describe.serial('Numeración de documentos', () => {
     page = await context.newPage();
     iframe = page.frameLocator('iframe');
 
-    // Login
+    // Login 
     await test.step('Login', async () => {
-      await login(page, credentials);
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
     });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
-    await page.getByRole('button', { name: 'Configuración', exact: true }).click();
-    await page.getByText('Numeración de documentos').click();
+    const comprasPage = new ComprasPage(page);
+    await comprasPage.goToConfiguraciones(ComprasPage.CONFIGURACIONES.NUMERACION_DE_DOCUMENTOS);
     iframe = page.frameLocator('iframe');
   });
 
@@ -56,7 +56,7 @@ test.describe.serial('Numeración de documentos', () => {
 
   test.fixme('Editar Numeracion', async () => {
     //EDITAR SERIE Y VERIFICAR
-    nuevaSerie = 'SERIEEDITADA'
+    nuevaSerie = 'SERIE_EDITADA'
 
     await iframe.getByRole('textbox', { name: 'Sucursal:' }).click();
     await iframe.locator('[role="option"][data-index="0"]').click();
@@ -77,7 +77,7 @@ test.describe.serial('Numeración de documentos', () => {
     await iframe.getByRole('row', { name: 'Factura Sujeto Excluido FS' })
       .getByRole('button').click(); //Boton delete
 
-    // TODO: Terminar la funcionalidad de este test. 
+    // TODO:
     // Cuando se escribio este test, aun faltaba funcinabilidad 
     // Terminar una vez se comprueba que sirve
     await page.locator('iframe').contentFrame().getByText('Arrastre su archivo al área').click();

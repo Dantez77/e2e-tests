@@ -1,6 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { LoginPage } from '@POM/loginPage';
+import { ComprasPage } from '@POM/comprasPage';
 
 test.describe('Compras Locales', () => {
   let page;
@@ -12,14 +13,18 @@ test.describe('Compras Locales', () => {
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    await login(page, credentials);
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
     iframe = page.frameLocator('iframe');
+
+    // Login 
+    await test.step('Login', async () => {
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
+    });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
+    const comprasPage = new ComprasPage(page);
+    await comprasPage.goToSubModule(ComprasPage.MAIN.COMPRAS_LOCALES);
     iframe = page.frameLocator('iframe');
   });
 
@@ -50,23 +55,22 @@ test.describe('Compras Locales', () => {
   });
 
   test('Grabar documento', async () => {
-    await page.getByRole('link', { name: 'Compras locales' }).click();
     await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
     await iframe.locator('[role="option"][data-index="0"]').click();
+    await iframe.getByRole('textbox', { name: 'Factura #' }).fill(numeroFactura);
+
     await iframe.getByRole('button', { name: 'Agregar' }).click();
     await iframe.getByRole('textbox', { name: 'Item' }).click();
-    const optionLocator = iframe.locator('[role="option"][data-index="3"]');
-    await optionLocator.click();
+    await iframe.locator('[role="option"][data-index="2"]').click();
     await iframe.getByRole('spinbutton', { name: 'Costo total sin iva' }).fill('100');
     await iframe.getByRole('spinbutton', { name: 'Cantidad' }).fill('13');
     await iframe.locator('#btnConfirmAddLine').click();
-    await iframe.getByRole('textbox', { name: 'Factura #' }).fill(numeroFactura);
+
     await iframe.getByRole('button', { name: 'Grabar Documento' }).click();
     await expect(iframe.locator('.mbsc-toast')).toHaveText('Documento ha sido grabado');
   });
 
   test('Buscar documento', async () => {
-    await page.getByRole('link', { name: 'Compras locales' }).click();
     await expect(iframe.getByRole('button', { name: 'Buscar documento' })).toBeVisible();
     await iframe.getByRole('button', { name: 'Buscar documento' }).click();
     await expect(iframe.getByRole('cell', { name: 'Documento vacío' })).toBeVisible();
@@ -75,8 +79,6 @@ test.describe('Compras Locales', () => {
   });
 
   test('Anular documento', async () => {
-    await page.getByRole('link', { name: 'Compras locales' }).click();
-
     await expect(iframe.getByRole('button', { name: 'Anular documento' })).toBeVisible();
     await iframe.getByRole('button', { name: 'Anular documento' }).click();
     await iframe.getByRole('button', { name: 'Buscar' }).click();

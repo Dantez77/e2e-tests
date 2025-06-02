@@ -1,6 +1,7 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { LoginPage } from '@POM/loginPage';
+import { ComprasPage } from '@POM/comprasPage';
 
 test.describe('Compras al exterior', () => {
   let page;
@@ -13,14 +14,18 @@ test.describe('Compras al exterior', () => {
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    await login(page, credentials);
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
     iframe = page.frameLocator('iframe');
+
+    // Login 
+    await test.step('Login', async () => {
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
+    });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
+    const comprasPage = new ComprasPage(page);
+    await comprasPage.goToSubModule(ComprasPage.MAIN.COMPRAS_AL_EXTERIOR);
     iframe = page.frameLocator('iframe');
   });
 
@@ -30,8 +35,6 @@ test.describe('Compras al exterior', () => {
   });
 
   test('Agregar, grabar, buscar y anular registro de compra al exterior', async () => {
-    // Agregar item a la tabla
-    await page.getByRole('link', { name: 'Compras al exterior' }).click();
     await test.step('Agregando Item a tabla', async () => {
       await iframe.getByRole('textbox', { name: 'Proveedor', exact: true }).click();
       await iframe.locator('[role="option"][data-index="0"]').click();

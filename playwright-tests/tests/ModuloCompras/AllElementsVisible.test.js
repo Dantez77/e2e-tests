@@ -1,26 +1,27 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { LoginPage } from '@POM/loginPage';
+import { ComprasPage } from '@POM/comprasPage';
 
 test.describe('Modulo Compras - Elementos visibles', () => {
   let page;
   let context;
 
   test.beforeAll(async ({ browser }) => {
-    context = await browser.newContext();
-    page = await context.newPage();
-
-    // Login y entrar al módulo de compras
-    await login(page, credentials);
-    const comprasBtn = page.getByRole('link', { name: 'btn-moduloCompras' });
-    await expect(comprasBtn).toBeVisible();
-    await comprasBtn.click();
-  });
-
-  test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
-  });
+      context = await browser.newContext();
+      page = await context.newPage();
+  
+      // Login 
+      await test.step('Login', async () => {
+        const loginPage = new LoginPage(page);
+        await loginPage.login(credentials);
+      });
+    });
+  
+    test.beforeEach(async () => {
+      const comprasPage = new ComprasPage(page);
+      await comprasPage.goto();
+    });
 
   test.afterAll(async () => {
     await page.close();

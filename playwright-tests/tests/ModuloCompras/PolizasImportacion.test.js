@@ -1,6 +1,7 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { LoginPage } from '@POM/loginPage';
+import { ComprasPage } from '@POM/comprasPage';
 
 test.describe.serial('Pólizas de importación', () => {
   let page;
@@ -11,14 +12,18 @@ test.describe.serial('Pólizas de importación', () => {
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    await login(page, credentials);
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
     iframe = page.frameLocator('iframe');
+
+    // Login 
+    await test.step('Login', async () => {
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
+    });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
+    const comprasPage = new ComprasPage(page);
+    await comprasPage.goToSubModule(ComprasPage.MAIN.POLIZAS_DE_IMPORTACION);
     iframe = page.frameLocator('iframe');
   });
 
@@ -29,7 +34,6 @@ test.describe.serial('Pólizas de importación', () => {
 
   test('Agregar registro de póliza de importación', async () => {
     test.slow();
-    await page.getByRole('link', { name: 'Pólizas de importación' }).click();
     await expect(iframe.getByRole('button', { name: 'Agregar' })).toBeVisible();
     await iframe.getByRole('button', { name: 'Agregar' }).click();
 
@@ -48,7 +52,6 @@ test.describe.serial('Pólizas de importación', () => {
   });
 
   test('Eliminar registro de póliza de importación', async () => {
-    await page.getByRole('link', { name: 'Pólizas de importación' }).click();
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(numeroPl);
     await expect(iframe.getByRole('cell', { name: numeroPl })).toBeVisible();
 

@@ -1,6 +1,7 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { LoginPage } from '@POM/loginPage';
+import { ComprasPage } from '@POM/comprasPage';
 
 test.describe('Modulo Compras - Proveedores', () => {
   let page;
@@ -12,14 +13,18 @@ test.describe('Modulo Compras - Proveedores', () => {
   test.beforeAll(async ({ browser }) => {
     context = await browser.newContext();
     page = await context.newPage();
-    await login(page, credentials);
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
     iframe = page.frameLocator('iframe');
+
+    // Login 
+    await test.step('Login', async () => {
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
+    });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
+    const comprasPage = new ComprasPage(page);
+    await comprasPage.goToSubModule(ComprasPage.MAIN.PROVEEDORES);
     iframe = page.frameLocator('iframe');
   });
 
@@ -29,7 +34,6 @@ test.describe('Modulo Compras - Proveedores', () => {
   });
 
   test('Agregando a tabla sin llenar los campos requeridos', async () => {
-    await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
     await expect(page.getByRole('link', { name: 'Proveedores Close' })).toBeVisible();
 
     await expect(iframe.getByRole('button', { name: 'Agregar' })).toBeVisible();
@@ -48,8 +52,6 @@ test.describe('Modulo Compras - Proveedores', () => {
   });
 
   test('Agregar proveedor', async () => {
-    await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
-
     await iframe.getByRole('button', { name: 'Agregar' }).click();
     await iframe.getByRole('textbox', { name: 'Codigo' }).fill(idProveedor);
     await iframe.getByRole('textbox', { name: 'Tipo de persona' }).click();
@@ -68,7 +70,6 @@ test.describe('Modulo Compras - Proveedores', () => {
   });
 
   test('Editar proveedor', async () => {
-    await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(idProveedor);
     await expect(iframe.getByRole('cell', { name: idProveedor, exact: true })).toBeVisible();
 
@@ -82,7 +83,6 @@ test.describe('Modulo Compras - Proveedores', () => {
   });
 
   test('Eliminar proveedor', async () => {
-    await page.getByRole('link', { name: 'Proveedores', exact: true }).click();
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill(idProveedor);
     await expect(iframe.getByRole('cell', { name: idProveedor, exact: true })).toBeVisible();
 

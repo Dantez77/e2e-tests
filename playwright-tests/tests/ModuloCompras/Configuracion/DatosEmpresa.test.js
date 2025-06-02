@@ -1,6 +1,7 @@
-const { test, expect } = require('@playwright/test');
-const credentials = require('@config/credentials.js');
-const { login } = require('@helpers/login.js');
+import { test, expect } from '@playwright/test';
+import credentials from '@config/credentials.js';
+import { LoginPage } from '@POM/loginPage';
+import { ComprasPage } from '@POM/comprasPage';
 
 test.describe.serial('Datos de la empresa', () => {
   let page;
@@ -12,19 +13,19 @@ test.describe.serial('Datos de la empresa', () => {
     page = await context.newPage();
     iframe = page.frameLocator('iframe');
 
-    // Login
+    // Login 
     await test.step('Login', async () => {
-      await login(page, credentials);
+      const loginPage = new LoginPage(page);
+      await loginPage.login(credentials);
     });
   });
 
   test.beforeEach(async () => {
-    await page.goto('https://azteq.club/azteq-club/menu/menu.php');
-    await page.getByRole('link', { name: 'btn-moduloCompras' }).click();
-    await page.getByRole('button', { name: 'Configuración', exact: true }).click();
-    await page.getByText('Datos de la empresa').click();
+    const comprasPage = new ComprasPage(page);
+    await comprasPage.goToConfiguraciones(ComprasPage.CONFIGURACIONES.DATOS_DE_LA_EMPRESA);
     iframe = page.frameLocator('iframe');
   });
+
 
   test.afterAll(async () => {
     await page.close();
