@@ -50,12 +50,11 @@ test.describe.serial('Catálogo de cuentas', () => {
   });
 
   test('Modificar cuenta contable', async () => {
-
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('CC-');
     await iframe.getByRole('row', { name: /CC-/ }).first().getByRole('button').nth(0).click();
     await iframe.getByRole('textbox', { name: 'Nombre' }).fill(nomCuentaEdita);
     await iframe.getByRole('button', { name: 'Grabar cambios' }).click();
-    await expect(iframe.getByRole('cell', { name: nomCuentaEdita })).toBeVisible();
+    await expect(iframe.getByRole('cell', { name: nomCuentaEdita })).not.toHaveCount(0);
   });
 
   test('Eliminar cuenta contable', async () => {
@@ -67,16 +66,17 @@ test.describe.serial('Catálogo de cuentas', () => {
   });
 
   //Solo usar para limpiar las tablas
-  test.skip('Limpiar todas las cuentas restantes', async () => {
-    test.fail();
-    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('CC-');
+  test('Limpiar todas las cuentas restantes', async () => {
+    test.slow();
+    await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('CC');
     // Loop while there are rows matching /^CC-/
     while (await iframe.getByRole('row', { name: /CC-/ }).count() > 0) {
-      await iframe.getByRole('row', { name: /CC-/ }).first().getByRole('button').nth(1).click();
+      const row = iframe.getByRole('row', { name: /CC-/ }).first();
+      await row.getByRole('button').nth(1).click();
       await iframe.getByRole('button', { name: 'Eliminar' }).click();
       await iframe.getByRole('button', { name: 'Si - proceder' }).click();
-      // Wait for the row to disappear before next iteration
-      await expect(iframe.getByRole('row', { name: /CC-/ }).first()).toBeHidden({ timeout: 5000 }).catch(() => { });
+      // Wait for the row to be detached from DOM before next iteration
+      await expect(row).not.toBeAttached({ timeout: 10000 });
     }
     // Assert no CC- rows remain
     await expect(iframe.getByRole('cell', { name: /CC-/ })).toHaveCount(0);

@@ -3,7 +3,7 @@ import credentials from '@config/credentials.js';
 import { LoginPage } from '@POM/loginPage';
 import { InventarioPage } from '@POM/inventarioPage';
 
-test.describe.serial('Existencias por Almacén', () => {
+test.describe('Transacciones Diarias', () => {
   let page;
   let context;
   let iframe;
@@ -22,7 +22,7 @@ test.describe.serial('Existencias por Almacén', () => {
 
   test.beforeEach(async () => {
     const inventarioPage = new InventarioPage(page);
-    await inventarioPage.goToInformesYconsultas(InventarioPage.INFORMES.EXISTENCIAS_ALMACEN);
+    await inventarioPage.goToInformesYconsultas(InventarioPage.INFORMES.COSTOS_EXISTENCIAS);
     iframe = page.frameLocator('iframe');
   });
 
@@ -31,27 +31,24 @@ test.describe.serial('Existencias por Almacén', () => {
     await context.close();
   });
 
-  test('Existencias por almacén', async () => {
-    await page.waitForTimeout(2000); // Esperar a que la página cargue completamente
-    await expect(iframe.getByText('Existencias por almacén')).toBeVisible();
-
-    await iframe.getByRole('textbox', { name: 'Almacén' }).click();
+  test('Generar costos de existencias', async () => {
+    await iframe.getByRole('textbox', { name: 'Almacenes' }).click();
     await iframe.getByRole('option', { name: 'Todos los almacenes' }).click();
-    //Esc button
     await page.keyboard.press('Escape');
     await page.keyboard.press('Escape');
-    
-    await iframe.getByRole('textbox', { name: 'Línea de Productos' }).click();
+
+    await iframe.getByRole('textbox', { name: 'Líneas de Producto' }).click();
     await iframe.getByRole('option', { name: 'Todas las lineas' }).click();
 
     await page.keyboard.press('Escape');
     await page.keyboard.press('Escape');
 
-    await iframe.getByRole('textbox', { name: 'Item' }).click();
+    await iframe.getByRole('textbox', { name: 'Items' }).click();
     await iframe.getByRole('option', { name: /Todos los items/ }).click();
 
     await page.keyboard.press('Escape');
     await page.keyboard.press('Escape');
+
 
     await iframe.getByRole('button', { name: 'Salida en PDF' }).click();
     await expect(iframe.getByText('100')).toBeVisible();

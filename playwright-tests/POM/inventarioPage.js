@@ -14,6 +14,11 @@ class InventarioPage {
 
   static INFORMES = {
     EXISTENCIAS_ALMACEN: 'existenciasAlmacen',
+    RESUMEN_MOVIMIENTOS: 'resumenDeMovimientos',
+    KARDEX: 'kardex',
+    TRANSACCIONES_DIARIAS: 'transaccionesDiarias',
+    COSTOS_EXISTENCIAS: 'costosDeExistencias',
+    
   };
 
   static CONFIGURACIONES = {
@@ -35,7 +40,7 @@ class InventarioPage {
       entradas: page.getByRole('link', { name: 'Entradas', exact: true }),
       lineasDeProductos: page.getByRole('link', { name: 'Lineas de productos', exact: true }),
       marcasDeProductos: page.getByRole('link', { name: 'Marcas de productos', exact: true }),
-      salidas: page.getByRole('link', { name: 'Salidas', exact: true }),      
+      salidas: page.getByRole('link', { name: 'Salidas', exact: true }),
     };
 
     this.movimientos = {
@@ -47,6 +52,10 @@ class InventarioPage {
     this.informes = {
       comprasPorFecha: page.getByText('Compras por fecha'),
       existenciasAlmacen: page.getByText('Existencias por almacén'),
+      resumenDeMovimientos: page.getByText('Resumen de movimientos'),
+      kardex: page.getByText('Kardex'),
+      transaccionesDiarias: page.getByText('Transacciones diarias'),
+      costosDeExistencias: page.getByText('Costos de existencias'),
     };
 
     this.configuraciones = {

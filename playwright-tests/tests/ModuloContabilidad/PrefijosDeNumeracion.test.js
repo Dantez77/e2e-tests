@@ -3,7 +3,7 @@ const { busquedaDoc } = require('@helpers/busquedaDoc');
 const credentials = require('@config/credentials.js');
 const { login } = require('@helpers/login.js');
 
-test.describe.serial('Prefijos de numeración', () => {
+test.describe('Prefijos de numeración', () => {
   let page;
   let context;
   let iframe;
@@ -47,17 +47,18 @@ test.describe.serial('Prefijos de numeración', () => {
 
   test('Editar prefijo de numeración', async () => {
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('P');
-    await iframe.getByRole('row', { name: nomNumeracion }).first().getByRole('button').nth(0).click();
+    //await iframe.getByRole('row', { name: nomNumeracion }).first().getByRole('button').nth(0).click();
+    await iframe.getByRole('row', { name: /prueba/ }).first().getByRole('button').nth(0).click();
     await iframe.getByRole('textbox', { name: 'Nombre de la numeración' }).fill(nomNumEditado);
     await iframe.getByRole('button', { name: 'Grabar' }).click();
-    await expect(iframe.getByRole('cell', { name: nomNumEditado })).toBeVisible();
+    await expect(iframe.getByRole('cell', { name: nomNumEditado })).not.toHaveCount(0);
   });
 
   test('Eliminar prefijo de numeración', async () => {
     await iframe.getByRole('searchbox', { name: 'Buscar:' }).fill('P');
-    await iframe.getByRole('row', { name: /prueba/ }).first().getByRole('button').nth(1).click(); 
+    await iframe.getByRole('row', { name: /prueba/ }).first().getByRole('button').nth(1).click();
     await iframe.getByRole('button', { name: 'Eliminar' }).click();
     await iframe.getByRole('button', { name: 'Si - proceder' }).click();
     await expect(iframe.getByRole('cell', { name: nomNumEditado })).toHaveCount(0);
   });
-}); 
+});

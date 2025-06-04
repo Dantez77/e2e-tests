@@ -3,7 +3,7 @@ import credentials from '@config/credentials.js';
 import { LoginPage } from '@POM/loginPage';
 import { InventarioPage } from '@POM/inventarioPage';
 
-test.describe.serial('Existencias por Almacén', () => {
+test.describe.serial('Resumen de Movimientos', () => {
   let page;
   let context;
   let iframe;
@@ -22,7 +22,7 @@ test.describe.serial('Existencias por Almacén', () => {
 
   test.beforeEach(async () => {
     const inventarioPage = new InventarioPage(page);
-    await inventarioPage.goToInformesYconsultas(InventarioPage.INFORMES.EXISTENCIAS_ALMACEN);
+    await inventarioPage.goToInformesYconsultas(InventarioPage.INFORMES.RESUMEN_MOVIMIENTOS);
     iframe = page.frameLocator('iframe');
   });
 
@@ -31,25 +31,14 @@ test.describe.serial('Existencias por Almacén', () => {
     await context.close();
   });
 
-  test('Existencias por almacén', async () => {
-    await page.waitForTimeout(2000); // Esperar a que la página cargue completamente
-    await expect(iframe.getByText('Existencias por almacén')).toBeVisible();
-
-    await iframe.getByRole('textbox', { name: 'Almacén' }).click();
-    await iframe.getByRole('option', { name: 'Todos los almacenes' }).click();
-    //Esc button
-    await page.keyboard.press('Escape');
-    await page.keyboard.press('Escape');
-    
-    await iframe.getByRole('textbox', { name: 'Línea de Productos' }).click();
-    await iframe.getByRole('option', { name: 'Todas las lineas' }).click();
-
+  test('Generar resumen de movimientos', async () => {
+    await iframe.getByRole('textbox', { name: 'Producto' }).first().click();
+    await iframe.getByRole('option', { name: /001/ }).click();
     await page.keyboard.press('Escape');
     await page.keyboard.press('Escape');
 
-    await iframe.getByRole('textbox', { name: 'Item' }).click();
-    await iframe.getByRole('option', { name: /Todos los items/ }).click();
-
+    await iframe.getByRole('textbox', { name: 'Línea de producto' }).first().click();
+    await iframe.locator('[role="option"][data-index="0"]').click();
     await page.keyboard.press('Escape');
     await page.keyboard.press('Escape');
 
