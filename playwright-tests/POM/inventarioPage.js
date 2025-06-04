@@ -6,8 +6,14 @@ class InventarioPage {
     MARCAS_DE_PRODUCTOS: 'marcasDeProductos',
   };
 
+  static MOVIMIENTOS = {
+    TRANSFERENCIA_ALMACENES: 'transferenciaEntreAlmacenes',
+    ALIMENTAR_CONTEO: 'alimentarConteo',
+    GENERAR_AJUSTES_CONTEO: 'generarAjustarConteo',
+  };
+
   static INFORMES = {
-    
+    EXISTENCIAS_ALMACEN: 'existenciasAlmacen',
   };
 
   static CONFIGURACIONES = {
@@ -21,6 +27,7 @@ class InventarioPage {
     this.moduloCompras = page.getByRole('link', { name: 'btn-moduloInventario' });
 
     this.main = {
+      movimientos: page.getByRole('button', { name: 'Movimientos', exact: true }),
       informesConsultas: page.getByRole('button', { name: 'Informes y consultas', exact: true }),
       configuraciones: page.getByRole('button', { name: 'Configuración', exact: true }),
 
@@ -31,9 +38,15 @@ class InventarioPage {
       salidas: page.getByRole('link', { name: 'Salidas', exact: true }),      
     };
 
+    this.movimientos = {
+      transferenciaEntreAlmacenes: page.getByText('Transferencia entre almacenes'),
+      alimentarConteo: page.getByText('Alimentar conteo físico'),
+      generarAjustarConteo: page.getByText('Generar ajustes de conteo físico'),
+    };
+
     this.informes = {
       comprasPorFecha: page.getByText('Compras por fecha'),
-
+      existenciasAlmacen: page.getByText('Existencias por almacén'),
     };
 
     this.configuraciones = {
@@ -49,6 +62,12 @@ class InventarioPage {
   async goToSubModule(nombre) {
     await this.goto();
     await this.main[nombre].click();
+  }
+
+  async goToMovimientos(nombre) {
+    await this.goto();
+    await this.main.movimientos.click();
+    await this.movimientos[nombre].click();
   }
 
   async goToConfiguraciones(nombre) {
