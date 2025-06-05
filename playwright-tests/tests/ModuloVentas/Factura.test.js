@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import { crearFactura } from '@helpers/crearFactura';
-import { busquedaDoc } from '@helpers/busquedaDoc';
 import credentials from '@config/credentials.js';
 import { LoginPage } from '@POM/loginPage';
 import { VentasPage } from '@POM/ventasPage';

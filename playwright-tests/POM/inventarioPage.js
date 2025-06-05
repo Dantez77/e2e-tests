@@ -18,7 +18,8 @@ class InventarioPage {
     KARDEX: 'kardex',
     TRANSACCIONES_DIARIAS: 'transaccionesDiarias',
     COSTOS_EXISTENCIAS: 'costosDeExistencias',
-    
+    EXISTENCIAS_POR_ITEM: 'existenciasPorItem',
+    CONSULTA_EXISTENCIAS_PRODUCTO: 'consultaExistenciasProducto',
   };
 
   static CONFIGURACIONES = {
@@ -56,6 +57,8 @@ class InventarioPage {
       kardex: page.getByText('Kardex'),
       transaccionesDiarias: page.getByText('Transacciones diarias'),
       costosDeExistencias: page.getByText('Costos de existencias'),
+      existenciasPorItem: page.getByText('Existencias por item'),
+      consultaExistenciasProducto: page.getByText('Consulta de existencias por producto'),
     };
 
     this.configuraciones = {
